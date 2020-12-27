@@ -79,4 +79,5 @@ func core(
 func init() {
 	logger = zap.New(zapcore.NewTee(core(config())), zap.AddCaller(), zap.AddCallerSkip(1))
 	defer logger.Sync()
+	logger.Debug("日志系统初始化成功")
 }
