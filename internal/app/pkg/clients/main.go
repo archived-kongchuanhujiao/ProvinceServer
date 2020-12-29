@@ -4,6 +4,7 @@ import (
 	"coding.net/kongchuanhujiao/server/internal/app/internal/clients"
 	"coding.net/kongchuanhujiao/server/internal/app/internal/clients/dingtalk"
 	"coding.net/kongchuanhujiao/server/internal/app/internal/clients/qq"
+	"coding.net/kongchuanhujiao/server/internal/pkg/configs"
 )
 
 const (
@@ -18,6 +19,11 @@ var (
 
 // NewClients 新建客户端
 func NewClients() {
+
+	conf := configs.GetConfigs()
+
+	qqClient = qq.NewQQClient(conf.QQNumber, conf.QQPassword)
+	dingTalkClient = dingtalk.NewDingTalkClient()
 
 }
 

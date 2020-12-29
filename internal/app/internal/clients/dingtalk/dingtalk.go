@@ -6,8 +6,8 @@ import "coding.net/kongchuanhujiao/server/internal/app/internal/clients"
 type DingTalk struct{}
 
 // NewDingTalkClient 新建 钉钉 客户端
-func NewDingTalkClient() {
-
+func NewDingTalkClient() (d *DingTalk) {
+	return
 }
 
 func (q *DingTalk) SendMessage(message *clients.Message) {

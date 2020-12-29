@@ -2,6 +2,7 @@ package qq
 
 import (
 	"github.com/Mrs4s/MiraiGo/client"
+	"github.com/Mrs4s/MiraiGo/message"
 	"go.uber.org/zap"
 )
 
@@ -57,12 +58,36 @@ func (q *QQ) login() (err error) {
 	return
 }
 
+// receiveGroupMessage 接收群消息
+func (q *QQ) receiveGroupMessage(_ *client.QQClient, m *message.GroupMessage) {
+	q.ReceiveMessage(nil)
+}
+
+// receiveFriendMessage 接收好友消息
+func (q *QQ) receiveFriendMessage(_ *client.QQClient, m *message.PrivateMessage) {
+	q.ReceiveMessage(nil)
+}
+
 // setEventHandle 设置事件处理器
 func (q *QQ) setEventHandle() {
 
 	// 更新服务器
-	q.client.OnServerUpdated(func(q *client.QQClient, e *client.ServerUpdatedEvent) bool {
+	q.client.OnServerUpdated(func(_ *client.QQClient, e *client.ServerUpdatedEvent) bool {
 		loggerr.Warn("更新服务器", zap.Any("信息", e.Servers))
 		return true
+	})
+
+	// 断线重连
+	q.client.OnDisconnected(func(_ *client.QQClient, e *client.ClientDisconnectedEvent) {
+		for {
+
+			loggerr.Warn("连接丢失，重连中...")
+			if err := q.login(); err != nil {
+				loggerr.Warn("重登录失败，再次尝试中...", zap.Error(err))
+				continue
+			}
+
+			return
+		}
 	})
 }

@@ -12,7 +12,7 @@ var loggerr = logger.Named("QQ客户端") // loggerr 日志
 
 // QQ QQ 客户端
 type QQ struct {
-	client *client.QQClient // client 客户端
+	client *client.QQClient // 客户端
 }
 
 // NewQQClient 新建 QQ 客户端
