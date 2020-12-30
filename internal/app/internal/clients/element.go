@@ -1,16 +1,20 @@
 package clients
 
 type (
+	// Text 文本
 	Text struct {
 		Content string // 内容
 	}
 
+	// At @
 	At struct {
 		Target uint64 // 目标
 	}
 
+	// Image 图片
 	Image struct {
-		URL string // 统一资源定位器
+		URL  string // 统一资源定位器
+		Data []byte // 数据
 	}
 )
 

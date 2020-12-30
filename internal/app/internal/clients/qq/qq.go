@@ -32,7 +32,13 @@ func NewQQClient(a uint64, p string) (q *QQ) {
 }
 
 func (q *QQ) SendMessage(message *clients.Message) {
-
+	ms := q.transformToMiraiGO(message)
+	if message.Target.Group == nil {
+		q.client.SendGroupMessage(int64(message.Target.Group.ID), ms)
+	} else {
+		q.client.SendPrivateMessage(int64(message.Target.ID), ms)
+	}
+	loggerr.Info("发送群消息", zap.Any("消息", message.Chain))
 }
 
 func (q *QQ) ReceiveMessage(message *clients.Message) {

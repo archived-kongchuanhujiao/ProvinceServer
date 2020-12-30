@@ -10,11 +10,11 @@ type (
 	Message struct {
 		Client string    // 客户端
 		Chain  []Element // 消息链
-		Sender *Sender   // 发送者
+		Target *Target   // 目标
 	}
 
-	// Sender 发送者
-	Sender struct {
+	// Target 目标
+	Target struct {
 		ID    uint64 // 唯一识别码
 		Name  string // 名称
 		Group *Group // 群
