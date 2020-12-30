@@ -1,6 +1,8 @@
 package qq
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/app/internal/clients"
+
 	"github.com/Mrs4s/MiraiGo/client"
 	"github.com/Mrs4s/MiraiGo/message"
 	"go.uber.org/zap"
@@ -58,14 +60,48 @@ func (q *QQ) login() (err error) {
 	return
 }
 
+// transformChain 转化消息链
+func (q *QQ) transformChain(ms *clients.Message, m []message.IMessageElement) {
+	for _, v := range m {
+		switch e := v.(type) {
+		case *message.TextElement:
+			ms.Chain = append(ms.Chain, &clients.Text{Content: e.Content})
+		case *message.AtElement:
+			ms.Chain = append(ms.Chain, &clients.At{Target: uint64(e.Target)})
+		case *message.ImageElement:
+			ms.Chain = append(ms.Chain, &clients.Image{URL: e.Url})
+		}
+	}
+}
+
 // receiveGroupMessage 接收群消息
 func (q *QQ) receiveGroupMessage(_ *client.QQClient, m *message.GroupMessage) {
-	q.ReceiveMessage(nil)
+
+	ms := &clients.Message{
+		Client: clients.QQClient,
+		Chain:  []clients.Element{},
+		Sender: &clients.Sender{
+			ID:    uint64(m.Sender.Uin),
+			Name:  m.Sender.DisplayName(),
+			Group: &clients.Group{ID: uint64(m.GroupCode), Name: m.GroupName},
+		},
+	}
+
+	q.transformChain(ms, m.Elements)
+	q.ReceiveMessage(ms)
 }
 
 // receiveFriendMessage 接收好友消息
 func (q *QQ) receiveFriendMessage(_ *client.QQClient, m *message.PrivateMessage) {
-	q.ReceiveMessage(nil)
+
+	ms := &clients.Message{
+		Client: clients.QQClient,
+		Chain:  []clients.Element{},
+		Sender: &clients.Sender{ID: uint64(m.Sender.Uin), Name: m.Sender.DisplayName()},
+	}
+
+	q.transformChain(ms, m.Elements)
+	q.ReceiveMessage(ms)
 }
 
 // setEventHandle 设置事件处理器

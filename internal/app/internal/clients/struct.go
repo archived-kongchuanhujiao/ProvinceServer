@@ -1,10 +1,15 @@
 package clients
 
+const (
+	QQClient       = "qq"       // QQClient QQ 客户端
+	DingTalkClient = "dingtalk" // DingTalkClient 钉钉 客户端
+)
+
 type (
 	// Message 消息
 	Message struct {
 		Client string    // 客户端
-		Chain  []*string // 消息链
+		Chain  []Element // 消息链
 		Sender *Sender   // 发送者
 	}
 
