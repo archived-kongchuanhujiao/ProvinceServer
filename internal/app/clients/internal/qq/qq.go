@@ -35,7 +35,7 @@ func NewQQClient(a uint64, p string) (q *QQ) {
 
 func (q *QQ) SendMessage(m *clientspublic.Message) {
 	ms := q.transformToMiraiGO(m)
-	if m.Target.Group == nil {
+	if m.Target.Group != nil {
 		q.client.SendGroupMessage(int64(m.Target.Group.ID), ms)
 	} else {
 		q.client.SendPrivateMessage(int64(m.Target.ID), ms)
