@@ -9,9 +9,11 @@ import (
 
 var loggerr = logger.Named("钉钉客户端") // loggerr 日志
 
-// DingTalk QQ 客户端
+// DingTalk 钉钉 客户端
 type DingTalk struct {
-	callback clientspublic.Callback // 回调
+	AccessToken string                 // AccessToken
+	Secret      string                 // Secret
+	callback    clientspublic.Callback // 回调
 }
 
 // NewDingTalkClient 新建 钉钉 客户端
