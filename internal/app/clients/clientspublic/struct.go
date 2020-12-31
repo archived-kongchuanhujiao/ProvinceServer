@@ -1,4 +1,4 @@
-package clients
+package clientspublic
 
 const (
 	QQClient       = "qq"       // QQClient QQ 客户端
@@ -6,6 +6,8 @@ const (
 )
 
 type (
+	Callback func(*Message) // Callback 回调
+
 	// Message 消息
 	Message struct {
 		Client string    // 客户端

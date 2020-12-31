@@ -20,7 +20,7 @@ type Configs struct {
 func GetConfigs() (c *Configs) {
 	n, err := strconv.ParseUint(os.Getenv("KQQNum"), 10, 64)
 	if err != nil {
-		logger.Panic("无法读取配置信息")
+		logger.Panic("无法读取配置信息", zap.Error(err))
 	}
 
 	c = &Configs{n, os.Getenv("KQQPWA"), os.Getenv("KDBURL")}
