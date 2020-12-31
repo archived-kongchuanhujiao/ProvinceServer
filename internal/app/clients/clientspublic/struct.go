@@ -10,7 +10,7 @@ type (
 
 	// Message 消息
 	Message struct {
-		Client string    // 客户端
+		Client Client    // 客户端
 		Chain  []Element // 消息链
 		Target *Target   // 目标
 	}

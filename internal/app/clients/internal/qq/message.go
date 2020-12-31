@@ -25,7 +25,7 @@ func (q *QQ) transformToChain(ms *clientspublic.Message, m []message.IMessageEle
 func (q *QQ) receiveGroupMessage(_ *client.QQClient, m *message.GroupMessage) {
 
 	ms := &clientspublic.Message{
-		Client: clientspublic.QQClient,
+		Client: q,
 		Chain:  []clientspublic.Element{},
 		Target: &clientspublic.Target{
 			ID:    uint64(m.Sender.Uin),
@@ -42,7 +42,7 @@ func (q *QQ) receiveGroupMessage(_ *client.QQClient, m *message.GroupMessage) {
 func (q *QQ) receiveFriendMessage(_ *client.QQClient, m *message.PrivateMessage) {
 
 	ms := &clientspublic.Message{
-		Client: clientspublic.QQClient,
+		Client: q,
 		Chain:  []clientspublic.Element{},
 		Target: &clientspublic.Target{ID: uint64(m.Sender.Uin), Name: m.Sender.DisplayName()},
 	}
