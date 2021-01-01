@@ -4,6 +4,10 @@ import (
 	"coding.net/kongchuanhujiao/server/internal/app/clients/clientspublic"
 )
 
+type IDTMessage interface {
+	Name() string
+}
+
 // DTMessage 钉钉消息结构
 // 消息结构详见: https://ding-doc.dingtalk.com/doc#/serverapi2/ye8tup/1babf232
 type DTMessage struct {
@@ -71,14 +75,18 @@ type Btn struct {
 	ActionURL string `json:"actionURL"`
 }
 
-// Response 错误时的响应结构体
-type Response struct {
+// ErrResponse 错误时的响应结构体
+type ErrResponse struct {
 	ErrMsg  string `json:"errmsg"`
 	ErrCode int64  `json:"errcode"`
 }
 
-func (d *DingTalk) transformToChain(ms *clientspublic.Message, m interface{}) {
+// 实现方法
+func (d DTMessage) Name() string   { return "DTMessage" }
+func (d DTPlainText) Name() string { return "DTPlainText" }
+func (d DTMarkdown) Name() string  { return "DTMarkdown" }
 
+func (d *DingTalk) transformToChain(ms *clientspublic.Message, m IDTMessage) {
 	switch e := m.(type) {
 	case DTPlainText:
 		ms.Chain = append(ms.Chain, &clientspublic.Text{Content: e.Text.Content})
@@ -93,4 +101,33 @@ func (d *DingTalk) transformToChain(ms *clientspublic.Message, m interface{}) {
 	}
 
 	// @TODO Parse to clientspublic.Image
+}
+
+func (d *DingTalk) transformToDTMessage(ms *clientspublic.Message) IDTMessage {
+	var result IDTMessage
+
+	for _, v := range ms.Chain {
+		switch e := v.(type) {
+		case *clientspublic.Text:
+			if result == nil {
+				result = DTPlainText{
+					DTMessage: DTMessage{},
+					Text:      Text{Content: e.Content},
+				}
+			}
+		case *clientspublic.At:
+			if result != nil {
+				switch r := result.(type) {
+				case DTMessage:
+					r.At.AtUsers = append(r.At.AtUsers, e.Target)
+				case DTPlainText:
+					r.At.AtUsers = append(r.At.AtUsers, e.Target)
+				case DTMarkdown:
+					r.At.AtUsers = append(r.At.AtUsers, e.Target)
+				}
+			}
+		}
+	}
+
+	return result
 }
