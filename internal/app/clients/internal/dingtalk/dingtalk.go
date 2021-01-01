@@ -23,7 +23,7 @@ func NewDingTalkClient() (d *DingTalk) {
 }
 
 func (d *DingTalk) SendMessage(m *clientspublic.Message) {
-	d.SendMessage(m)
+	SendDTMessage(d, m)
 	loggerr.Info("发送群消息", zap.Any("消息", m.Chain))
 }
 

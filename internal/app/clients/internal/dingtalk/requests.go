@@ -16,7 +16,7 @@ var (
 	sendMsg = "robot/send?access_token="
 )
 
-func sendMessage(c *DingTalk, m *clientspublic.Message) bool {
+func SendDTMessage(c *DingTalk, m *clientspublic.Message) bool {
 	json, err := json2.Marshal(c.transformToDTMessage(m))
 
 	if err != nil {
