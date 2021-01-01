@@ -30,7 +30,9 @@ func sendMessage(c *DingTalk, m *clientspublic.Message) bool {
 }
 
 func request(c *DingTalk, subUrl string, json []byte) (errRes ErrResponse, ok bool) {
-	req, err := http.NewRequest(http.MethodPost, mainAPI+subUrl+c.AccessToken, bytes.NewReader(json))
+	ts, sign := generateSign(c.Secret)
+
+	req, err := http.NewRequest(http.MethodPost, mainAPI+subUrl+c.AccessToken+"&timestamp="+ts+"&sign="+sign, bytes.NewReader(json))
 
 	if err != nil {
 		loggerr.Warn("调用钉钉接口出现异常", zap.Error(err))
