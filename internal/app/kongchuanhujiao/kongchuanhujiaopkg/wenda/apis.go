@@ -1,7 +1,10 @@
 package wenda
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/app/client"
+	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
+
 	"github.com/kataras/iris/v12/mvc"
 )
 
@@ -18,35 +21,52 @@ type (
 		Subject uint8  `json:"sub"`  // 学科
 	}
 
+	POSTPraisePeq struct { // POSTPraisePeq 表扬请求数据
+		ID   uint32   `json:"id"`   // 唯一识别码
+		List []uint64 `json:"list"` // 名单
+	}
+
 	POSTPUSHCENTERReq struct {
 		ID     uint32 `json:"id"`     // 唯一识别码
 		Target string `json:"target"` // 目标
 	}
 )
 
-func (w *APIs) BeforeActivation(_ mvc.BeforeActivation) {}
+func (a *APIs) BeforeActivation(_ mvc.BeforeActivation) {}
 
+// 获取状态。
 // GET /apis/wenda/
-func (w *APIs) Get() map[string]string { return map[string]string{"status": "online"} }
+func (a *APIs) Get() map[string]string { return map[string]string{"status": "online"} }
 
 // 获取问题列表或问题。
 // GET /apis/wenda/questions
-func (w *APIs) GetQuestions(v *GetQuestionReq) interface{} {
+func (a *APIs) GetQuestions(v *GetQuestionReq) interface{} {
 	if v.ID != 0 {
 		return wenda.GetQuestions(0, v.ID, false, 0)[0]
 	}
 	return wenda.GetQuestions(v.Page, v.ID, false, 0)
 }
 
+// 推送表扬列表。
+// POST /apis/wenda/praise
+func (a *APIs) PostPraise(v *POSTPraisePeq) {
+	q := wenda.GetQuestions(0, v.ID, false, 0)
+	msg := clientmsg.NewTextMessage("表扬下列答对的同学：\n")
+	for _, mem := range v.List {
+		msg.AddAt(mem)
+	}
+	client.GetClient().SendMessage(msg.SetTarget(&clientmsg.Target{Group: &clientmsg.Group{ID: q[0].Target}}))
+}
+
 // 获取市场列表。
 // GET /apis/wenda/markets
-func (w *APIs) GetMarkets(v *GetMarketsReq) []wenda.QuestionListTab {
+func (a *APIs) GetMarkets(v *GetMarketsReq) []wenda.QuestionListTab {
 	return wenda.GetQuestions(v.Page, 0, true, v.Subject)
 }
 
 // 推送数据到钉钉。
 // POST /apis/wenda/pushcenter
-func (w *APIs) PostPUSHCENTER(v *POSTPUSHCENTERReq) {
+func (a *APIs) PostPUSHCENTER(v *POSTPUSHCENTERReq) {
 
 	/*
 		TODO 通过ID 读取问题。
