@@ -10,7 +10,7 @@ import (
 
 // generateSign 加签
 func generateSign(secret string) (ts string, sign string) {
-	ts = strconv.FormatInt(time.Now().UnixNano(), 10)
+	ts = strconv.FormatInt(time.Now().Unix()*1000, 10)
 	sign = ts + "\n" + secret
 
 	h := hmac.New(sha256.New, []byte(secret))
