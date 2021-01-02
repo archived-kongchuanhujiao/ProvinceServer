@@ -2,6 +2,7 @@ package dingtalk
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/clients/clientspublic"
+	"strconv"
 )
 
 type IDTMessage interface {
@@ -122,8 +123,14 @@ func (d *DingTalk) transformToDTMessage(ms *clientspublic.Message) IDTMessage {
 					r.At.AtUsers = append(r.At.AtUsers, e.Target)
 				case DTPlainText:
 					r.At.AtUsers = append(r.At.AtUsers, e.Target)
+					for _, user := range r.At.AtUsers {
+						r.Text.Content += "@" + strconv.FormatUint(user, 10) + " "
+					}
 				case DTMarkdown:
 					r.At.AtUsers = append(r.At.AtUsers, e.Target)
+					for _, user := range r.At.AtUsers {
+						r.MarkDown.Text += "@" + strconv.FormatUint(user, 10) + " "
+					}
 				}
 			}
 		}
