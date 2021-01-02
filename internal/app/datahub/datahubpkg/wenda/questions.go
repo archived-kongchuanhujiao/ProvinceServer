@@ -8,12 +8,15 @@ import (
 )
 
 // GetQuestions 获取问题
-func GetQuestions(page uint32, id uint32) (data []QuestionListTab) {
+func GetQuestions(page uint32, id uint32, market bool, sub uint8) (data []QuestionListTab) {
 
 	sqr := sqrl.Select("*").From("questions").OrderBy("questions.id DESC")
 	if id != 0 {
 		sqr = sqr.Where("questions.id=?", id).Limit(1)
 	} else {
+		if market {
+			sqr = sqr.Where("questions.market=?", 1).Where("questions.`subject`=?", sub)
+		}
 		sqr = sqr.Limit(20).Offset(uint64(page * 20))
 	}
 
