@@ -17,7 +17,7 @@ func NewApis() {
 	app.Use(recover.New())
 	APIs := mvc.New(app.Party("apis/"))
 
-	APIs.Party("wenda/").Handle(new(wenda.WendaAPIs))
+	APIs.Party("wenda/").Handle(new(wenda.APIs))
 
 	go func() {
 

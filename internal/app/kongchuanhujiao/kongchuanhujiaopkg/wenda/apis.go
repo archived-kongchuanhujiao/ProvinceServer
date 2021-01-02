@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	WendaAPIs struct{} // WendaAPIs 问答 APIs
+	APIs struct{} // APIs 问答 APIs
 
 	GetQuestionReq struct { // GetQuestionReq 问题请求数据
 		Page uint32 `json:"page"` // 页面
@@ -19,14 +19,14 @@ type (
 	}
 )
 
-func (w *WendaAPIs) BeforeActivation(_ mvc.BeforeActivation) {}
+func (w *APIs) BeforeActivation(_ mvc.BeforeActivation) {}
 
 // GET /apis/wenda/
-func (w *WendaAPIs) Get() map[string]string { return map[string]string{"status": "online"} }
+func (w *APIs) Get() map[string]string { return map[string]string{"status": "online"} }
 
 // 获取问题列表或问题。
 // GET /apis/wenda/questions
-func (w *WendaAPIs) GetQuestions(v *GetQuestionReq) interface{} {
+func (w *APIs) GetQuestions(v *GetQuestionReq) interface{} {
 	if v.ID != 0 {
 		return wenda.GetQuestions(0, v.ID, false, 0)[0]
 	}
@@ -35,6 +35,6 @@ func (w *WendaAPIs) GetQuestions(v *GetQuestionReq) interface{} {
 
 // 获取市场列表。
 // GET /apis/wenda/markets
-func (w *WendaAPIs) GetMarkets(v *GetMarketsReq) []wenda.QuestionListTab {
+func (w *APIs) GetMarkets(v *GetMarketsReq) []wenda.QuestionListTab {
 	return wenda.GetQuestions(v.Page, 0, true, v.Subject)
 }
