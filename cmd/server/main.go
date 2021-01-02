@@ -2,8 +2,8 @@ package main
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/apis"
-	"coding.net/kongchuanhujiao/server/internal/app/clients/clientspkg"
-	"coding.net/kongchuanhujiao/server/internal/app/clients/clientspublic"
+	"coding.net/kongchuanhujiao/server/internal/app/client"
+	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 )
@@ -15,20 +15,22 @@ func main() {
 
 	datahubpkg.ConnectAllDatabase()
 	apis.NewApis()
-	clientspkg.NewClients()
-	clientspkg.SetCallback(func(m *clientspublic.Message) {
+	client.NewClients()
+	client.SetCallback(func(m *clientmsg.Message) {
 
-		c, ok := m.Chain[0].(*clientspublic.Text)
+		c, ok := m.Chain[0].(*clientmsg.Text)
 		if !ok {
 			return
 		}
 
 		if c.Content == "你好空传互教" {
-			m.QuickMessage(m.AddText("\nReply: 你好。"))
+			client.GetClient().SendMessage(m.AddText("\nReply: 你好。"))
 		}
-		if m.Target.ID == 2074466353 {
-			clientspkg.GetClient(clientspublic.DingTalkClient).SendMessage(m)
+
+		if c.Content == "外部测试" {
+			client.GetClient().SendMessage(clientmsg.NewTextMessage("你好"))
 		}
+
 	})
 
 	select {}

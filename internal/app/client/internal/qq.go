@@ -1,7 +1,7 @@
-package qq
+package internal
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/clients/clientspublic"
+	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/Mrs4s/MiraiGo/client"
@@ -12,12 +12,12 @@ var loggerr = logger.Named("QQ客户端") // loggerr 日志
 
 // QQ QQ 客户端
 type QQ struct {
-	client   *client.QQClient       // 客户端
-	callback clientspublic.Callback // 回调
+	client   *client.QQClient   // 客户端
+	callback clientmsg.Callback // 回调
 }
 
-// NewQQClient 新建 QQ 客户端
-func NewQQClient(a uint64, p string) (q *QQ) {
+// NewClient 新建 QQ 客户端
+func NewClient(a uint64, p string) (q *QQ) {
 
 	setProtocol()
 	c := client.NewClient(int64(a), p)
@@ -33,7 +33,7 @@ func NewQQClient(a uint64, p string) (q *QQ) {
 	return
 }
 
-func (q *QQ) SendMessage(m *clientspublic.Message) {
+func (q *QQ) SendMessage(m *clientmsg.Message) {
 	ms := q.transformToMiraiGO(m)
 	if m.Target.Group != nil {
 		q.client.SendGroupMessage(int64(m.Target.Group.ID), ms)
@@ -43,13 +43,13 @@ func (q *QQ) SendMessage(m *clientspublic.Message) {
 	loggerr.Info("发送消息", zap.Any("消息", m.Chain))
 }
 
-func (q *QQ) ReceiveMessage(m *clientspublic.Message) {
+func (q *QQ) ReceiveMessage(m *clientmsg.Message) {
 	logger.Debug("接收消息", zap.Any("消息", m))
 	if q.callback != nil {
 		q.callback(m)
 	}
 }
 
-func (q *QQ) SetCallback(f clientspublic.Callback) {
+func (q *QQ) SetCallback(f clientmsg.Callback) {
 	q.callback = f
 }

@@ -1,4 +1,4 @@
-package qq
+package internal
 
 import (
 	"github.com/Mrs4s/MiraiGo/client"
