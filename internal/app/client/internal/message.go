@@ -62,7 +62,7 @@ func (q *QQ) transformToMiraiGO(ms *clientmsg.Message) (m *message.SendingMessag
 		case *clientmsg.Text:
 			m.Elements = append(m.Elements, message.NewText(e.Content))
 		case *clientmsg.At:
-			mem := q.client.FindGroupByUin(int64(ms.Target.Group.ID)).FindMember(int64(ms.Target.ID))
+			mem := q.client.FindGroupByUin(int64(ms.Target.Group.ID)).FindMember(int64(e.Target))
 			m.Elements = append(m.Elements, message.NewAt(int64(e.Target), mem.DisplayName()))
 		case *clientmsg.Image:
 			se, err := q.client.UploadGroupImage(int64(ms.Target.Group.ID), e.Data)
