@@ -17,7 +17,7 @@ func NewClients() {
 	conf := configs.GetConfigs()
 
 	qqClient = qq.NewQQClient(conf.QQNumber, conf.QQPassword)
-	dingTalkClient = dingtalk.NewDingTalkClient()
+	dingTalkClient = dingtalk.NewDingTalkClient(conf.DTAccessToken, conf.DTSecret)
 }
 
 // GetClient 获取客户端。

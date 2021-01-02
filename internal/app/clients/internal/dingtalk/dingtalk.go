@@ -17,8 +17,8 @@ type DingTalk struct {
 }
 
 // NewDingTalkClient 新建 钉钉 客户端
-func NewDingTalkClient() (d *DingTalk) {
-	d = &DingTalk{}
+func NewDingTalkClient(at, st string) (d *DingTalk) {
+	d = &DingTalk{AccessToken: at, Secret: st}
 	return
 }
 

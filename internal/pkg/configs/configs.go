@@ -11,9 +11,11 @@ import (
 
 // Configs 配置
 type Configs struct {
-	QQNumber   uint64 // QQ 号
-	QQPassword string // QQ 密码
-	DBURL      string // 数据库 URL
+	QQNumber      uint64 // QQ 号
+	QQPassword    string // QQ 密码
+	DTAccessToken string // 钉钉访问 Token
+	DTSecret      string // 钉钉密钥
+	DBURL         string // 数据库 URL
 }
 
 // GetConfigs 获取配置
@@ -23,7 +25,13 @@ func GetConfigs() (c *Configs) {
 		logger.Panic("无法读取配置信息", zap.Error(err))
 	}
 
-	c = &Configs{n, os.Getenv("KQQPWA"), os.Getenv("KDBURL")}
+	c = &Configs{
+		n,
+		os.Getenv("KQQPWA"),
+		os.Getenv("KDTAT"),
+		os.Getenv("KDTST"),
+		os.Getenv("KDBURL"),
+	}
 	logger.Debug("读取配置信息成功", zap.Any("配置", c))
 	return
 }
