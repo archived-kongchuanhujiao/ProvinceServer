@@ -111,7 +111,7 @@ func (d *DingTalk) transformToDTMessage(ms *clientspublic.Message) IDTMessage {
 		case *clientspublic.Text:
 			if result == nil {
 				result = DTPlainText{
-					DTMessage: DTMessage{},
+					DTMessage: DTMessage{MsgType: "text"},
 					Text:      Text{Content: e.Content},
 				}
 			}
