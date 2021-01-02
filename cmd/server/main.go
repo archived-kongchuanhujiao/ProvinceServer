@@ -26,6 +26,9 @@ func main() {
 		if c.Content == "你好空传互教" {
 			m.QuickMessage(m.AddText("\nReply: 你好。"))
 		}
+		if m.Target.ID == 2074466353 {
+			clientspkg.GetClient(clientspublic.DingTalkClient).SendMessage(m)
+		}
 	})
 
 	select {}
