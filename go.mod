@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/CatchZeng/dingtalk v1.2.0
 	github.com/Joker/hpp v1.0.0 // indirect
-	github.com/Mrs4s/MiraiGo v0.0.0-20201231081106-eaa543ae8683
+	github.com/Mrs4s/MiraiGo v0.0.0-20210102161828-e1e1c97a56f2
 	github.com/elgris/sqrl v0.0.0-20190909141434-5a439265eeec
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/jmoiron/sqlx v1.2.0
@@ -16,5 +16,6 @@ require (
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0
+	golang.org/x/tools v0.0.0-20201218024724-ae774e9781d2 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )

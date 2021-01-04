@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
 
 	"github.com/Mrs4s/MiraiGo/client"
@@ -65,7 +66,15 @@ func (q *QQ) transformToMiraiGO(ms *clientmsg.Message) (m *message.SendingMessag
 			mem := q.client.FindGroupByUin(int64(ms.Target.Group.ID)).FindMember(int64(e.Target))
 			m.Elements = append(m.Elements, message.NewAt(int64(e.Target), mem.DisplayName()))
 		case *clientmsg.Image:
-			se, err := q.client.UploadGroupImage(int64(ms.Target.Group.ID), e.Data)
+			if ms.Target.Group != nil {
+				se, err := q.client.UploadGroupImage(int64(ms.Target.Group.ID), bytes.NewReader(e.Data))
+				if err != nil {
+					loggerr.Error("上传图片错误", zap.Error(err))
+				}
+				m.Elements = append(m.Elements, se)
+				continue
+			}
+			se, err := q.client.UploadPrivateImage(int64(ms.Target.ID), bytes.NewReader(e.Data))
 			if err != nil {
 				loggerr.Error("上传图片错误", zap.Error(err))
 			}
