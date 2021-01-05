@@ -3,8 +3,8 @@ package wenda
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
-
 	"github.com/kataras/iris/v12/mvc"
 )
 
@@ -76,15 +76,14 @@ func (a *APIs) PostPUSHCENTER(v *POSTPUSHCENTERReq) {
 	*/
 
 	if v.Target == "dingtalk" {
-		// TODO 找 datahub / ~pkg/ 自己弄个发吧
 		/*
 		 TODO 预期调用
 		  这里 -> datahub/pkg/wenda/ -> datahub/internal/dingtalk / 然后消息就发送出去了
-		  预期是 internal/dingtalk/ 只能有 accessToken 和 密钥，因为在inernal里获取有可能引入包循环问题
+		  预期是 internal/dingtalk/ 只能有 accessToken 和 密钥，因为在internal里获取有可能引入包循环问题
 		  所以进入 internal 前先把必要的数据准备好，如第一段所写
-
 		*/
 
+		datahubpkg.PushMessage("fakeToken", "fakeSecret", "", []string{}, false)
 	}
 
 }
