@@ -19,6 +19,6 @@ func Push(accessToken string, secret string, content string, atMobiles []string,
 	_, err := client.Send(msg)
 
 	if err != nil {
-		logger.Warn("发送钉钉消息失败", zap.Error(err))
+		logger.Error("发送钉钉消息失败", zap.Error(err))
 	}
 }
