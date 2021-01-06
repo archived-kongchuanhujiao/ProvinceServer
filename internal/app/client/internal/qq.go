@@ -45,7 +45,7 @@ func (q *QQ) SendMessage(m *clientmsg.Message) {
 
 func (q *QQ) ReceiveMessage(m *clientmsg.Message) {
 	logger.Debug("接收消息", zap.Any("消息", m))
-	if q.callback != nil {
+	if q.callback != nil && len(m.Chain) != 0 {
 		q.callback(m)
 	}
 }
