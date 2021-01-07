@@ -20,36 +20,38 @@ type (
 		Data    interface{} `json:"data"`    // 数据
 	}
 
-	GetQuestionsReq struct { // GetQuestionsReq 问题请求数据
+	GetQuestionsReq struct { // GetQuestionsReq 问题请求
 		Page uint32 // 页面
 		ID   uint32 // 唯一识别码
 	}
 
-	PutQuestionReq struct { // PutQuestionReq 问题更新数据
+	PutQuestionReq struct { // PutQuestionReq 问题更新
 		ID     uint32 // 唯一识别码
 		Status uint8  // 状态
 	}
 
-	POSTPraisePeq struct { // POSTPraisePeq 表扬请求数据
+	POSTPraisePeq struct { // POSTPraisePeq 表扬请求
 		ID   uint32   // 唯一识别码
 		List []uint64 // 名单
 	}
 
-	GetMarketsReq struct { // GetMarketsReq 市场请求数据
+	GetMarketsReq struct { // GetMarketsReq 市场请求
 		Page    uint32 // 页面
 		Subject uint8  // 学科
 	}
 
-	PostMarketsReq struct { // PostMarketsReq 市场复制数据
+	PostMarketsReq struct { // PostMarketsReq 市场复制
 		ID     uint32   // 唯一识别码
 		Target []uint64 // 目标集
 	}
 
-	POSTPUSHCENTERReq struct {
+	PostPushcenterReq struct { // PostPushcenterReq 推送发送
 		ID     uint32 // 唯一识别码
 		Target string // 目标
 	}
 )
+
+// TODO 中间件安全校验
 
 // GetQuestions 获取问题列表或问题。
 // GET /apis/wenda/questions
@@ -108,9 +110,9 @@ func (a *APIs) GetMarkets(v *GetMarketsReq) *Response {
 // PostMarkets 复制市场问题。
 // POST /apis/wenda/markets
 func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *Response {
-	ck := c.GetCookie("user")
+	user := c.GetCookie("user")
 	for _, t := range v.Target {
-		err := wenda.CopyQuestions(v.ID, ck, t)
+		err := wenda.CopyQuestions(v.ID, user, t)
 		if err != nil {
 			return &Response{1, "服务器错误", nil}
 		}
@@ -118,14 +120,13 @@ func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *Response {
 	return &Response{0, "ok", nil}
 }
 
-// PostPUSHCENTER 推送数据到钉钉。
+// PostPushcenter 推送数据到钉钉。
 // POST /apis/wenda/pushcenter
-func (a *APIs) PostPUSHCENTER(v *POSTPUSHCENTERReq) *Response {
+func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *Response {
 
+	user := c.GetCookie("user")
 	/*
-		TODO 通过ID 读取问题。
-		 然后读取cookie，我也不知道MVC怎么读， 你看看读取user Cookie
-		 然后数据库获取对应的教师的钉钉或qq工作群，(这我也还没写，你就假装他有)
+		TODO 读取user Cookie，数据库获取对应的教师的钉钉或qq工作群，(这我也还没写，你就假装他有)
 		 弄个模板。然后生成再发送消息，两个模板函数最好拆分因为他们没有共同点
 	*/
 
@@ -137,7 +138,7 @@ func (a *APIs) PostPUSHCENTER(v *POSTPUSHCENTERReq) *Response {
 		  所以进入 internal 前先把必要的数据准备好，如第一段所写
 		*/
 
-		// Dummy, Need to be replace in future
+		// Dummy, Need to be replace in future // FIXME 改中文
 		fakeQuestion := wenda.QuestionListTab{}
 		content := "题目: " + fakeQuestion.Question + "\n题目状态: " + string(fakeQuestion.Status) + "\n选项: " + fakeQuestion.Options
 
