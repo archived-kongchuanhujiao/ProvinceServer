@@ -137,7 +137,16 @@ func (a *APIs) PostPUSHCENTER(v *POSTPUSHCENTERReq) *Response {
 		  所以进入 internal 前先把必要的数据准备好，如第一段所写
 		*/
 
-		datahubpkg.PushMessage("fakeToken", "fakeSecret", "", []string{}, false)
+		// Dummy, Need to be replace in future
+		fakeQuestion := wenda.QuestionListTab{}
+		content := "题目: " + fakeQuestion.Question + "\n题目状态: " + string(fakeQuestion.Status) + "\n选项: " + fakeQuestion.Options
+
+		err := datahubpkg.PushMessage("fakeToken", "fakeSecret", content, []string{}, false)
+
+		if err != nil {
+			logger.Error("发送钉钉消息失败", zap.Error(err))
+			return &Response{Status: 1, Message: "发送失败"}
+		}
 	}
 	return &Response{0, "", nil}
 }
