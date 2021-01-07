@@ -106,6 +106,7 @@ func (a *APIs) PostPUSHCENTER(v *POSTPUSHCENTERReq) *Response {
 
 		if err != nil {
 			logger.Error("发送钉钉消息失败", zap.Error(err))
+			return &Response{Status: 1, Message: "发送失败"}
 		}
 	}
 	return &Response{0, "", nil}
