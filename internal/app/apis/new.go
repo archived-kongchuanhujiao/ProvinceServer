@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/kongchuanhujiaopkg/wenda"
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/kataras/iris/v12"
