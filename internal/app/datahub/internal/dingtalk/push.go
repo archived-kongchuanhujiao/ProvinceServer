@@ -11,7 +11,12 @@ import (
 // 另请查询 [apis.go#PostPUSHCENTER()]
 
 func Push(accessToken string, secret string, content string, atMobiles []string, isAtAll bool) {
-	msg := dingtalk.NewTextMessage().SetContent(content).SetAt(atMobiles, isAtAll)
+	msg := dingtalk.NewTextMessage().SetContent(content)
+
+	if len(atMobiles) > 0 {
+		msg.SetAt(atMobiles, isAtAll)
+	}
+
 	client := dingtalk.Client{
 		AccessToken: accessToken,
 		Secret:      secret,
