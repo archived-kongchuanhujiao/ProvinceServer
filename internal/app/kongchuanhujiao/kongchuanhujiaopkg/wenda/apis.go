@@ -102,7 +102,11 @@ func (a *APIs) PostPUSHCENTER(v *POSTPUSHCENTERReq) *Response {
 		  所以进入 internal 前先把必要的数据准备好，如第一段所写
 		*/
 
-		datahubpkg.PushMessage("fakeToken", "fakeSecret", "", []string{}, false)
+		err := datahubpkg.PushMessage("fakeToken", "fakeSecret", "", []string{}, false)
+
+		if err != nil {
+			logger.Error("发送钉钉消息失败", zap.Error(err))
+		}
 	}
 	return &Response{0, "", nil}
 }
