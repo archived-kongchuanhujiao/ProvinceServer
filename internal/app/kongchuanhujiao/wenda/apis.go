@@ -58,7 +58,7 @@ type (
 // GET /apis/wenda/questions
 func (a *APIs) GetQuestions(v *GetQuestionsReq) *Response {
 	var (
-		d   []*wenda.QuestionListTab
+		d   []*wenda.QuestionsTab
 		err error
 	)
 	if v.ID != 0 {
@@ -127,7 +127,11 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *Respons
 
 	user := c.GetCookie("account")
 
-	accounts.GetAccount(user, 0)
+	ac, err := accounts.GetAccount(user, 0)
+
+	if err != nil {
+		return &Response{Status: 1, Message: "无法获取对应账号"}
+	}
 
 	/*
 		TODO 通过上述函数的字段
@@ -142,11 +146,11 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *Respons
 		  所以进入 internal 前先把必要的数据准备好，如第一段所写
 		*/
 
-		// Dummy, Need to be replace in future // FIXME 改中文
-		fakeQuestion := wenda.QuestionListTab{}
+		// 临时添加的假问题, 在获取问题实装后请修改
+		fakeQuestion := wenda.QuestionsTab{}
 		content := "题目: " + fakeQuestion.Question + "\n题目状态: " + string(fakeQuestion.Status) + "\n选项: " + fakeQuestion.Options
 
-		err := datahubpkg.PushMessage("fakeToken", "fakeSecret", content, []string{}, false)
+		err := datahubpkg.PushMessage(ac.Token, "fakeSecret", content, []string{}, false)
 
 		if err != nil {
 			logger.Error("发送钉钉消息失败", zap.Error(err))
