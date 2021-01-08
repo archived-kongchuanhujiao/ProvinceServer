@@ -56,15 +56,15 @@ type (
 
 // GetQuestions 获取问题列表或问题。
 // GET /apis/wenda/questions
-func (a *APIs) GetQuestions(v *GetQuestionsReq) *Response {
+func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *Response {
 	var (
 		d   []*wenda.QuestionsTab
 		err error
 	)
 	if v.ID != 0 {
-		d, err = wenda.GetQuestions(0, v.ID, false, 0)
+		d, err = wenda.GetQuestions(&wenda.QuestionsTab{ID: v.ID}, 0)
 	} else {
-		d, err = wenda.GetQuestions(v.Page, v.ID, false, 0)
+		d, err = wenda.GetQuestions(&wenda.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, v.Page)
 	}
 	if err != nil {
 		return &Response{1, "服务器错误", nil}
@@ -86,7 +86,7 @@ func (a *APIs) PutQuestions(v *PutQuestionReq) *Response {
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
 func (a *APIs) PostPraise(v *POSTPraisePeq) *Response {
-	q, err := wenda.GetQuestions(0, v.ID, false, 0)
+	q, err := wenda.GetQuestions(&wenda.QuestionsTab{ID: v.ID}, 0)
 	if err != nil {
 		return &Response{1, "服务器错误", nil}
 	}
@@ -101,7 +101,7 @@ func (a *APIs) PostPraise(v *POSTPraisePeq) *Response {
 // GetMarkets 获取市场列表。
 // GET /apis/wenda/markets
 func (a *APIs) GetMarkets(v *GetMarketsReq) *Response {
-	q, err := wenda.GetQuestions(v.Page, 0, true, v.Subject)
+	q, err := wenda.GetQuestions(&wenda.QuestionsTab{Market: true, Subject: v.Subject}, v.Page)
 	if err != nil {
 		return &Response{1, "服务器错误", nil}
 	}

@@ -8,19 +8,20 @@ import (
 )
 
 // GetQuestions 获取问题
-func GetQuestions(page uint32, id uint32, market bool, subject uint8) (data []*QuestionsTab, err error) {
+func GetQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err error) {
 
 	sqr := sqrl.Select("*").From("questions").OrderBy("id DESC")
-	if id != 0 {
-		sqr = sqr.Where("id=?", id).Limit(1)
-	} else {
-		sqr = sqr.Limit(20).Offset(uint64(page * 20))
+	if v.Creator != "" {
+		sqr = sqr.Where("creator=?", v.Creator).Limit(20).Offset(uint64(page * 20))
 	}
-	if market {
+	if v.ID != 0 {
+		sqr = sqr.Where("id=?", v.ID).Limit(1)
+	}
+	if v.Market {
 		sqr = sqr.Where("market=?", true)
 	}
-	if subject != 0 {
-		sqr = sqr.Where("`subject`=?", subject)
+	if v.Subject != 0 {
+		sqr = sqr.Where("`subject`=?", v.Subject)
 	}
 
 	sql, args, err := sqr.ToSql()
@@ -54,7 +55,7 @@ func UpdateQuestions(id uint32, status uint8) (err error) {
 
 // CopyQuestions 复制问题
 func CopyQuestions(id uint32, creator string, target uint64) (err error) {
-	q, err := GetQuestions(0, id, true, 0)
+	q, err := GetQuestions(&QuestionsTab{ID: id, Market: true}, 0)
 	if err != nil {
 		return
 	}
