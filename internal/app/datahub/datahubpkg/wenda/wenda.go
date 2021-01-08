@@ -59,8 +59,10 @@ func CopyQuestions(id uint32, creator string, target uint64) (err error) {
 		return
 	}
 	que := q[0]
+
 	sql, args, err := sqrl.Insert("questions").Values(nil, que.Type, que.Subject, que.Question,
 		creator, target, 0, que.Options, que.Key, false).ToSql()
+
 	_, err = maria.DB.Exec(sql, args...)
 	if err != nil {
 		maria.Logger.Error("复制失败", zap.Error(err), zap.String("SQL语句", sql))
