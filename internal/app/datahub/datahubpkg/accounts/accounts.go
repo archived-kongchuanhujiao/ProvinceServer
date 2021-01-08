@@ -8,7 +8,7 @@ import (
 )
 
 // GetAccount 获取账号
-func GetAccount(id string, qq uint64) (data *Tab) {
+func GetAccount(id string, qq uint64) (data *Tab, err error) {
 	sqr := sqrl.Select("*").From("accounts")
 	if id != "" {
 		sqr = sqr.Where("id=?", id)
