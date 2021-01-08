@@ -110,7 +110,7 @@ func (a *APIs) GetMarkets(v *GetMarketsReq) *Response {
 // PostMarkets 复制市场问题。
 // POST /apis/wenda/markets
 func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *Response {
-	user := c.GetCookie("user")
+	user := c.GetCookie("account")
 	for _, t := range v.Target {
 		err := wenda.CopyQuestions(v.ID, user, t)
 		if err != nil {
@@ -124,7 +124,7 @@ func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *Response {
 // POST /apis/wenda/pushcenter
 func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *Response {
 
-	user := c.GetCookie("user")
+	user := c.GetCookie("account")
 	/*
 		TODO 读取user Cookie，数据库获取对应的教师的钉钉或qq工作群，(这我也还没写，你就假装他有)
 		 弄个模板。然后生成再发送消息，两个模板函数最好拆分因为他们没有共同点
