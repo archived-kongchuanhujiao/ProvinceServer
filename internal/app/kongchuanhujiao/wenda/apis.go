@@ -4,6 +4,7 @@ import (
 	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/accounts"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 	"github.com/kataras/iris/v12/context"
@@ -125,8 +126,11 @@ func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *Response {
 func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *Response {
 
 	user := c.GetCookie("account")
+
+	accounts.GetAccount(user, 0)
+
 	/*
-		TODO 读取user Cookie，数据库获取对应的教师的钉钉或qq工作群，(这我也还没写，你就假装他有)
+		TODO 通过上述函数的字段
 		 弄个模板。然后生成再发送消息，两个模板函数最好拆分因为他们没有共同点
 	*/
 
