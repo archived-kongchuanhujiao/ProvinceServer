@@ -125,17 +125,15 @@ func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *Response {
 // POST /apis/wenda/pushcenter
 func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *Response {
 
-	user := c.GetCookie("account")
-
-	ac, err := accounts.GetAccount(user, 0)
-
+	ac, err := accounts.GetAccount(c.GetCookie("account"), 0)
 	if err != nil {
-		return &Response{Status: 1, Message: "无法获取对应账号"}
+		return &Response{1, "服务器错误", nil}
 	}
 
 	/*
-		TODO 通过上述函数的字段
-		 弄个模板。然后生成再发送消息，两个模板函数最好拆分因为他们没有共同点
+		TODO 弄个答题数据推送模板（独立一个函数）。生成后发送消息
+		 两个模板函数拆分出来，因为一个是封装的消息结构体一个是第三方包的钉钉消息结构体
+		 空接口（伪泛型）禁止
 	*/
 
 	if v.Target == "dingtalk" {
@@ -143,15 +141,17 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *Respons
 		 TODO 预期调用
 		  这里 -> datahub/pkg/wenda/ -> datahub/internal/dingtalk / 然后消息就发送出去了
 		  预期是 internal/dingtalk/ 只能有 accessToken 和 密钥，因为在internal里获取有可能引入包循环问题
-		  所以进入 internal 前先把必要的数据准备好，如第一段所写
+		  所以进入 internal 前先把必要的数据准备好（这里理论来说以后会有一张表专门存储答题数据计算结构，推送就是推这个结果的），如第一段所写
 		*/
 
 		// 临时添加的假问题, 在获取问题实装后请修改
+		// FIXME 实际上不是问题的内容，而是学生作答数据，作答数据结果和作答数据是两张表
+		// FIXME 有关作答数据计算结果的内容需要确定
 		fakeQuestion := wenda.QuestionsTab{}
+		// FIXME 这里单独一个文件（./push.go）去生成，钉钉生成MarkDown,QQ就是封装的消息链
 		content := "题目: " + fakeQuestion.Question + "\n题目状态: " + string(fakeQuestion.Status) + "\n选项: " + fakeQuestion.Options
 
 		err := datahubpkg.PushMessage(ac.Token, "fakeSecret", content, []string{}, false)
-
 		if err != nil {
 			logger.Error("发送钉钉消息失败", zap.Error(err))
 			return &Response{Status: 1, Message: "发送失败"}
