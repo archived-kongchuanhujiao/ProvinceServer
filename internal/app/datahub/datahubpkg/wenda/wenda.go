@@ -8,7 +8,7 @@ import (
 )
 
 // GetQuestions 获取问题
-func GetQuestions(page uint32, id uint32, market bool, subject uint8) (data []*QuestionListTab, err error) {
+func GetQuestions(page uint32, id uint32, market bool, subject uint8) (data []*QuestionsTab, err error) {
 
 	sqr := sqrl.Select("*").From("questions").OrderBy("id DESC")
 	if id != 0 {

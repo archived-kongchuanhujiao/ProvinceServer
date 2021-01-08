@@ -1,7 +1,7 @@
 package wenda
 
 type (
-	QuestionListTab struct { // QuestionListTab 问题
+	QuestionsTab struct { // QuestionsTab 问题
 		ID        uint32 `json:"id" db:"id"`                 // 唯一标识符
 		Type      uint8  `json:"type" db:"type"`             // 类型
 		Subject   uint8  `json:"subject" db:"subject"`       // 学科
