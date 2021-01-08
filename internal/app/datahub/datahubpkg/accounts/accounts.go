@@ -8,9 +8,9 @@ import (
 )
 
 // GetAccount 获取账号
-func GetAccount(id uint32, qq uint64) (data *Tab) {
+func GetAccount(id string, qq uint64) (data *Tab) {
 	sqr := sqrl.Select("*").From("accounts")
-	if id != 0 {
+	if id != "" {
 		sqr = sqr.Where("id=?", id)
 	} else {
 		sqr = sqr.Where("qq=?", qq)
