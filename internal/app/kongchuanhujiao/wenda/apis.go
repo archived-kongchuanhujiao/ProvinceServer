@@ -73,8 +73,8 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *Response {
 }
 
 // PutQuestions 更新问题状态。
-// PUT /apis/wenda/questions
-func (a *APIs) PutQuestions(v *PutQuestionReq) *Response {
+// PUT /apis/wenda/questions/status
+func (a *APIs) PutQuestionsStatus(v *PutQuestionReq) *Response {
 	err := wenda.UpdateQuestions(v.ID, v.Status)
 	if err != nil {
 		logger.Error("错误", zap.Error(err))
