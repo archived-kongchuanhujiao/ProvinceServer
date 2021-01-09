@@ -7,8 +7,8 @@ import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/accounts"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
-	"github.com/kataras/iris/v12/context"
 
+	"github.com/kataras/iris/v12/context"
 	"go.uber.org/zap"
 )
 
@@ -92,6 +92,9 @@ func (a *APIs) PostQuestions(v *wenda.QuestionsTab) *Response {
 	return &Response{0, "ok", nil}
 }
 
+// TODO 修改问题和删除问题
+// 修改问题原理：删除原问题并将ID改成原来的再插入
+
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
 func (a *APIs) PostPraise(v *PostPraisePeq) *Response {
@@ -129,6 +132,8 @@ func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *Response {
 	}
 	return &Response{0, "ok", nil}
 }
+
+// TODO 写个上传文档和上传图片的API
 
 // PostPushcenter 推送数据到钉钉。
 // POST /apis/wenda/pushcenter
