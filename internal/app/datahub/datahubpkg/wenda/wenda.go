@@ -53,6 +53,17 @@ func UpdateQuestions(id uint32, status uint8) (err error) {
 	return
 }
 
+// InsertQuestions 插入问题
+func InsertQuestions(q *QuestionsTab) (err error) {
+	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question,
+		q.Creator, q.Target, 0, q.Options, q.Key, q.Market).ToSql()
+	_, err = maria.DB.Exec(sql, args...)
+	if err != nil {
+		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
+	}
+	return
+}
+
 // CopyQuestions 复制问题
 func CopyQuestions(id uint32, creator string, target uint64) (err error) {
 	q, err := GetQuestions(&QuestionsTab{ID: id, Market: true}, 0)
@@ -60,13 +71,9 @@ func CopyQuestions(id uint32, creator string, target uint64) (err error) {
 		return
 	}
 	que := q[0]
-
-	sql, args, err := sqrl.Insert("questions").Values(nil, que.Type, que.Subject, que.Question,
-		creator, target, 0, que.Options, que.Key, false).ToSql()
-
-	_, err = maria.DB.Exec(sql, args...)
-	if err != nil {
-		maria.Logger.Error("复制失败", zap.Error(err), zap.String("SQL语句", sql))
-	}
+	que.Creator = creator
+	que.Target = target
+	que.Market = false
+	err = InsertQuestions(que)
 	return
 }

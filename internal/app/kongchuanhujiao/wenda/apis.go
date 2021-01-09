@@ -31,7 +31,7 @@ type (
 		Status uint8  // 状态
 	}
 
-	POSTPraisePeq struct { // POSTPraisePeq 表扬请求
+	PostPraisePeq struct { // PostPraisePeq 表扬请求
 		ID   uint32   // 唯一识别码
 		List []uint64 // 名单
 	}
@@ -46,7 +46,7 @@ type (
 		Target []uint64 // 目标集
 	}
 
-	PostPushcenterReq struct { // PostPushcenterReq 推送发送
+	PostPushcenterReq struct { // PostPushcenterReq 推送新建
 		ID     uint32 // 唯一识别码
 		Target string // 目标
 	}
@@ -72,12 +72,21 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *Response {
 	return &Response{0, "ok", d}
 }
 
-// PutQuestions 更新问题状态。
+// PutQuestionsStatus 更新问题状态。
 // PUT /apis/wenda/questions/status
 func (a *APIs) PutQuestionsStatus(v *PutQuestionReq) *Response {
 	err := wenda.UpdateQuestions(v.ID, v.Status)
 	if err != nil {
-		logger.Error("错误", zap.Error(err))
+		return &Response{1, "服务器错误", nil}
+	}
+	return &Response{0, "ok", nil}
+}
+
+// PostQuestions 新建问题。
+// POST /apis/wenda/questions
+func (a *APIs) PostQuestions(v *wenda.QuestionsTab) *Response {
+	err := wenda.InsertQuestions(v)
+	if err != nil {
 		return &Response{1, "服务器错误", nil}
 	}
 	return &Response{0, "ok", nil}
@@ -85,7 +94,7 @@ func (a *APIs) PutQuestionsStatus(v *PutQuestionReq) *Response {
 
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
-func (a *APIs) PostPraise(v *POSTPraisePeq) *Response {
+func (a *APIs) PostPraise(v *PostPraisePeq) *Response {
 	q, err := wenda.GetQuestions(&wenda.QuestionsTab{ID: v.ID}, 0)
 	if err != nil {
 		return &Response{1, "服务器错误", nil}
