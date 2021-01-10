@@ -146,7 +146,7 @@ func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *Response {
 // POST /apis/wenda/pushcenter
 func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *Response {
 
-	ac, err := accounts.GetAccount(c.GetCookie("account"), 0)
+	ac, err := accounts.SelectAccount(c.GetCookie("account"), 0)
 	if err != nil {
 		return &Response{1, "服务器错误", nil}
 	}
