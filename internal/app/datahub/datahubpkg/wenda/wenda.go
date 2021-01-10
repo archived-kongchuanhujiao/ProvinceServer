@@ -2,13 +2,12 @@ package wenda
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
-
 	"github.com/elgris/sqrl"
 	"go.uber.org/zap"
 )
 
-// GetQuestions 获取问题
-func GetQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err error) {
+// SelectQuestions 获取问题
+func SelectQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err error) {
 
 	sqr := sqrl.Select("*").From("questions").OrderBy("id DESC")
 	if v.Creator != "" {
@@ -38,8 +37,8 @@ func GetQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err error
 	return
 }
 
-// UpdateQuestions 更新问题
-func UpdateQuestions(id uint32, status uint8) (err error) {
+// UpdateQuestionStatus 更新问题状态
+func UpdateQuestionStatus(id uint32, status uint8) (err error) {
 	sql, args, err := sqrl.Update("questions").Set("`status`", status).Where("id=?", id).ToSql()
 	if err != nil {
 		maria.Logger.Error("生成SQL语句失败", zap.Error(err))
@@ -53,8 +52,8 @@ func UpdateQuestions(id uint32, status uint8) (err error) {
 	return
 }
 
-// InsertQuestions 插入问题
-func InsertQuestions(q *QuestionsTab) (err error) {
+// InsertQuestion 插入问题
+func InsertQuestion(q *QuestionsTab) (err error) {
 	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question,
 		q.Creator, q.Target, 0, q.Options, q.Key, q.Market).ToSql()
 	_, err = maria.DB.Exec(sql, args...)
@@ -64,9 +63,25 @@ func InsertQuestions(q *QuestionsTab) (err error) {
 	return
 }
 
+// UpdateQuestion 更新问题
+func UpdateQuestion(q *QuestionsTab) (err error) {
+	sql, args, err := sqrl.Update("questions").Where("id=?", q.ID).
+		Set("`subject`", q.Subject).
+		Set("question", q.Question).
+		Set("target", q.Target).
+		Set("`options`", q.Options).
+		Set("`key`", q.Key).
+		Set("market", q.Market).ToSql()
+	_, err = maria.DB.Exec(sql, args...)
+	if err != nil {
+		maria.Logger.Error("更新失败", zap.Error(err), zap.String("SQL语句", sql))
+	}
+	return
+}
+
 // CopyQuestions 复制问题
 func CopyQuestions(id uint32, creator string, target uint64) (err error) {
-	q, err := GetQuestions(&QuestionsTab{ID: id, Market: true}, 0)
+	q, err := SelectQuestions(&QuestionsTab{ID: id, Market: true}, 0)
 	if err != nil {
 		return
 	}
@@ -74,6 +89,20 @@ func CopyQuestions(id uint32, creator string, target uint64) (err error) {
 	que.Creator = creator
 	que.Target = target
 	que.Market = false
-	err = InsertQuestions(que)
+	err = InsertQuestion(que)
+	return
+}
+
+// DeleteQuestion 删除问题
+func DeleteQuestion(id uint32) (err error) {
+	sql, args, err := sqrl.Delete("questions").Where("id=?", id).ToSql()
+	if err != nil {
+		maria.Logger.Error("生成SQL语句失败", zap.Error(err))
+		return err
+	}
+	_, err = maria.DB.Exec(sql, args...)
+	if err != nil {
+		maria.Logger.Error("删除失败", zap.Error(err), zap.String("SQL语句", sql))
+	}
 	return
 }

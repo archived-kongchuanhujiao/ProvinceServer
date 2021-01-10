@@ -26,7 +26,7 @@ type (
 		ID   uint32 // 唯一识别码
 	}
 
-	PutQuestionReq struct { // PutQuestionReq 问题更新
+	PutQuestionStatusReq struct { // PutQuestionStatusReq 问题更新
 		ID     uint32 // 唯一识别码
 		Status uint8  // 状态
 	}
@@ -50,6 +50,8 @@ type (
 		ID     uint32 // 唯一识别码
 		Target string // 目标
 	}
+
+	DeleteQuestionsReq struct{ ID uint32 } // DeleteQuestionsReq 问题删除
 )
 
 // TODO 中间件安全校验
@@ -62,9 +64,9 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *Response {
 		err error
 	)
 	if v.ID != 0 {
-		d, err = wenda.GetQuestions(&wenda.QuestionsTab{ID: v.ID}, 0)
+		d, err = wenda.SelectQuestions(&wenda.QuestionsTab{ID: v.ID}, 0)
 	} else {
-		d, err = wenda.GetQuestions(&wenda.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, v.Page)
+		d, err = wenda.SelectQuestions(&wenda.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, v.Page)
 	}
 	if err != nil {
 		return &Response{1, "服务器错误", nil}
@@ -74,8 +76,8 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *Response {
 
 // PutQuestionsStatus 更新问题状态。
 // PUT /apis/wenda/questions/status
-func (a *APIs) PutQuestionsStatus(v *PutQuestionReq) *Response {
-	err := wenda.UpdateQuestions(v.ID, v.Status)
+func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *Response {
+	err := wenda.UpdateQuestionStatus(v.ID, v.Status)
 	if err != nil {
 		return &Response{1, "服务器错误", nil}
 	}
@@ -85,20 +87,27 @@ func (a *APIs) PutQuestionsStatus(v *PutQuestionReq) *Response {
 // PostQuestions 新建问题。
 // POST /apis/wenda/questions
 func (a *APIs) PostQuestions(v *wenda.QuestionsTab) *Response {
-	err := wenda.InsertQuestions(v)
+	err := wenda.InsertQuestion(v)
 	if err != nil {
 		return &Response{1, "服务器错误", nil}
 	}
 	return &Response{0, "ok", nil}
 }
 
-// TODO 修改问题和删除问题
-// 修改问题原理：删除原问题并将ID改成原来的再插入
+// PutQuestions 更新问题。
+// PUT /apis/wenda/questions
+func (a *APIs) PutQuestions(v *wenda.QuestionsTab) *Response {
+	err := wenda.UpdateQuestion(v)
+	if err != nil {
+		return &Response{1, "服务器错误", nil}
+	}
+	return &Response{0, "ok", nil}
+}
 
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
 func (a *APIs) PostPraise(v *PostPraisePeq) *Response {
-	q, err := wenda.GetQuestions(&wenda.QuestionsTab{ID: v.ID}, 0)
+	q, err := wenda.SelectQuestions(&wenda.QuestionsTab{ID: v.ID}, 0)
 	if err != nil {
 		return &Response{1, "服务器错误", nil}
 	}
@@ -113,7 +122,7 @@ func (a *APIs) PostPraise(v *PostPraisePeq) *Response {
 // GetMarkets 获取市场列表。
 // GET /apis/wenda/markets
 func (a *APIs) GetMarkets(v *GetMarketsReq) *Response {
-	q, err := wenda.GetQuestions(&wenda.QuestionsTab{Market: true, Subject: v.Subject}, v.Page)
+	q, err := wenda.SelectQuestions(&wenda.QuestionsTab{Market: true, Subject: v.Subject}, v.Page)
 	if err != nil {
 		return &Response{1, "服务器错误", nil}
 	}
@@ -169,4 +178,14 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *Respons
 		}
 	}
 	return &Response{0, "", nil}
+}
+
+// DeleteQuestions 删除问题。
+// Delete /apis/wenda/questions
+func (a *APIs) DeleteQuestions(v *DeleteQuestionsReq) *Response {
+	err := wenda.DeleteQuestion(v.ID)
+	if err != nil {
+		return &Response{1, "服务器错误", nil}
+	}
+	return &Response{0, "ok", nil}
 }
