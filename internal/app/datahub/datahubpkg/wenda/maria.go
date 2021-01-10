@@ -53,10 +53,10 @@ func UpdateQuestionStatus(id uint32, status uint8) (err error) {
 	return
 }
 
-// InsertQuestion 插入问题
+// InsertQuestion 新建问题
 func InsertQuestion(q *QuestionsTab) (err error) {
-	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question,
-		q.Creator, q.Target, 0, q.Options, q.Key, q.Market).ToSql()
+	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question, q.Creator,
+		q.Target, 0, q.Options, q.Key, q.Market).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
