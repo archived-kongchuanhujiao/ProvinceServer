@@ -48,10 +48,10 @@ func getQuestionSummary(tab *wenda.QuestionsTab, isMarkdown bool) (sum string) {
 	}
 
 	if !isMarkdown {
-		template := "## #%v 详细信息\n\n> 正确人数 > %v 人\n> 正确率 > %v%\n> 易错选项 > %v\n> 最快答对的同学 > %v"
+		template := "## #%v 详细信息\n\n> 正确人数 > %v 人\n> 正确率 > %v\n> 易错选项 > %v\n> 最快答对的同学 > %v"
 		sum += fmt.Sprintf(template, tab.ID, "人数", "正确率", "易错选项", "最速同学")
 	} else {
-		template := "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v%\n 易错选项 > %v\n 最快答对的同学 > %v"
+		template := "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n 最快答对的同学 > %v"
 		sum += fmt.Sprintf(template, tab.ID, "人数", "正确率", "易错选项", "最速同学")
 	}
 
