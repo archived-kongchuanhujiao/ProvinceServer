@@ -1,10 +1,10 @@
 package wenda
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
 	"fmt"
 	"github.com/CatchZeng/dingtalk"
-	"github.com/Mrs4s/MiraiGo/message"
 	"strconv"
 )
 
@@ -21,16 +21,11 @@ func convertToMarkdown(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
 	return builder
 }
 
-// convertToChain 将问题数据转换为 MiraiGO 消息链
+// convertToChain 将问题数据转换为消息链
 // TODO 详见 apis.go@PostPushcenter()
-func convertToChain(tab *wenda.QuestionsTab) (m *message.SendingMessage) {
-	m = &message.SendingMessage{
-		Elements: []message.IMessageElement{},
-	}
-
+func convertToChain(tab *wenda.QuestionsTab) (m *clientmsg.Message) {
 	t, c := getQuestionDetail(tab, false)
-
-	m.Elements = append(m.Elements, message.NewText(t+"\n"+c))
+	m = clientmsg.NewTextMessage(t + "\n" + c)
 
 	return
 }
