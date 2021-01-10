@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/gorilla/websocket"
@@ -18,14 +19,14 @@ func (a *APIs) GetRuntime(c *context.Context) {
 	up := websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
 	conn, err := up.Upgrade(c.ResponseWriter(), c.Request(), nil)
 	if err != nil {
-		logger.Error("操你妈，你背叛了工人阶级", zap.Error(err))
+		logger.Error("升级至 Websocket 失败", zap.Error(err))
 		return
 	}
 	defer conn.Close()
 
 	_, msg, err := conn.ReadMessage()
 	if err != nil {
-		logger.Error("操你妈，你背叛了工人阶级", zap.Error(err))
+		logger.Error("读取消息失败", zap.Error(err))
 		return
 	}
 
@@ -36,6 +37,13 @@ func (a *APIs) GetRuntime(c *context.Context) {
 	}
 	id := uint32(i)
 
-	// TODO 向DataHub写入
-
+	wenda.AddClient(id, conn)
+	defer wenda.RemoveClient(id, conn)
+	go func() {
+		for {
+			if _, _, err := conn.ReadMessage(); err != nil {
+				return
+			}
+		}
+	}()
 }
