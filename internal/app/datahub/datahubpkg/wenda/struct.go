@@ -1,5 +1,13 @@
 package wenda
 
+import (
+	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
+
+	"github.com/gorilla/websocket"
+)
+
+var loggerr = logger.Named("数据总线").Named("问答")
+
 type (
 	QuestionsTab struct { // QuestionsTab 问题
 		ID       uint32 `json:"id" db:"id"`             // 唯一标识符
@@ -13,4 +21,6 @@ type (
 		Key      string `json:"key" db:"key"`           // 答案
 		Market   bool   `json:"market" db:"market"`     // 存在市场
 	}
+
+	runtime map[uint32][]*websocket.Conn // runtime 运行时
 )

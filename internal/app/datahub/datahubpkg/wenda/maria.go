@@ -2,6 +2,7 @@ package wenda
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+
 	"github.com/elgris/sqrl"
 	"go.uber.org/zap"
 )
@@ -25,7 +26,7 @@ func SelectQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err er
 
 	sql, args, err := sqr.ToSql()
 	if err != nil {
-		maria.Logger.Error("生成SQL语句失败", zap.Error(err))
+		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
 	}
 
@@ -41,8 +42,8 @@ func SelectQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err er
 func UpdateQuestionStatus(id uint32, status uint8) (err error) {
 	sql, args, err := sqrl.Update("questions").Set("`status`", status).Where("id=?", id).ToSql()
 	if err != nil {
-		maria.Logger.Error("生成SQL语句失败", zap.Error(err))
-		return err
+		loggerr.Error("生成SQL语句失败", zap.Error(err))
+		return
 	}
 
 	_, err = maria.DB.Exec(sql, args...)
@@ -56,6 +57,11 @@ func UpdateQuestionStatus(id uint32, status uint8) (err error) {
 func InsertQuestion(q *QuestionsTab) (err error) {
 	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question,
 		q.Creator, q.Target, 0, q.Options, q.Key, q.Market).ToSql()
+	if err != nil {
+		loggerr.Error("生成SQL语句失败", zap.Error(err))
+		return
+	}
+
 	_, err = maria.DB.Exec(sql, args...)
 	if err != nil {
 		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
@@ -72,6 +78,11 @@ func UpdateQuestion(q *QuestionsTab) (err error) {
 		Set("`options`", q.Options).
 		Set("`key`", q.Key).
 		Set("market", q.Market).ToSql()
+	if err != nil {
+		loggerr.Error("生成SQL语句失败", zap.Error(err))
+		return
+	}
+
 	_, err = maria.DB.Exec(sql, args...)
 	if err != nil {
 		maria.Logger.Error("更新失败", zap.Error(err), zap.String("SQL语句", sql))
@@ -97,8 +108,8 @@ func CopyQuestions(id uint32, creator string, target uint64) (err error) {
 func DeleteQuestion(id uint32) (err error) {
 	sql, args, err := sqrl.Delete("questions").Where("id=?", id).ToSql()
 	if err != nil {
-		maria.Logger.Error("生成SQL语句失败", zap.Error(err))
-		return err
+		loggerr.Error("生成SQL语句失败", zap.Error(err))
+		return
 	}
 	_, err = maria.DB.Exec(sql, args...)
 	if err != nil {
