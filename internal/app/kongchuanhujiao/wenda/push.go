@@ -2,6 +2,7 @@ package wenda
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
+	"fmt"
 	"github.com/CatchZeng/dingtalk"
 	"github.com/Mrs4s/MiraiGo/message"
 	"strconv"
@@ -12,7 +13,7 @@ import (
 func convertToMarkdown(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
 	builder := dingtalk.NewMarkdownMessage()
 
-	t, c := getQuestionDetail(tab)
+	t, c := getQuestionDetail(tab, true)
 
 	builder.Markdown.Title = t
 	builder.Markdown.Text = c
@@ -27,7 +28,7 @@ func convertToChain(tab *wenda.QuestionsTab) (m *message.SendingMessage) {
 		Elements: []message.IMessageElement{},
 	}
 
-	t, c := getQuestionDetail(tab)
+	t, c := getQuestionDetail(tab, false)
 
 	m.Elements = append(m.Elements, message.NewText(t+"\n"+c))
 
@@ -35,24 +36,40 @@ func convertToChain(tab *wenda.QuestionsTab) (m *message.SendingMessage) {
 }
 
 // getQuestionDetail 获取问题信息的字符串形式
-func getQuestionDetail(tab *wenda.QuestionsTab) (title string, content string) {
+func getQuestionDetail(tab *wenda.QuestionsTab, useMarkdown bool) (title string, content string) {
 	title = "问题 #" + strconv.Itoa(int(tab.ID)) + " 的数据"
 	// FIXME 等待数据库 API
-	content = "问题状态: " + getStatusName(tab.Status) + "\n"
+	content = getQuestionSummary(tab, useMarkdown)
 
 	return
 }
 
-// getStatusName 获取状态名
-func getStatusName(status uint8) string {
-	switch status {
-	case 0:
-		return "准备作答"
-	case 1:
-		return "允许作答"
-	case 2:
-		return "停止作答"
-	default:
-		return "未知"
+// getQuestionSummary 获取题目概要
+func getQuestionSummary(tab *wenda.QuestionsTab, isMarkdown bool) (sum string) {
+	sum = tab.Question + " 选项: " + tab.Options
+
+	if len(sum) > 20 {
+		sum = sum[0:20] + "..."
 	}
+
+	if !isMarkdown {
+		template := "## #{id} 详细信息\n\n> 正确人数 > {number} 人\n> 正确率 > {percent}%\n> 易错选项 > {option}\n> 最快答对的同学 > {name}"
+		sum += fmt.Sprintf(template, tab.ID, "人数", "正确率", "易错选项", "最速同学")
+	} else {
+		template := "#{id} 详细信息\n\n 正确人数 > {number} 人\n 正确率 > {percent}%\n 易错选项 > {option}\n 最快答对的同学 > {name}"
+		sum += fmt.Sprintf(template, tab.ID, "人数", "正确率", "易错选项", "最速同学")
+	}
+
+	return
 }
+
+/*
+Markdown 模板
+
+## #{id} 详细信息
+
+> 正确人数 > {number} 人
+> 正确率 > {percent}%
+> 易错选项 > {option}
+> 最快答对的同学 > {name}
+*/
