@@ -142,8 +142,6 @@ func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *Response {
 	return &Response{0, "ok", nil}
 }
 
-// TODO 写个上传文档和上传图片的API
-
 // PostPushcenter 推送数据到钉钉。
 // POST /apis/wenda/pushcenter
 func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *Response {
