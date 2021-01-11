@@ -1,5 +1,17 @@
 package accounts
 
+import (
+	"errors"
+	"math/rand"
+	"strconv"
+	"time"
+
+	"coding.net/kongchuanhujiao/server/internal/app/client"
+	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/accounts"
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao"
+)
+
 // TODO https://qianjunakasumi.coding.net/p/kongchuanhujiao/requirements/issues/15/detail
 /*
 TODO
@@ -11,3 +23,51 @@ TODO
    验证 验证码：通过map[uint64(QQ)]uint8(验证码) // 对比，如果一致则注册成功
    向数据库写入，数据API我后面会写
 */
+
+type (
+	APIs struct{} // APIs 账号 APIs
+
+	PostCodeReq struct{ ID string } // PostCodeReq 验证码发送
+)
+
+var code map[string]string = map[string]string{} // code 验证码
+
+// 验证码。
+// POST apis/accounts/code
+func (a *APIs) PostCode(v *PostCodeReq) *kongchuanhujiao.Response {
+	err := sendCode(v.ID)
+	if err != nil {
+		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+	}
+	return &kongchuanhujiao.Response{Message: "ok"}
+}
+
+// 登录。
+// POST apis/accounts/login
+func (a *APIs) PostLogin() {
+
+}
+
+func (a *APIs) GetLogin() {
+
+}
+
+// sendCode 发送验证码
+func sendCode(id string) error {
+	a, err := accounts.SelectAccount(id, 0)
+	if err != nil {
+		return err
+	}
+
+	if len(a) == 0 {
+		return errors.New("账号不存在")
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	c := strconv.FormatUint(uint64(rand.Float32()*10000), 10)
+
+	m := clientmsg.NewTextMessage(c)
+	client.GetClient().SendMessage(m.SetTarget(&clientmsg.Target{ID: a[0].QQ}))
+	code[id] = c
+	return nil
+}

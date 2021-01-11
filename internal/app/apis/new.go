@@ -1,6 +1,7 @@
 package apis
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/accounts"
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
@@ -17,6 +18,7 @@ func NewApis() {
 	app.Use(recover.New())
 	APIs := mvc.New(app.Party("apis/"))
 
+	APIs.Party("accounts/").Handle(new(accounts.APIs))
 	APIs.Party("wenda/").Handle(new(wenda.APIs))
 
 	go func() {
