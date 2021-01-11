@@ -23,3 +23,14 @@ func Push(accessToken string, secret string, content string, atMobiles []string,
 
 	return err
 }
+
+func PushMD(accessToken string, secret string, md *dingtalk.MarkdownMessage) error {
+
+	client := dingtalk.Client{
+		AccessToken: accessToken,
+		Secret:      secret,
+	}
+	_, err := client.Send(md)
+
+	return err
+}

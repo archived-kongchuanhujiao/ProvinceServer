@@ -164,7 +164,7 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchu
 		// FIXME 有关作答数据计算结果的内容需要确定
 		// FIXME 这里单独一个文件（wenda/push.go）去生成，钉钉生成MarkDown,QQ就是封装的消息链
 
-		err := datahubpkg.PushMessage(ac[0].Token, ac[0].Push, "", []string{}, false)
+		err := datahubpkg.PushMessageMD(ac[0].Token, ac[0].Push, ConvertToMarkdown(&wenda.QuestionsTab{}))
 		if err != nil {
 			logger.Error("发送钉钉消息失败", zap.Error(err))
 			return &kongchuanhujiao.Response{Status: 1, Message: "发送失败"}

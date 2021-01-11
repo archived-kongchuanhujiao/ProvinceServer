@@ -10,7 +10,7 @@ import (
 
 // convertToMarkDown 将问题数据转换为钉钉 Markdown 消息
 // FIXME 详见 apis.go@PostPushcenter()
-func convertToMarkdown(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
+func ConvertToMarkdown(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
 	builder := dingtalk.NewMarkdownMessage()
 
 	t, c := getQuestionDetail(tab, true)
@@ -23,7 +23,7 @@ func convertToMarkdown(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
 
 // convertToChain 将问题数据转换为消息链
 // TODO 详见 apis.go@PostPushcenter()
-func convertToChain(tab *wenda.QuestionsTab) (m *clientmsg.Message) {
+func ConvertToChain(tab *wenda.QuestionsTab) (m *clientmsg.Message) {
 	t, c := getQuestionDetail(tab, false)
 	m = clientmsg.NewTextMessage(t + "\n" + c)
 
