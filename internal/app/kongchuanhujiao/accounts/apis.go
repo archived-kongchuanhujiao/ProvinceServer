@@ -64,9 +64,9 @@ func sendCode(id string) error {
 	}
 
 	rand.Seed(time.Now().UnixNano())
-	c := strconv.FormatUint(uint64(rand.Float32()*10000), 10)
+	c := strconv.FormatFloat(rand.Float64(), 'f', -1, 64)[2:6]
 
-	m := clientmsg.NewTextMessage(c)
+	m := clientmsg.NewTextMessage("您的验证码是： " + c + " 。任何人都不会索要验证码！")
 	client.GetClient().SendMessage(m.SetTarget(&clientmsg.Target{ID: a[0].QQ}))
 	code[id] = c
 	return nil
