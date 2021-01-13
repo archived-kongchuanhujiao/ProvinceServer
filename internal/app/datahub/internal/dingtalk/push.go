@@ -8,13 +8,13 @@ import (
 // 另请查询 [apis.go#PostPushcenter()]
 
 // Push 推送一个任意样式的消息至钉钉平台.
-func Push(accessToken string, secret string, md *dingtalk.Message) error {
+func Push(accessToken string, secret string, md dingtalk.Message) error {
 
 	client := dingtalk.Client{
 		AccessToken: accessToken,
 		Secret:      secret,
 	}
-	_, err := client.Send(*md)
+	_, err := client.Send(md)
 
 	return err
 }

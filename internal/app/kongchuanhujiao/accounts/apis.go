@@ -42,6 +42,13 @@ func (a *APIs) PostCode(v *PostCodeReq) *kongchuanhujiao.Response {
 	return &kongchuanhujiao.Response{Message: "ok"}
 }
 
+func (a *APIs) PostRegister() {
+
+}
+
+func (a *APIs) PostRegisterVerifier() {
+}
+
 // 登录。
 // POST apis/accounts/login
 func (a *APIs) PostLogin() {

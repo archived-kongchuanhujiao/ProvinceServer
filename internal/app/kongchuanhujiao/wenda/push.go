@@ -10,7 +10,7 @@ import (
 
 // convertToMarkDown 将问题数据转换为钉钉 Markdown 消息
 // FIXME 详见 apis.go@PostPushcenter()
-func ConvertToMarkdown(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
+func ConvertToDTMessage(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
 	builder := dingtalk.NewMarkdownMessage()
 
 	t, c := getQuestionDetail(tab, true)
