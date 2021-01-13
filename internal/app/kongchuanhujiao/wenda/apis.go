@@ -41,7 +41,7 @@ type (
 		Target []uint64 // 目标集
 	}
 
-	PostPushcenterReq struct { // PostPushcenterReq 推送新建
+	PostPushcenterReq struct { // PostPushcenterReq 推送激活
 		ID     uint32 // 唯一识别码
 		Target string // 目标
 	}
