@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"errors"
+	"github.com/kataras/iris/v12/context"
 	"math/rand"
 	"strconv"
 	"time"
@@ -42,11 +43,12 @@ func (a *APIs) PostCode(v *PostCodeReq) *kongchuanhujiao.Response {
 	return &kongchuanhujiao.Response{Message: "ok"}
 }
 
-func (a *APIs) PostRegister() {
-
-}
-
-func (a *APIs) PostRegisterVerifier() {
+// 获取验证码并发送
+// POST apis/accounts/register/verifier
+func (a *APIs) PostRegisterVerifier(c *context.Context) *kongchuanhujiao.Response {
+	id := c.PostValue("QQ")
+	a.PostCode(&PostCodeReq{ID: id})
+	return &kongchuanhujiao.Response{Message: "ok"}
 }
 
 // 登录。
