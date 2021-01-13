@@ -4,33 +4,17 @@ import (
 	"github.com/CatchZeng/dingtalk"
 )
 
-// TODO 这里引入第三方包
-// TODO 这里不能调用其他的包，只能调用第三方包，否则软件架构会混乱。所有需要的数据在进来前就要准备好，不能从这里获取其他数据信息
+// 这里不能调用其他的包，只能调用第三方包，否则软件架构会混乱。所有需要的数据在进来前就要准备好，不能从这里获取其他数据信息/
 // 另请查询 [apis.go#PostPushcenter()]
 
-func Push(accessToken string, secret string, content string, atMobiles []string, isAtAll bool) error {
-	msg := dingtalk.NewTextMessage().SetContent(content)
-
-	if len(atMobiles) > 0 {
-		msg.SetAt(atMobiles, isAtAll)
-	}
+// Push 推送一个任意样式的消息至钉钉平台.
+func Push(accessToken string, secret string, md *dingtalk.Message) error {
 
 	client := dingtalk.Client{
 		AccessToken: accessToken,
 		Secret:      secret,
 	}
-	_, err := client.Send(msg)
-
-	return err
-}
-
-func PushMD(accessToken string, secret string, md *dingtalk.MarkdownMessage) error {
-
-	client := dingtalk.Client{
-		AccessToken: accessToken,
-		Secret:      secret,
-	}
-	_, err := client.Send(md)
+	_, err := client.Send(*md)
 
 	return err
 }

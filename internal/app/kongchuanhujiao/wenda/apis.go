@@ -146,25 +146,12 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchu
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
-	/*
-		TODO 弄个答题数据推送模板（独立一个函数）。生成后发送消息
-		 两个模板函数拆分出来，因为一个是封装的消息结构体一个是第三方包的钉钉消息结构体
-		 空接口（伪泛型）禁止
-	*/
-
 	if v.Target == "dingtalk" {
-		/*
-		 TODO 预期调用
-		  这里 -> datahub/datahubpkg/wenda/ -> datahub/internal/dingtalk / 然后消息就发送出去了
-		  预期是 internal/dingtalk/ 只能有 accessToken 和 密钥，因为在internal里获取有可能引入包循环问题
-		  所以进入 internal 前先把必要的数据准备好（这里理论来说以后会有一张表专门存储答题数据计算结构，推送就是推这个结果的），如第一段所写
-		*/
 
 		// FIXME 取消使用问题数据，而是学生作答数据，作答数据结果和作答数据是两张表
 		// FIXME 有关作答数据计算结果的内容需要确定
-		// FIXME 这里单独一个文件（wenda/push.go）去生成，钉钉生成MarkDown,QQ就是封装的消息链
+		err := datahubpkg.PushMessage(ac[0].Token, ac[0].Push, ConvertToMarkdown(&wenda.QuestionsTab{}))
 
-		err := datahubpkg.PushMessageMD(ac[0].Token, ac[0].Push, ConvertToMarkdown(&wenda.QuestionsTab{}))
 		if err != nil {
 			logger.Error("发送钉钉消息失败", zap.Error(err))
 			return &kongchuanhujiao.Response{Status: 1, Message: "发送失败"}
