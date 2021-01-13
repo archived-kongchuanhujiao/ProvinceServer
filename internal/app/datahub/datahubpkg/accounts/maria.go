@@ -29,18 +29,3 @@ func SelectAccount(id string, qq uint64) (data []*Tab, err error) {
 	}
 	return
 }
-
-// InsertAccount 新建账号
-func InsertAccount(a *Tab) (err error) {
-	sql, args, err := sqrl.Insert("accounts").Values(nil, a.Type, a.QQ, a.Class, nil, nil).ToSql()
-	if err != nil {
-		loggerr.Error("生成SQL语句失败", zap.Error(err))
-		return
-	}
-
-	_, err = maria.DB.Exec(sql, args...)
-	if err != nil {
-		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
-	}
-	return
-}
