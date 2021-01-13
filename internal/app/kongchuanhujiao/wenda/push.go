@@ -68,3 +68,18 @@ Markdown 模板
 > 易错选项 > {option}
 > 最快答对的同学 > {name}
 */
+
+// PushDigestToQQ TODO 推送摘要至QQ平台
+func PushDigestToQQ() (err error) {
+	return
+}
+
+// PushDigestToDingtalk 推送摘要至钉钉平台
+func PushDigestToDingtalk(accessToken string, secret string, md dingtalk.Message) (err error) {
+	client := dingtalk.Client{
+		AccessToken: accessToken,
+		Secret:      secret,
+	}
+	_, err = client.Send(md)
+	return
+}

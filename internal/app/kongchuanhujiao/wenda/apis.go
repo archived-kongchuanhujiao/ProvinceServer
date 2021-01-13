@@ -3,7 +3,6 @@ package wenda
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/accounts"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao"
@@ -150,7 +149,7 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchu
 
 		// FIXME 取消使用问题数据，而是学生作答数据，作答数据结果和作答数据是两张表
 		// FIXME 有关作答数据计算结果的内容需要确定
-		err := datahubpkg.PushMessage(ac[0].Token, ac[0].Push, ConvertToDTMessage(&wenda.QuestionsTab{}))
+		err := PushDigestToDingtalk(ac[0].Token, ac[0].Push, ConvertToDTMessage(&wenda.QuestionsTab{}))
 
 		if err != nil {
 			logger.Error("发送钉钉消息失败", zap.Error(err))
