@@ -5,69 +5,45 @@ import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
 	"fmt"
 	"github.com/CatchZeng/dingtalk"
-	"strconv"
 )
 
 // convertToMarkDown 将问题数据转换为钉钉 Markdown 消息
 // FIXME 详见 apis.go@PostPushcenter()
 func ConvertToDTMessage(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
 	builder := dingtalk.NewMarkdownMessage()
-
-	t, c := getQuestionDetail(tab, true)
-
-	builder.Markdown.Title = t
-	builder.Markdown.Text = c
-
+	builder.Markdown.Title = "答题数据："
+	builder.Markdown.Text = digestQuestionData(tab, true)
 	return builder
 }
 
 // convertToChain 将问题数据转换为消息链
 // TODO 详见 apis.go@PostPushcenter()
-func ConvertToChain(tab *wenda.QuestionsTab) (m *clientmsg.Message) {
-	t, c := getQuestionDetail(tab, false)
-	m = clientmsg.NewTextMessage(t + "\n" + c)
-
-	return
+func ConvertToChain(tab *wenda.QuestionsTab) *clientmsg.Message {
+	return clientmsg.NewTextMessage(digestQuestionData(tab, false))
 }
 
-// getQuestionDetail 获取问题信息的字符串形式
-func getQuestionDetail(tab *wenda.QuestionsTab, useMarkdown bool) (title string, content string) {
-	title = "问题 #" + strconv.Itoa(int(tab.ID)) + " 的数据"
-	// FIXME 等待数据库 API
-	content = getQuestionSummary(tab, useMarkdown)
-
-	return
-}
-
-// getQuestionSummary 获取题目概要
-func getQuestionSummary(tab *wenda.QuestionsTab, isMarkdown bool) (sum string) {
-	sum = tab.Question + " 选项: " + tab.Options
-
-	if len(sum) > 20 {
-		sum = sum[0:20] + "..."
-	}
-
+// digestQuestionData 摘要答题数据
+func digestQuestionData(tab *wenda.QuestionsTab, isMarkdown bool) (sum string) {
+	sum = digestQuestion(tab)
+	template := ""
 	if !isMarkdown {
-		template := "## #%v 详细信息\n\n> 正确人数 > %v 人\n> 正确率 > %v\n> 易错选项 > %v\n> 最快答对的同学 > %v"
-		sum += fmt.Sprintf(template, tab.ID, "人数", "正确率", "易错选项", "最速同学")
+		template = "## #%v 详细信息\n\n> 正确人数 > %v 人\n> 正确率 > %v\n> 易错选项 > %v\n> 最快答对的同学 > %v"
 	} else {
-		template := "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n 最快答对的同学 > %v"
-		sum += fmt.Sprintf(template, tab.ID, "人数", "正确率", "易错选项", "最速同学")
+		template = "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n 最快答对的同学 > %v"
 	}
-
+	sum += fmt.Sprintf(template, tab.ID, "人数", "正确率", "易错选项", "最速同学")
 	return
 }
 
-/*
-Markdown 模板
-
-## #{id} 详细信息
-
-> 正确人数 > {number} 人
-> 正确率 > {percent}%
-> 易错选项 > {option}
-> 最快答对的同学 > {name}
-*/
+// digestQuestion 摘要题干
+func digestQuestion(q *wenda.QuestionsTab) (s string) {
+	// FIXME Question 和 Options 均为json，需要特殊解析
+	s = q.Question + " 选项：" + q.Options
+	if len(s) > 20 {
+		s = s[0:20] + "..."
+	}
+	return
+}
 
 // PushDigestToQQ TODO 推送摘要至QQ平台
 func PushDigestToQQ() (err error) {
