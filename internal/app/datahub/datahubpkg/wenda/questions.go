@@ -68,6 +68,7 @@ func UpdateQuestionStatus(q *wendapkg.QuestionsTab, status uint8) (err error) {
 			Members: client.GetClient().GetGroupMembers(q.Target),
 		}
 		ActiveGroup[q.Target] = wendapkg.QuestionID(q.ID)
+		return sendQuestionMsg(q)
 	}
 
 	return
