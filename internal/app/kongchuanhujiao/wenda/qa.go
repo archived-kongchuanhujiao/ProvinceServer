@@ -88,25 +88,6 @@ func sendQuestionMsg(q *wenda.QuestionsTab) (err error) {
 	return
 }
 
-// ReadQuestion 使用 i：问题ID(ID) 读取问答信息
-func ReadQuestion(i uint32) (q *Question, err error) {
-	// FIXME
-	res, err := a.DB.Question().ReadQuestion(i)
-	if err != nil {
-		return
-	}
-
-	answer, err := a.DB.Answer().ReadAnswerList(i)
-	if err != nil {
-		return
-	}
-
-	groupInfo := a.Cli.C.FindGroupByUin(int64(res.Target))
-	mems := a.ReadMemInfo(uint64(groupInfo.Uin))
-
-	return &Question{res, mems, groupInfo.Name, answer}, nil
-}
-
 // insertAnswer 新增回答
 // qid 问题 ID
 // qnum 学生 QQ 号
