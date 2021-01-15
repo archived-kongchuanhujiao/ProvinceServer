@@ -2,6 +2,7 @@ package wenda
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+
 	"github.com/elgris/sqrl"
 	"go.uber.org/zap"
 )
@@ -18,5 +19,7 @@ func InsertAnswer(a *AnswersTab) (err error) {
 	if err != nil {
 		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
+
+	caches[a.Question].Answers = a
 	return
 }

@@ -133,40 +133,12 @@ func ReadQuestion(i uint32) (q *Question, err error) {
 	return &Question{res, mems, groupInfo.Name, answer}, nil
 }
 
-// ReadMemInfo 使用 i：群ID(ID) 读取群成员信息 FIXME 应该由APIs 拆分出来，此代码应当废弃
-func ReadMemInfo(i uint64) []*memInfo {
-	// FIXME
-	var data []*memInfo
-	for _, v := range a.Cli.C.FindGroupByUin(int64(i)).Members {
-		data = append(data, &memInfo{uint64(v.Uin), v.DisplayName()})
-	}
-
-	return data
-}
-
-// writeAnswer 写入回答答案
-func writeAnswer(q *wenda.QuestionsTab, stu uint64, ans string) {
-	// FIXME
-	a := &wenda.AnswersTab{
-		Question: q.ID,
-		QQ:       stu,
-		Answer:   ans,
-		Time:     time.Now(),
-	}
-
-	err := a.DB.Answer().WriteAnswerList(a)
-	if err != nil {
-		logger.Error("写入答案失败", zap.Error(err))
-		return
-	}
-
-	// TODO 向数据总线也写入
-	q.Answer = append(q.Answer, a)
-}
-
-// writeAnswerOverFill 写入答案 [填空题]
-func writeAnswerOverFill() {
-	//// FIXME
+// insertAnswer 新增回答
+// qid 问题 ID
+// qnum 学生 QQ 号
+// ans 学生回答内容
+func insertAnswer(q *wenda.QuestionsTab, qnum uint64, ans string) {
+	_ = wenda.InsertAnswer(&wenda.AnswersTab{Question: q.ID, QQ: qnum, Answer: ans, Time: time.Now()})
 }
 
 // handleAnswer 处理消息中可能存在的答案
