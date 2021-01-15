@@ -1,6 +1,8 @@
 package wenda
 
 import (
+	"time"
+
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 
@@ -9,7 +11,9 @@ import (
 )
 
 // InsertAnswer 新增回答
+// 结构体中无需传 ID、Time
 func InsertAnswer(a *AnswersTab) (err error) {
+	a.Time = time.Now()
 	sql, args, err := sqrl.Insert("answers").Values(nil, a.Question, a.QQ, a.Answer, a.Time).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
