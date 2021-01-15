@@ -2,7 +2,6 @@ package wenda
 
 import (
 	"io/ioutil"
-	"strconv"
 	"strings"
 	"time"
 
@@ -89,31 +88,6 @@ func sendQuestionMsg(q *wenda.QuestionsTab) (err error) {
 	return
 }
 
-// StopQA 使用 i：问题ID(ID) 停止问答
-func StopQA(i uint32) (err error) {
-	// FIXME
-
-	if err = a.deleteQABasicSrvPoll(i); err != nil {
-		log.Error().Err(err).Msg("删除问答基本服务监听失败")
-		return
-	}
-
-	if err = wenda.UpdateQuestionStatus(i, 2); err != nil {
-		return
-	}
-
-	log.Info().Msg("问题 " + strconv.Itoa(int(i)) + " 已停止答题")
-	return
-}
-
-// PrepareQA 使用 i：问题ID(ID) 准备作答
-func PrepareQA(i uint32) (err error) {
-	if err = deleteQABasicSrvPoll(i); err != nil {
-		return
-	}
-	return wenda.UpdateQuestionStatus(i, 0)
-}
-
 // ReadQuestion 使用 i：问题ID(ID) 读取问答信息
 func ReadQuestion(i uint32) (q *Question, err error) {
 	// FIXME
@@ -142,7 +116,7 @@ func insertAnswer(q *wenda.QuestionsTab, qnum uint64, ans string) {
 }
 
 // handleAnswer 处理消息中可能存在的答案
-func handleAnswer(m *qq.Msg) {
+func handleAnswer(m *clientmsg.Message) {
 	// FIXME
 	q, ok := QABasicSrvPoll[m.Group.ID]
 	if !ok {
