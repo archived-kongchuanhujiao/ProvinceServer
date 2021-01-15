@@ -98,47 +98,32 @@ func insertAnswer(q *wenda.QuestionsTab, qnum uint64, ans string) {
 
 // handleAnswer 处理消息中可能存在的答案
 func handleAnswer(m *clientmsg.Message) {
-	// FIXME
-	q, ok := QABasicSrvPoll[m.Group.ID]
+
+	qid, ok := wenda.ActiveGroup[m.Target.Group.ID]
 	if !ok {
 		return
 	}
 
-	for _, v := range q.Answer {
-		if v.AnswererID == m.User.ID {
+	q := wenda.Caches[qid]
+	for _, v := range q.Answers {
+		if v.QQ == m.Target.ID {
 			return
 		}
 	}
 
-	switch q.Type {
-	// 选择题
-	case 0:
+	switch q.Questions.Type {
+
+	case 0, 1: // 选择题、填空题
 		if checkAnswerForSelect(m.Chain[0].Text) {
-			a.writeAnswer(q, m.User.ID, strings.ToUpper(m.Chain[0].Text))
+			writeAnswer(qid, m.User.ID, strings.ToUpper(m.Chain[0].Text))
 		}
-	// 简答题
-	case 1:
+	case 2: // 多选题
+
+	case 3: // 简答题
 		if checkAnswerForFill(m.Chain[0].Text) {
-			a.writeAnswer(q, m.User.ID, strings.TrimPrefix(m.Chain[0].Text, "#"))
+			writeAnswer(qid, m.User.ID, strings.TrimPrefix(m.Chain[0].Text, "#"))
 		}
-	// 多选题
-	case 2:
-
-	// 填空题
-	case 3:
 
 	}
 
-}
-
-// deleteQABasicSrvPoll 使用 i：问题ID(ID) 删除问答基本服务池字段 FIXME 这里逻辑有点大问题
-func deleteQABasicSrvPoll(i uint32) (err error) {
-	// FIXME
-	q, err := a.DB.Question().ReadQuestion(i)
-	if err != nil {
-		return
-	}
-
-	delete(QABasicSrvPoll, q.Target)
-	return
 }
