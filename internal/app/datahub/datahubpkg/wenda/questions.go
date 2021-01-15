@@ -57,17 +57,17 @@ func UpdateQuestionStatus(q *QuestionsTab, status uint8) (err error) {
 
 	switch status {
 	case 0, 2: // 准备作答
-		delete(activeGroup, q.Target)
+		delete(ActiveGroup, q.Target)
 	case 1: // 开始作答
 		a, err := SelectAnswers(q.ID)
 		if err != nil {
 			return err
 		}
-		caches[q.ID] = &wendapkg.WendaDetails{
+		Caches[wendapkg.QuestionID(q.ID)] = &wendapkg.WendaDetails{
 			Questions: q, Answers: a,
 			Members: client.GetClient().GetGroupMembers(q.Target),
 		}
-		activeGroup[q.Target] = wendapkg.QuestionID(q.ID)
+		ActiveGroup[q.Target] = wendapkg.QuestionID(q.ID)
 	}
 
 	return

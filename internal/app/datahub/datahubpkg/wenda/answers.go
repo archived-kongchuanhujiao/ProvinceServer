@@ -2,6 +2,7 @@ package wenda
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 
 	"github.com/elgris/sqrl"
 	"go.uber.org/zap"
@@ -20,7 +21,7 @@ func InsertAnswer(a *AnswersTab) (err error) {
 		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
 
-	caches[a.Question].Answers = a
+	Caches[wendapkg.QuestionID(a.Question)].Answers = append(Caches[wendapkg.QuestionID(a.Question)].Answers, a)
 	return
 }
 
