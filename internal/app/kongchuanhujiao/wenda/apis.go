@@ -59,6 +59,7 @@ type (
 // GET /apis/wenda/questions
 func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhujiao.Response {
 
+	// FIXME 需要拆分出更细的颗粒密度
 	var (
 		d   []*wenda.QuestionsTab
 		g   map[uint64]string
