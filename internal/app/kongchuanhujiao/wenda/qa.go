@@ -3,7 +3,6 @@ package wenda
 import (
 	"io/ioutil"
 	"strings"
-	"time"
 
 	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
@@ -14,28 +13,22 @@ import (
 	"go.uber.org/zap"
 )
 
-// StartQA 使用 i：问题ID(ID) 开始作答
+// StartQA 开始作答
+// i 问题（问答） ID
 func StartQA(i uint32) (err error) {
-
 	q, err := wenda.SelectQuestions(&wenda.QuestionsTab{ID: i}, 0)
 	if err != nil {
-		return
-	}
-	if err = wenda.UpdateQuestionStatus(i, 1); err != nil {
 		return
 	}
 
 	que := q[0]
 
-	logger.Info("问题开始监听", zap.Uint32("ID", i))
-	if err = sendQuestionMsg(que); err != nil {
+	if err = wenda.UpdateQuestionStatus(que, 1); err != nil {
 		return
 	}
 
-	que.Status = 1
-	// TODO 写到 datahub
-	//QABasicSrvPoll[q.Target] = que
-	return
+	logger.Info("问答开始", zap.Uint32("ID", i))
+	return sendQuestionMsg(que)
 }
 
 // sendQuestionMsg 发送问答题干
@@ -88,14 +81,6 @@ func sendQuestionMsg(q *wenda.QuestionsTab) (err error) {
 	return
 }
 
-// insertAnswer 新增回答
-// qid 问题 ID
-// qnum 学生 QQ 号
-// ans 学生回答内容
-func insertAnswer(q *wenda.QuestionsTab, qnum uint64, ans string) {
-	_ = wenda.InsertAnswer(&wenda.AnswersTab{Question: q.ID, QQ: qnum, Answer: ans, Time: time.Now()})
-}
-
 // handleAnswer 处理消息中可能存在的答案
 func handleAnswer(m *clientmsg.Message) {
 
@@ -103,6 +88,12 @@ func handleAnswer(m *clientmsg.Message) {
 	if !ok {
 		return
 	}
+
+	ans, ok := m.Chain[0].(*clientmsg.Text)
+	if !ok {
+		return
+	}
+	answer := ans.Content
 
 	q := wenda.Caches[qid]
 	for _, v := range q.Answers {
@@ -114,16 +105,25 @@ func handleAnswer(m *clientmsg.Message) {
 	switch q.Questions.Type {
 
 	case 0, 1: // 选择题、填空题
-		if checkAnswerForSelect(m.Chain[0].Text) {
-			writeAnswer(qid, m.User.ID, strings.ToUpper(m.Chain[0].Text))
+		if !checkAnswerForSelect(answer) {
+			return
 		}
+		_ = wenda.InsertAnswer(&wenda.AnswersTab{
+			Question: uint32(qid),
+			QQ:       m.Target.ID,
+			Answer:   strings.ToUpper(answer),
+		})
 	case 2: // 多选题
 
 	case 3: // 简答题
-		if checkAnswerForFill(m.Chain[0].Text) {
-			writeAnswer(qid, m.User.ID, strings.TrimPrefix(m.Chain[0].Text, "#"))
+		if !checkAnswerForFill(answer) {
+			return
 		}
+		_ = wenda.InsertAnswer(&wenda.AnswersTab{
+			Question: uint32(qid),
+			QQ:       m.Target.ID,
+			Answer:   strings.TrimPrefix(answer, "#"),
+		})
 
 	}
-
 }
