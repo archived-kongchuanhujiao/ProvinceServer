@@ -1,6 +1,7 @@
 package wenda
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 	"io/ioutil"
 	"strings"
 
@@ -16,7 +17,7 @@ import (
 // StartQA 开始作答
 // i 问题（问答） ID
 func StartQA(i uint32) (err error) {
-	q, err := wenda.SelectQuestions(&wenda.QuestionsTab{ID: i}, 0)
+	q, err := wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: i}, 0)
 	if err != nil {
 		return
 	}
@@ -32,7 +33,7 @@ func StartQA(i uint32) (err error) {
 }
 
 // sendQuestionMsg 发送问答题干
-func sendQuestionMsg(q *wenda.QuestionsTab) (err error) {
+func sendQuestionMsg(q *wendapkg.QuestionsTab) (err error) {
 	var (
 		question []struct {
 			Type string `json:"type"` // 类型
@@ -108,7 +109,7 @@ func handleAnswer(m *clientmsg.Message) {
 		if !checkAnswerForSelect(answer) {
 			return
 		}
-		_ = wenda.InsertAnswer(&wenda.AnswersTab{
+		_ = wenda.InsertAnswer(&wendapkg.AnswersTab{
 			Question: uint32(qid),
 			QQ:       m.Target.ID,
 			Answer:   strings.ToUpper(answer),
@@ -119,7 +120,7 @@ func handleAnswer(m *clientmsg.Message) {
 		if !checkAnswerForFill(answer) {
 			return
 		}
-		_ = wenda.InsertAnswer(&wenda.AnswersTab{
+		_ = wenda.InsertAnswer(&wendapkg.AnswersTab{
 			Question: uint32(qid),
 			QQ:       m.Target.ID,
 			Answer:   strings.TrimPrefix(answer, "#"),

@@ -22,8 +22,8 @@ type (
 	}
 
 	GetQuestionsRes struct { // GetQuestionsReq 问题响应
-		Questions []*wenda.QuestionsTab `json:"questions"` // 问题
-		Groups    *wendapkg.Groups      `json:"groups"`    // 群
+		Questions []*wendapkg.QuestionsTab `json:"questions"` // 问题
+		Groups    *wendapkg.Groups         `json:"groups"`    // 群
 	}
 
 	PutQuestionStatusReq struct { // PutQuestionStatusReq 问题更新
@@ -62,15 +62,15 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 
 	// FIXME 需要拆分出更细的颗粒密度
 	var (
-		d   []*wenda.QuestionsTab
+		d   []*wendapkg.QuestionsTab
 		g   *wendapkg.Groups
 		err error
 	)
 
 	if v.ID != 0 {
-		d, err = wenda.SelectQuestions(&wenda.QuestionsTab{ID: v.ID}, 0)
+		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: v.ID}, 0)
 	} else {
-		d, err = wenda.SelectQuestions(&wenda.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, v.Page)
+		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, v.Page)
 		g = client.GetClient().GetGroups()
 	}
 	if err != nil {
@@ -83,7 +83,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 // PutQuestionsStatus 更新问题状态。s
 // PUT /apis/wenda/questions/status
 func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Response {
-	err := wenda.UpdateQuestionStatus(&wenda.QuestionsTab{ID: v.ID}, v.Status)
+	err := wenda.UpdateQuestionStatus(&wendapkg.QuestionsTab{ID: v.ID}, v.Status)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -92,7 +92,7 @@ func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Resp
 
 // PostQuestions 新建问题。
 // POST /apis/wenda/questions
-func (a *APIs) PostQuestions(v *wenda.QuestionsTab) *kongchuanhujiao.Response {
+func (a *APIs) PostQuestions(v *wendapkg.QuestionsTab) *kongchuanhujiao.Response {
 	err := wenda.InsertQuestion(v)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
@@ -102,7 +102,7 @@ func (a *APIs) PostQuestions(v *wenda.QuestionsTab) *kongchuanhujiao.Response {
 
 // PutQuestions 更新问题。
 // PUT /apis/wenda/questions
-func (a *APIs) PutQuestions(v *wenda.QuestionsTab) *kongchuanhujiao.Response {
+func (a *APIs) PutQuestions(v *wendapkg.QuestionsTab) *kongchuanhujiao.Response {
 	err := wenda.UpdateQuestion(v)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
@@ -113,7 +113,7 @@ func (a *APIs) PutQuestions(v *wenda.QuestionsTab) *kongchuanhujiao.Response {
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
 func (a *APIs) PostPraise(v *PostPraisePeq) *kongchuanhujiao.Response {
-	q, err := wenda.SelectQuestions(&wenda.QuestionsTab{ID: v.ID}, 0)
+	q, err := wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: v.ID}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -128,7 +128,7 @@ func (a *APIs) PostPraise(v *PostPraisePeq) *kongchuanhujiao.Response {
 // GetMarkets 获取市场列表。
 // GET /apis/wenda/markets
 func (a *APIs) GetMarkets(v *GetMarketsReq) *kongchuanhujiao.Response {
-	q, err := wenda.SelectQuestions(&wenda.QuestionsTab{Market: true, Subject: v.Subject}, v.Page)
+	q, err := wenda.SelectQuestions(&wendapkg.QuestionsTab{Market: true, Subject: v.Subject}, v.Page)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -161,7 +161,7 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchu
 
 		// FIXME 取消使用问题数据，而是学生作答数据，作答数据结果和作答数据是两张表
 		// FIXME 有关作答数据计算结果的内容需要确定
-		err := PushDigestToDingtalk(ac[0].Token, ac[0].Push, ConvertToDTMessage(&wenda.QuestionsTab{}))
+		err := PushDigestToDingtalk(ac[0].Token, ac[0].Push, ConvertToDTMessage(&wendapkg.QuestionsTab{}))
 
 		if err != nil {
 			logger.Error("发送钉钉消息失败", zap.Error(err))

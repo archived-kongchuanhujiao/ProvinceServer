@@ -10,7 +10,7 @@ import (
 )
 
 // SelectQuestions 获取问题
-func SelectQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err error) {
+func SelectQuestions(v *wendapkg.QuestionsTab, page uint32) (data []*wendapkg.QuestionsTab, err error) {
 
 	sqr := sqrl.Select("*").From("questions").OrderBy("id DESC")
 	if v.Creator != "" {
@@ -42,7 +42,7 @@ func SelectQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err er
 
 // UpdateQuestionStatus 更新问题状态
 // 当 status = 1 时， q 必须传入由 SelectQuestions 获取的
-func UpdateQuestionStatus(q *QuestionsTab, status uint8) (err error) {
+func UpdateQuestionStatus(q *wendapkg.QuestionsTab, status uint8) (err error) {
 
 	sql, args, err := sqrl.Update("questions").Set("`status`", status).Where("id=?", q.ID).ToSql()
 	if err != nil {
@@ -74,7 +74,7 @@ func UpdateQuestionStatus(q *QuestionsTab, status uint8) (err error) {
 }
 
 // InsertQuestion 新增问题
-func InsertQuestion(q *QuestionsTab) (err error) {
+func InsertQuestion(q *wendapkg.QuestionsTab) (err error) {
 	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question, q.Creator,
 		q.Target, 0, q.Options, q.Key, q.Market).ToSql()
 	if err != nil {
@@ -90,7 +90,7 @@ func InsertQuestion(q *QuestionsTab) (err error) {
 }
 
 // UpdateQuestion 更新问题
-func UpdateQuestion(q *QuestionsTab) (err error) {
+func UpdateQuestion(q *wendapkg.QuestionsTab) (err error) {
 	sql, args, err := sqrl.Update("questions").Where("id=?", q.ID).
 		Set("`subject`", q.Subject).
 		Set("question", q.Question).
@@ -112,7 +112,7 @@ func UpdateQuestion(q *QuestionsTab) (err error) {
 
 // CopyQuestions 复制问题
 func CopyQuestions(id uint32, creator string, target uint64) (err error) {
-	q, err := SelectQuestions(&QuestionsTab{ID: id, Market: true}, 0)
+	q, err := SelectQuestions(&wendapkg.QuestionsTab{ID: id, Market: true}, 0)
 	if err != nil {
 		return
 	}

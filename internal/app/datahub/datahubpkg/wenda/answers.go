@@ -12,7 +12,7 @@ import (
 
 // InsertAnswer 新增回答
 // 结构体中无需传 ID、Time
-func InsertAnswer(a *AnswersTab) (err error) {
+func InsertAnswer(a *wendapkg.AnswersTab) (err error) {
 	a.Time = time.Now()
 	sql, args, err := sqrl.Insert("answers").Values(nil, a.Question, a.QQ, a.Answer, a.Time).ToSql()
 	if err != nil {
@@ -31,7 +31,7 @@ func InsertAnswer(a *AnswersTab) (err error) {
 
 // SelectAnswers 获取回答
 // qid 问题 ID
-func SelectAnswers(qid uint32) (data []*AnswersTab, err error) {
+func SelectAnswers(qid uint32) (data []*wendapkg.AnswersTab, err error) {
 	sql, args, err := sqrl.Select("*").From("answers").
 		Where("question=?", qid).OrderBy("id DESC").ToSql()
 	if err != nil {
