@@ -2,6 +2,7 @@ package internal
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/Mrs4s/MiraiGo/client"
@@ -33,6 +34,7 @@ func NewClient(a uint64, p string) (q *QQ) {
 	return
 }
 
+// SendMessage 发送消息
 func (q *QQ) SendMessage(m *clientmsg.Message) {
 	ms := q.transformToMiraiGO(m)
 	if m.Target.Group != nil {
@@ -43,6 +45,7 @@ func (q *QQ) SendMessage(m *clientmsg.Message) {
 	loggerr.Info("发送消息", zap.Any("消息", m.Chain))
 }
 
+// ReceiveMessage 接收消息
 func (q *QQ) ReceiveMessage(m *clientmsg.Message) {
 	logger.Debug("接收消息", zap.Any("消息", m))
 	if q.callback != nil && len(m.Chain) != 0 {
@@ -50,15 +53,25 @@ func (q *QQ) ReceiveMessage(m *clientmsg.Message) {
 	}
 }
 
+// SetCallback 设置回调
 func (q *QQ) SetCallback(f clientmsg.Callback) {
 	q.callback = f
 }
 
 // GetGroups 获取群
-func (q *QQ) GetGroups() (m map[uint64]string) {
-	m = map[uint64]string{}
+func (q *QQ) GetGroups() *wendapkg.Groups {
+	g := wendapkg.Groups{}
 	for _, v := range q.client.GroupList {
-		m[uint64(v.Code)] = v.Name
+		g[uint64(v.Code)] = v.Name
 	}
-	return
+	return &g
+}
+
+// GetGroupMembers 获取群成员
+func (q *QQ) GetGroupMembers(i uint64) *wendapkg.GroupMembers {
+	m := wendapkg.GroupMembers{}
+	for _, v := range q.client.GroupList[int64(i)].Members {
+		m[uint64(v.Uin)] = v.DisplayName()
+	}
+	return &m
 }
