@@ -97,8 +97,8 @@ func StopQA(i uint32) (err error) {
 		log.Error().Err(err).Msg("删除问答基本服务监听失败")
 		return
 	}
-	if err = a.DB.Question().UpdateQuestion(i, 2); err != nil {
-		log.Error().Err(err).Msg("更新问答状态字段失败")
+
+	if err = wenda.UpdateQuestionStatus(i, 2); err != nil {
 		return
 	}
 
