@@ -82,8 +82,8 @@ func sendQuestionMsg(q *wendapkg.QuestionsTab) (err error) {
 	return
 }
 
-// handleAnswer 处理消息中可能存在的答案
-func handleAnswer(m *clientmsg.Message) {
+// HandleAnswer 处理消息中可能存在的答案
+func HandleAnswer(m *clientmsg.Message) {
 
 	qid, ok := wenda.ActiveGroup[m.Target.Group.ID]
 	if !ok {
@@ -125,6 +125,5 @@ func handleAnswer(m *clientmsg.Message) {
 			QQ:       m.Target.ID,
 			Answer:   strings.TrimPrefix(answer, "#"),
 		})
-
 	}
 }
