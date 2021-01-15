@@ -1,7 +1,9 @@
 package wenda
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 
 	"github.com/elgris/sqrl"
 	"go.uber.org/zap"
@@ -39,8 +41,10 @@ func SelectQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err er
 }
 
 // UpdateQuestionStatus 更新问题状态
-func UpdateQuestionStatus(id uint32, status uint8) (err error) {
-	sql, args, err := sqrl.Update("questions").Set("`status`", status).Where("id=?", id).ToSql()
+// 当 status = 1 时， q 必须传入由 SelectQuestions 获取的
+func UpdateQuestionStatus(q *QuestionsTab, status uint8) (err error) {
+
+	sql, args, err := sqrl.Update("questions").Set("`status`", status).Where("id=?", q.ID).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
@@ -50,6 +54,22 @@ func UpdateQuestionStatus(id uint32, status uint8) (err error) {
 	if err != nil {
 		maria.Logger.Error("更新失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
+
+	switch status {
+	case 0, 2: // 准备作答
+		delete(activeGroup, q.Target)
+	case 1: // 开始作答
+		a, err := SelectAnswers(q.ID)
+		if err != nil {
+			return err
+		}
+		caches[q.ID] = &wendapkg.WendaDetails{
+			Questions: q, Answers: a,
+			Members: client.GetClient().GetGroupMembers(q.Target),
+		}
+		activeGroup[q.Target] = wendapkg.QuestionID(q.ID)
+	}
+
 	return
 }
 
