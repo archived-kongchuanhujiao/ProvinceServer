@@ -80,10 +80,10 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	return &kongchuanhujiao.Response{Message: "ok", Data: &GetQuestionsRes{d, g}}
 }
 
-// PutQuestionsStatus 更新问题状态。
+// PutQuestionsStatus 更新问题状态。s
 // PUT /apis/wenda/questions/status
 func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Response {
-	err := wenda.UpdateQuestionStatus(v.ID, v.Status)
+	err := wenda.UpdateQuestionStatus(&wenda.QuestionsTab{ID: v.ID}, v.Status)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
