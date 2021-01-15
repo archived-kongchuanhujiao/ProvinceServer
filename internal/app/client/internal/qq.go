@@ -53,3 +53,12 @@ func (q *QQ) ReceiveMessage(m *clientmsg.Message) {
 func (q *QQ) SetCallback(f clientmsg.Callback) {
 	q.callback = f
 }
+
+// GetGroups 获取群
+func (q *QQ) GetGroups() (m map[uint64]string) {
+	m = map[uint64]string{}
+	for _, v := range q.client.GroupList {
+		m[uint64(v.Code)] = v.Name
+	}
+	return
+}

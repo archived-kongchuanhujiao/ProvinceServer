@@ -20,6 +20,11 @@ type (
 		ID   uint32 // 唯一识别码
 	}
 
+	GetQuestionsRes struct { // GetQuestionsReq 问题响应
+		Questions []*wenda.QuestionsTab `json:"questions"` // 问题
+		Groups    map[uint64]string     `json:"groups"`    // 群
+	}
+
 	PutQuestionStatusReq struct { // PutQuestionStatusReq 问题更新
 		ID     uint32 // 唯一识别码
 		Status uint8  // 状态
@@ -53,19 +58,24 @@ type (
 // GetQuestions 获取问题列表或问题。
 // GET /apis/wenda/questions
 func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhujiao.Response {
+
 	var (
 		d   []*wenda.QuestionsTab
+		g   map[uint64]string
 		err error
 	)
+
 	if v.ID != 0 {
 		d, err = wenda.SelectQuestions(&wenda.QuestionsTab{ID: v.ID}, 0)
 	} else {
 		d, err = wenda.SelectQuestions(&wenda.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, v.Page)
+		g = client.GetClient().GetGroups()
 	}
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
-	return &kongchuanhujiao.Response{Message: "ok", Data: d}
+
+	return &kongchuanhujiao.Response{Message: "ok", Data: &GetQuestionsRes{d, g}}
 }
 
 // PutQuestionsStatus 更新问题状态。
