@@ -23,3 +23,21 @@ func InsertAnswer(a *AnswersTab) (err error) {
 	caches[a.Question].Answers = a
 	return
 }
+
+// SelectAnswers 获取回答
+// qid 问题 ID
+func SelectAnswers(qid uint32) (data []*AnswersTab) {
+	sql, args, err := sqrl.Select("*").From("answers").
+		Where("question=?", qid).OrderBy("id DESC").ToSql()
+	if err != nil {
+		loggerr.Error("生成SQL语句失败", zap.Error(err))
+		return
+	}
+
+	err = maria.DB.Select(&data, sql, args...)
+	if err != nil {
+		maria.Logger.Error("查询失败", zap.Error(err), zap.String("SQL语句", sql))
+		return
+	}
+	return
+}
