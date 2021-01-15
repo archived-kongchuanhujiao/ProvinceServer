@@ -6,6 +6,7 @@ import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/accounts"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao"
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/kataras/iris/v12/context"
@@ -22,7 +23,7 @@ type (
 
 	GetQuestionsRes struct { // GetQuestionsReq 问题响应
 		Questions []*wenda.QuestionsTab `json:"questions"` // 问题
-		Groups    map[uint64]string     `json:"groups"`    // 群
+		Groups    *wendapkg.Groups      `json:"groups"`    // 群
 	}
 
 	PutQuestionStatusReq struct { // PutQuestionStatusReq 问题更新
@@ -62,7 +63,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	// FIXME 需要拆分出更细的颗粒密度
 	var (
 		d   []*wenda.QuestionsTab
-		g   map[uint64]string
+		g   *wendapkg.Groups
 		err error
 	)
 
