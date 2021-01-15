@@ -68,9 +68,10 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	)
 
 	if v.ID != 0 {
-		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: v.ID}, 0)
+		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, 0)
 	} else {
-		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, v.Page)
+		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID),
+			Creator: c.GetCookie("account")}, v.Page)
 		g = client.GetClient().GetGroups()
 	}
 	if err != nil {
@@ -83,7 +84,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 // PutQuestionsStatus 更新问题状态。s
 // PUT /apis/wenda/questions/status
 func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Response {
-	err := wenda.UpdateQuestionStatus(&wendapkg.QuestionsTab{ID: v.ID}, v.Status)
+	err := wenda.UpdateQuestionStatus(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, v.Status)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -113,7 +114,7 @@ func (a *APIs) PutQuestions(v *wendapkg.QuestionsTab) *kongchuanhujiao.Response 
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
 func (a *APIs) PostPraise(v *PostPraisePeq) *kongchuanhujiao.Response {
-	q, err := wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: v.ID}, 0)
+	q, err := wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -140,7 +141,7 @@ func (a *APIs) GetMarkets(v *GetMarketsReq) *kongchuanhujiao.Response {
 func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *kongchuanhujiao.Response {
 	user := c.GetCookie("account")
 	for _, t := range v.Target {
-		err := wenda.CopyQuestions(v.ID, user, t)
+		err := wenda.CopyQuestions(wendapkg.QuestionID(v.ID), user, t)
 		if err != nil {
 			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 		}

@@ -1,6 +1,7 @@
 package wenda
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 	"github.com/gorilla/websocket"
 )
@@ -8,5 +9,5 @@ import (
 var loggerr = logger.Named("数据总线").Named("问答")
 
 type (
-	runtime map[uint32][]*websocket.Conn // runtime 运行时
+	runtime map[wendapkg.QuestionID][]*websocket.Conn // runtime 运行时
 )

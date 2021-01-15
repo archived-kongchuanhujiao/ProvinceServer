@@ -63,11 +63,11 @@ func UpdateQuestionStatus(q *wendapkg.QuestionsTab, status uint8) (err error) {
 		if err != nil {
 			return err
 		}
-		Caches[wendapkg.QuestionID(q.ID)] = &wendapkg.WendaDetails{
+		Caches[q.ID] = &wendapkg.WendaDetails{
 			Questions: q, Answers: a,
 			Members: client.GetClient().GetGroupMembers(q.Target),
 		}
-		ActiveGroup[q.Target] = wendapkg.QuestionID(q.ID)
+		ActiveGroup[q.Target] = q.ID
 		return sendQuestionMsg(q)
 	}
 
@@ -112,7 +112,7 @@ func UpdateQuestion(q *wendapkg.QuestionsTab) (err error) {
 }
 
 // CopyQuestions 复制问题
-func CopyQuestions(id uint32, creator string, target uint64) (err error) {
+func CopyQuestions(id wendapkg.QuestionID, creator string, target uint64) (err error) {
 	q, err := SelectQuestions(&wendapkg.QuestionsTab{ID: id, Market: true}, 0)
 	if err != nil {
 		return

@@ -1,6 +1,7 @@
 package wenda
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 	"net/http"
 	"strconv"
 
@@ -37,8 +38,8 @@ func (a *APIs) GetRuntime(c *context.Context) {
 	}
 	id := uint32(i)
 
-	wenda.AddClient(id, conn)
-	defer wenda.RemoveClient(id, conn)
+	wenda.AddClient(wendapkg.QuestionID(id), conn)
+	defer wenda.RemoveClient(wendapkg.QuestionID(id), conn)
 	go func() {
 		for {
 			if _, _, err := conn.ReadMessage(); err != nil {

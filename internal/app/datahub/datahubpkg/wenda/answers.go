@@ -33,7 +33,7 @@ func InsertAnswer(a *wendapkg.AnswersTab) (err error) {
 
 // SelectAnswers 获取回答
 // qid 问题 ID
-func SelectAnswers(qid uint32) (data []*wendapkg.AnswersTab, err error) {
+func SelectAnswers(qid wendapkg.QuestionID) (data []*wendapkg.AnswersTab, err error) {
 	sql, args, err := sqrl.Select("*").From("answers").
 		Where("question=?", qid).OrderBy("id DESC").ToSql()
 	if err != nil {
