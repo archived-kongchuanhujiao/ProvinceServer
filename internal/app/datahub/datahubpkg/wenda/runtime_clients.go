@@ -1,6 +1,7 @@
 package wenda
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 )
@@ -24,9 +25,9 @@ func RemoveClient(id uint32, conn *websocket.Conn) {
 }
 
 // PushData 推送数据 TODO 数据结构
-func PushData(id uint32) {
+func PushData(id uint32, data []*wendapkg.AnswersTab) {
 	for _, v := range wendaRuntime[id] {
-		err := v.WriteJSON("")
+		err := v.WriteJSON(data)
 		if err != nil {
 			loggerr.Error("推送数据失败", zap.Error(err))
 			continue
