@@ -81,11 +81,25 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	return &kongchuanhujiao.Response{Message: "ok", Data: &GetQuestionsRes{d, g}}
 }
 
-// PutQuestionsStatus 更新问题状态。s
+// PutQuestionsStatus 更新问题状态。
 // PUT /apis/wenda/questions/status
 func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Response {
-	err := wenda.UpdateQuestionStatus(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, v.Status)
+
+	var (
+		q   = &wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}
+		err error
+	)
+
+	if v.Status == 1 {
+		var qs []*wendapkg.QuestionsTab
+		qs, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, 0)
+		q = qs[0]
+	}
 	if err != nil {
+		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+	}
+
+	if wenda.UpdateQuestionStatus(q, v.Status) != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 	return &kongchuanhujiao.Response{Message: "ok"}
