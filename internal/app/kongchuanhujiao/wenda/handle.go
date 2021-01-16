@@ -1,9 +1,7 @@
 package wenda
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 	"fmt"
-	"go.uber.org/zap"
 	"strings"
 
 	"coding.net/kongchuanhujiao/server/internal/app/client"
@@ -38,7 +36,6 @@ func HandleAnswer(m *clientmsg.Message) {
 		if !checkAnswerForSelect(answer) {
 			return
 		}
-		logger.Info("答题有效", zap.Uint32("问答ID", uint32(q.Questions.ID)))
 		_ = wenda.InsertAnswer(&wendapkg.AnswersTab{
 			Question: qid,
 			QQ:       m.Target.ID,
@@ -50,7 +47,6 @@ func HandleAnswer(m *clientmsg.Message) {
 		if !checkAnswerForFill(answer) {
 			return
 		}
-		logger.Info("答题有效", zap.Uint32("问答ID", uint32(q.Questions.ID)))
 		_ = wenda.InsertAnswer(&wendapkg.AnswersTab{
 			Question: qid,
 			QQ:       m.Target.ID,

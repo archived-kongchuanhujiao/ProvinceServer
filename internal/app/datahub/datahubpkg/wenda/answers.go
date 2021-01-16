@@ -13,6 +13,7 @@ import (
 // InsertAnswer 新增回答
 // 结构体中无需传 ID、Time
 func InsertAnswer(a *wendapkg.AnswersTab) (err error) {
+	loggerr.Info("插入回答数据", zap.Uint32("问答ID", uint32(a.Question)))
 	a.Time = time.Now()
 	sql, args, err := sqrl.Insert("answers").Values(nil, a.Question, a.QQ, a.Answer, a.Time).ToSql()
 	if err != nil {
