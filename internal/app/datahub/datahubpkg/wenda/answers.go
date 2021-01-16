@@ -25,7 +25,7 @@ func InsertAnswer(a *wendapkg.AnswersTab) (err error) {
 		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
 
-	q := Caches[wendapkg.QuestionID(a.Question)]
+	q := Caches[a.Question]
 	q.Answers = append(q.Answers, a)
 	PushData(q.Questions.ID, q.Answers)
 	return

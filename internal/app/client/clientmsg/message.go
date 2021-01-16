@@ -10,8 +10,8 @@ type (
 	Text  struct{ Content string } // Text 文本
 	At    struct{ Target uint64 }  // At @
 	Image struct {                 // Image 图片
-		URL  string
-		Data []byte
+		URL  string // 超链接
+		Data []byte // 数据
 	}
 
 	Message struct { // Message 消息

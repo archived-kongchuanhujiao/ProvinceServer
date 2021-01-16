@@ -1,35 +1,30 @@
 package wenda
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 	"fmt"
+	"go.uber.org/zap"
 	"strings"
 
 	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
-	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 )
 
-// HandleAnswer 处理消息中可能存在的答案
+// HandleAnswer 处理回答
 func HandleAnswer(m *clientmsg.Message) {
-
-	logger.Debug("开始处理答题")
 
 	qid, ok := wenda.ActiveGroup[m.Target.Group.ID]
 	if !ok {
 		return
 	}
 
-	logger.Debug("是活动的答题")
-
 	ans, ok := m.Chain[0].(*clientmsg.Text)
 	if !ok {
 		return
 	}
 	answer := ans.Content
-
-	logger.Debug("成功获取答题内容")
 
 	q := wenda.Caches[qid]
 	for _, v := range q.Answers {
@@ -38,18 +33,14 @@ func HandleAnswer(m *clientmsg.Message) {
 		}
 	}
 
-	// TODO 检查答题是否有效
-
-	logger.Debug("是有效的答题")
-
 	switch q.Questions.Type {
-
 	case 0, 1: // 选择题、填空题
 		if !checkAnswerForSelect(answer) {
 			return
 		}
+		logger.Info("答题有效", zap.Uint32("问答ID", uint32(q.Questions.ID)))
 		_ = wenda.InsertAnswer(&wendapkg.AnswersTab{
-			Question: uint32(qid),
+			Question: qid,
 			QQ:       m.Target.ID,
 			Answer:   strings.ToUpper(answer),
 		})
@@ -59,8 +50,9 @@ func HandleAnswer(m *clientmsg.Message) {
 		if !checkAnswerForFill(answer) {
 			return
 		}
+		logger.Info("答题有效", zap.Uint32("问答ID", uint32(q.Questions.ID)))
 		_ = wenda.InsertAnswer(&wendapkg.AnswersTab{
-			Question: uint32(qid),
+			Question: qid,
 			QQ:       m.Target.ID,
 			Answer:   strings.TrimPrefix(answer, "#"),
 		})
