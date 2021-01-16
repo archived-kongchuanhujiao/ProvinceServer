@@ -20,5 +20,6 @@ func Connect() {
 		Logger.Panic("连接失败", zap.Error(err))
 	}
 
+	Logger.Debug("连接成功")
 	DB = db
 }
