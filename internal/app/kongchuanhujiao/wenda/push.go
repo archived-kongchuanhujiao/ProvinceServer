@@ -3,7 +3,6 @@ package wenda
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
-	"encoding/json"
 	"fmt"
 	"github.com/CatchZeng/dingtalk"
 	"strings"
@@ -39,26 +38,25 @@ func digestQuestionData(tab *wendapkg.QuestionsTab, isMarkdown bool) (sum string
 
 // digestQuestion 摘要题干
 func digestQuestion(q *wendapkg.QuestionsTab) (s string) {
-	// FIXME Question 和 Options 均为json，需要特殊解析
-	qs := wendapkg.Question{}
-	var os []wendapkg.Option
 
-	err := json.Unmarshal([]byte(q.Question), &qs)
-	err = json.Unmarshal([]byte(q.Options), &os)
-
-	if err != nil {
-		return "无法解析"
+	var questionText string
+	for _, v := range q.Question {
+		if v.Type == "img" {
+			questionText += "[图片]"
+		}
+		questionText += v.Data
 	}
 
 	var optionsText string
 
-	for _, op := range os {
-		optionsText = op.Type + ": " + op.Body + "\n"
+	abc := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I"} // FIXME 弄到全局public去
+	for k, v := range q.Options {
+		optionsText += abc[k] + ". " + v + "\n"
 	}
 
 	optionsText = strings.TrimSuffix(optionsText, "\n")
 
-	s = "题目: " + qs.Text + " 选项：" + optionsText
+	s = "题目: " + questionText + " 选项：" + optionsText
 	if len(s) > 20 {
 		s = s[0:20] + "..."
 	}

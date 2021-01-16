@@ -8,7 +8,6 @@ import (
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
-	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 )
 
@@ -17,28 +16,11 @@ var (
 	ActiveGroup = map[uint64]wendapkg.QuestionID{}                 // ActiveGroup 活动的群
 )
 
-// sendQuestionMsg 发送问答题干 TODO 迁移至 datahub
+// sendQuestionMsg 发送问答题干
 func sendQuestionMsg(q *wendapkg.QuestionsTab) (err error) {
-	var (
-		question []struct {
-			Type string `json:"type"` // 类型
-			Data string `json:"data"`
-		}
-		options []string
-		json    = jsoniter.ConfigCompatibleWithStandardLibrary
-	)
-
-	if err = json.UnmarshalFromString(q.Question, &question); err != nil {
-		logger.Error("解析问题失败", zap.Error(err))
-		return
-	}
-	if err = json.UnmarshalFromString(q.Options, &options); err != nil {
-		logger.Error("解析选项失败", zap.Error(err))
-		return
-	}
 
 	m := clientmsg.NewTextMessage("问题:\n")
-	for _, v := range question {
+	for _, v := range q.Question {
 		if v.Type == "img" {
 			f, err := ioutil.ReadFile("assets/question/pictures/" + v.Data)
 			if err != nil {
@@ -53,7 +35,7 @@ func sendQuestionMsg(q *wendapkg.QuestionsTab) (err error) {
 
 	m.AddText("选项:\n")
 	abc := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
-	for k, v := range options {
+	for k, v := range q.Options {
 		m.AddText(abc[k] + ". " + v + "\n")
 	}
 
