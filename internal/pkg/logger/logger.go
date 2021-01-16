@@ -52,7 +52,7 @@ func core(
 	console = zapcore.NewCore(
 		zapcore.NewConsoleEncoder(consoleConf),
 		zapcore.AddSync(os.Stdout),
-		zap.InfoLevel,
+		zap.DebugLevel, // TODO 生产后调为 zap.InfoLevel
 	)
 
 	t := time.Now()
