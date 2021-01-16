@@ -19,10 +19,10 @@ func SelectCalculations(qid wendapkg.QuestionID) (data []*wendapkg.CalculationsT
 	}
 
 	type calculationsTab struct { // calculationsTab 计算结果
-		Question    uint32 `db:"question"`     // 问题
-		AnswerCount uint8  `db:"answer_count"` // 作答人数
-		Right       string `db:"right"`        // 正确
-		Wrong       string `db:"wrong"`        // 错误
+		Question    wendapkg.QuestionID `db:"question"`     // 问题
+		AnswerCount uint8               `db:"answer_count"` // 作答人数
+		Right       string              `db:"right"`        // 正确
+		Wrong       string              `db:"wrong"`        // 错误
 	}
 
 	var d []*calculationsTab

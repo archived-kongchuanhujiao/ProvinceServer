@@ -14,7 +14,7 @@ type (
 	}
 
 	CalculationsTab struct { // CalculationsTab 计算结果
-		Question    uint32     `json:"question" db:"question"`         // 问题
+		Question    QuestionID `json:"question" db:"question"`         // 问题
 		AnswerCount uint8      `json:"answer_count" db:"answer_count"` // 作答人数
 		Right       []uint64   `json:"right" db:"right"`               // 正确
 		Wrong       [][]uint64 `json:"wrong" db:"wrong"`               // 错误
