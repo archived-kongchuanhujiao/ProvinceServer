@@ -34,7 +34,7 @@ func calculateQuestion(w *wendapkg.WendaDetails) (calc *wendapkg.CalculationsTab
 	}
 
 	calc = &wendapkg.CalculationsTab{
-		Question:    uint32(w.Questions.ID),
+		Question:    w.Questions.ID,
 		AnswerCount: uint8(len(w.Answers)),
 		Right:       rightStus,
 		Wrong:       wrongStus,
