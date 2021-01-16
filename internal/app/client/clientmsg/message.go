@@ -9,7 +9,7 @@ type (
 
 	Text  struct{ Content string } // Text 文本
 	At    struct{ Target uint64 }  // At @
-	Image struct { // Image 图片
+	Image struct {                 // Image 图片
 		URL  string
 		Data []byte
 	}
@@ -39,7 +39,7 @@ func (m *Message) AddImage(d []byte) *Message       { m.Chain = append(m.Chain, 
 func (m *Message) SetTarget(t *Target) *Message     { m.Target = t; return m }                               // SetTarget 设置目标
 func (m *Message) SetGroupTarget(t *Group) *Message { m.Target.Group = t; return m }                         // SetGroupTarget 设置群目标
 
-func NewMessage() *Message              { return &Message{Chain: []Element{}} } // NewMessage 新建消息
-func NewTextMessage(s string) *Message  { return NewMessage().AddText(s) }      // NewTextMessage 新建文本消息
-func NewAtMessage(t uint64) *Message    { return NewMessage().AddAt(t) }        // NewAtMessage 新建@消息
-func NewImageMessage(d []byte) *Message { return NewMessage().AddImage(d) }     // NewImageMessage 新建图片消息
+func NewMessage() *Message              { return &Message{Chain: []Element{}, Target: &Target{}} } // NewMessage 新建消息
+func NewTextMessage(s string) *Message  { return NewMessage().AddText(s) }                         // NewTextMessage 新建文本消息
+func NewAtMessage(t uint64) *Message    { return NewMessage().AddAt(t) }                           // NewAtMessage 新建@消息
+func NewImageMessage(d []byte) *Message { return NewMessage().AddImage(d) }                        // NewImageMessage 新建图片消息
