@@ -70,8 +70,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	if v.ID != 0 {
 		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, 0)
 	} else {
-		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID),
-			Creator: c.GetCookie("account")}, v.Page)
+		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{Creator: c.GetCookie("account")}, v.Page)
 		g = client.GetClient().GetGroups()
 	}
 	if err != nil {
