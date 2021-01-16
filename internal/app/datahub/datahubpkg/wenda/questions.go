@@ -13,12 +13,16 @@ import (
 // SelectQuestions 获取问题
 func SelectQuestions(v *wendapkg.QuestionsTab, page uint32) (data []*wendapkg.QuestionsTab, err error) {
 
-	sqr := sqrl.Select("*").From("questions").OrderBy("id DESC")
-	if v.Creator != "" {
-		sqr = sqr.Where("creator=?", v.Creator).Limit(20).Offset(uint64(page * 20))
-	}
+	var sqr *sqrl.SelectBuilder
 	if v.ID != 0 {
-		sqr = sqr.Where("id=?", v.ID).Limit(1)
+		sqr = sqrl.Select("*").Limit(20).Offset(uint64(page * 20))
+	} else {
+		sqr = sqrl.Select("id", "question", "target", "`status`").Where("id=?", v.ID).Limit(1)
+	}
+
+	sqr = sqr.From("questions").OrderBy("id DESC")
+	if v.Creator != "" {
+		sqr = sqr.Where("creator=?", v.Creator)
 	}
 	if v.Market {
 		sqr = sqr.Where("market=?", true)
