@@ -70,7 +70,7 @@ func (q *QQ) GetGroups() *wendapkg.Groups {
 // GetGroupMembers 获取群成员
 func (q *QQ) GetGroupMembers(i uint64) *wendapkg.GroupMembers {
 	m := wendapkg.GroupMembers{}
-	for _, v := range q.client.GroupList[int64(i)].Members {
+	for _, v := range q.client.FindGroup(int64(i)).Members {
 		m[uint64(v.Uin)] = v.DisplayName()
 	}
 	return &m
