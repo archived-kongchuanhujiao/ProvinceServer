@@ -22,8 +22,10 @@ type (
 	}
 
 	GetQuestionsRes struct { // GetQuestionsReq 问题响应
-		Questions []*wendapkg.QuestionsTab `json:"questions"` // 问题
-		Groups    *wendapkg.Groups         `json:"groups"`    // 群
+		Questions []*wendapkg.QuestionsTab `json:"questions"`  // 问题
+		Groups    *wendapkg.Groups         `json:"groups"`     // 群
+		GroupName string                   `json:"group_name"` // 群名称
+		Members   *wendapkg.GroupMembers   `json:"members"`    // 群成员
 	}
 
 	PutQuestionStatusReq struct { // PutQuestionStatusReq 问题更新
@@ -64,11 +66,16 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	var (
 		d   []*wendapkg.QuestionsTab
 		g   *wendapkg.Groups
+		n   string // 群名称
+		m   *wendapkg.GroupMembers
 		err error
 	)
 
 	if v.ID != 0 {
 		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, 0)
+		t := d[0].Target
+		n = client.GetClient().GetGroupName(t)
+		m = client.GetClient().GetGroupMembers(t)
 	} else {
 		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{Creator: c.GetCookie("account")}, v.Page)
 		g = client.GetClient().GetGroups()
@@ -77,7 +84,10 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
-	return &kongchuanhujiao.Response{Message: "ok", Data: &GetQuestionsRes{d, g}}
+	return &kongchuanhujiao.Response{
+		Message: "ok",
+		Data:    &GetQuestionsRes{d, g, n, m},
+	}
 }
 
 // PutQuestionsStatus 更新问题状态。
