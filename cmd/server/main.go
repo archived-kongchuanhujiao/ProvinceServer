@@ -16,7 +16,7 @@ func main() {
 
 	datahubpkg.ConnectAllDatabase()
 	apis.NewApis()
-	client.NewClients()
+	client.NewClient()
 	client.SetCallback(func(m *clientmsg.Message) {
 		if t := m.Chain[0]; t.TypeName() == "text" {
 			c := t.(*clientmsg.Text)
@@ -25,11 +25,9 @@ func main() {
 					clientmsg.NewAtMessage(m.Target.ID).AddText("你好").SetGroupTarget(m.Target.Group),
 				)
 			}
-
 		}
 		wenda.HandleAnswer(m)
 	})
 
 	select {}
-
 }

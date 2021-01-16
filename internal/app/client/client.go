@@ -8,14 +8,14 @@ import (
 
 var cli *internal.QQ // client 客户端
 
-// NewClients 新建客户端
-func NewClients() {
+// NewClient 新建客户端
+func NewClient() {
 	conf := configs.GetConfigs()
 	cli = internal.NewClient(conf.QQNumber, conf.QQPassword)
 }
 
 // GetClient 获取客户端。
-// 执行函数：NewClients 前调用返回值为 nil
+// 执行函数：NewClient 前调用返回值为 nil
 func GetClient() *internal.QQ { return cli }
 
 // SetCallback 设置回调
