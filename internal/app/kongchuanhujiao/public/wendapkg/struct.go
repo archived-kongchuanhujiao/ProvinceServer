@@ -52,4 +52,15 @@ type (
 	}
 
 	OptionsField []string // OptionsField 选项字段
+
+	Question struct { // 问题
+		Type string `json:"type"` // 题目类型
+		Text string `json:"text"` // 题目文本
+		Path string `json:"path"` // 题目图片, 当 type 为 img 时不为空
+	}
+
+	Option struct { // 选项
+		Type string `json:"type"` // 选项
+		Body string `json:"body"` // 答案
+	}
 )
