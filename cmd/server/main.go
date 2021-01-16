@@ -14,7 +14,7 @@ func main() {
 
 	logger.Info("Copyright (C) 2020-present | version：")
 
-	datahubpkg.ConnectAllDatabase()
+	datahubpkg.ConnectDatabase()
 	apis.NewApis()
 	client.NewClient()
 	client.SetCallback(func(m *clientmsg.Message) {
