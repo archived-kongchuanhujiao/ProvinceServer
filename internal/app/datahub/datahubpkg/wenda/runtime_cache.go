@@ -22,7 +22,7 @@ func sendQuestionMsg(q *wendapkg.QuestionsTab) (err error) {
 	m := clientmsg.NewTextMessage("问题:\n")
 	for _, v := range q.Question {
 		if v.Type == "img" {
-			f, err := ioutil.ReadFile("assets/question/pictures/" + v.Data)
+			f, err := ioutil.ReadFile("assets/pictures/questions/" + v.Data)
 			if err != nil {
 				logger.Error("读取题干图片失败", zap.Error(err))
 				return err
