@@ -14,8 +14,14 @@ type (
 	}
 
 	CalculationsTab struct { // CalculationsTab 计算结果
-		Question uint32 `json:"question" db:"question"` // 问题
-		Data     string `json:"data" db:"data"`         // 数据 TODO string 更改为具体的结构体
+		Question uint32    `json:"question" db:"question"` // 问题
+		Data     DataField `json:"data" db:"data"`         // 数据
+	}
+
+	DataField struct { // DataField 数据字段
+		AnswerCount uint8      `json:"answer_count"` // 作答人数
+		Right       []uint64   `json:"right"`        // 正确
+		Wrong       [][]uint64 `json:"wrong"`        // 错误
 	}
 
 	// WendaDetails 问答详情
