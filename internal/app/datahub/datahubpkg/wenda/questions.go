@@ -17,7 +17,8 @@ func SelectQuestions(v *wendapkg.QuestionsTab, page uint32) (data []*wendapkg.Qu
 	if v.ID != 0 {
 		sqr = sqrl.Select("*").Where("id=?", v.ID).Limit(1)
 	} else {
-		sqr = sqrl.Select("id", "question", "target", "`status`").Limit(20).Offset(uint64(page * 20))
+		sqr = sqrl.Select("id", "question", "target", "`status`", `options`).Limit(20).
+			Offset(uint64(page * 20))
 	}
 
 	sqr = sqr.From("questions").OrderBy("id DESC")
