@@ -1,8 +1,10 @@
 package wenda
 
 import (
+	"fmt"
 	"strings"
 
+	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
@@ -62,5 +64,25 @@ func HandleAnswer(m *clientmsg.Message) {
 			QQ:       m.Target.ID,
 			Answer:   strings.TrimPrefix(answer, "#"),
 		})
+	}
+}
+
+// HandleTest 处理测试
+func HandleTest(m *clientmsg.Message) {
+
+	t, ok := m.Chain[0].(*clientmsg.Text)
+	if !ok {
+		return
+	}
+
+	switch t.Content {
+	case "你好":
+		client.GetClient().SendMessage(
+			clientmsg.NewAtMessage(m.Target.ID).AddText("你好").SetGroupTarget(m.Target.Group),
+		)
+	case "活动的群":
+		client.GetClient().SendMessage(
+			clientmsg.NewTextMessage(fmt.Sprintln(wenda.ActiveGroup)).SetGroupTarget(m.Target.Group),
+		)
 	}
 }
