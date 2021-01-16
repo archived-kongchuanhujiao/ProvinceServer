@@ -12,10 +12,9 @@ import (
 // main 启动函数
 func main() {
 
-	logger.Info("Copyright (C) 2020-present | version：")
+	logger.Info("Copyright (C) 2020-present | version：21.01.XX")
 
 	datahubpkg.ConnectDatabase()
-	apis.NewApis()
 	client.NewClient()
 	client.SetCallback(func(m *clientmsg.Message) {
 		if t := m.Chain[0]; t.TypeName() == "text" {
@@ -28,6 +27,7 @@ func main() {
 		}
 		wenda.HandleAnswer(m)
 	})
+	apis.NewApis()
 
 	select {}
 }
