@@ -6,6 +6,7 @@ import (
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 
 	"github.com/elgris/sqrl"
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 )
 
@@ -32,10 +33,50 @@ func SelectQuestions(v *wendapkg.QuestionsTab, page uint32) (data []*wendapkg.Qu
 		return
 	}
 
-	err = maria.DB.Select(&data, sql, args...)
+	type questionsTab struct { // questionsTab 问题
+		ID       wendapkg.QuestionID `db:"id"`       // 唯一标识符
+		Type     uint8               `db:"type"`     // 类型
+		Subject  uint8               `db:"subject"`  // 学科
+		Question string              `db:"question"` // 问题
+		Creator  string              `db:"creator"`  // 创建者
+		Target   uint64              `db:"target"`   // 目标
+		Status   uint8               `db:"status"`   // 状态
+		Options  string              `db:"options"`  // 选项
+		Key      string              `db:"key"`      // 答案
+		Market   bool                `db:"market"`   // 存在市场
+	}
+
+	var d []*questionsTab
+	err = maria.DB.Select(&d, sql, args...)
 	if err != nil {
 		maria.Logger.Error("查询失败", zap.Error(err), zap.String("SQL语句", sql))
 		return
+	}
+
+	for _, v := range d {
+
+		q := wendapkg.QuestionField{}
+		o := wendapkg.OptionsField{}
+
+		err := jsoniter.UnmarshalFromString(v.Question, &q)
+		if err != nil {
+			loggerr.Error("解析问题字段失败", zap.Error(err))
+			return nil, err
+		}
+
+		err = jsoniter.UnmarshalFromString(v.Options, &o)
+		if err != nil {
+			loggerr.Error("解析选项字段失败", zap.Error(err))
+			return nil, err
+		}
+
+		data = append(data, &wendapkg.QuestionsTab{
+			ID: v.ID, Type: v.Type, Subject: v.Subject,
+			Question: q,
+			Creator:  v.Creator, Target: v.Target, Status: v.Status,
+			Options: o,
+			Key:     v.Key, Market: v.Market,
+		})
 	}
 	return
 }
