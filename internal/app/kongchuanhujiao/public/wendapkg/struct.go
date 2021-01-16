@@ -14,14 +14,10 @@ type (
 	}
 
 	CalculationsTab struct { // CalculationsTab 计算结果
-		Question uint32    `json:"question" db:"question"` // 问题
-		Data     DataField `json:"data" db:"data"`         // 数据
-	}
-
-	DataField struct { // DataField 数据字段
-		AnswerCount uint8      `json:"answer_count"` // 作答人数
-		Right       []uint64   `json:"right"`        // 正确
-		Wrong       [][]uint64 `json:"wrong"`        // 错误
+		Question    uint32     `json:"question" db:"question"`         // 问题
+		AnswerCount uint8      `json:"answer_count" db:"answer_count"` // 作答人数
+		Right       []uint64   `json:"right" db:"right"`               // 正确
+		Wrong       [][]uint64 `json:"wrong" db:"wrong"`               // 错误
 	}
 
 	// WendaDetails 问答详情
