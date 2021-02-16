@@ -9,9 +9,9 @@ import (
 	"go.uber.org/zap"
 )
 
-var loggerr = logger.Named("QQ客户端") // loggerr 日志
+var loggerr = logger.Named("QQ") // loggerr 日志
 
-// QQ QQ 客户端
+// QQ 客户端
 type QQ struct {
 	client   *client.QQClient   // 客户端
 	callback clientmsg.Callback // 回调
@@ -47,7 +47,7 @@ func (q *QQ) SendMessage(m *clientmsg.Message) {
 
 // ReceiveMessage 接收消息
 func (q *QQ) ReceiveMessage(m *clientmsg.Message) {
-	logger.Debug("接收消息", zap.Any("消息", m))
+	loggerr.Debug("接收消息", zap.Any("消息", m))
 	if q.callback != nil && len(m.Chain) != 0 {
 		q.callback(m)
 	}
