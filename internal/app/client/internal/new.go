@@ -7,11 +7,16 @@ import (
 
 // setProtocol 设置协议
 func setProtocol() {
-	err := client.SystemDeviceInfo.ReadJson([]byte("{\"display\":\"MIRAI.373480.001\",\"product\":\"mirai\",\"device\":\"mirai\",\"board\":\"mirai\",\"model\":\"mirai\",\"finger_print\":\"mamoe/mirai/mirai:10/MIRAI.200122.001/6671789:user/release-keys\",\"boot_id\":\"7794a02c-d854-18ac-649e-35fedfd0b37a\",\"proc_version\":\"Linux version 3.0.31-47Fxpwhn (android-build@xxx.xxx.xxx.xxx.com)\",\"protocol\":0,\"imei\":\"678319144775066\"}"))
-	if err != nil {
-		loggerr.Panic("设置协议信息失败")
-	}
 	client.SystemDeviceInfo.Protocol = client.AndroidPhone
+	client.SystemDeviceInfo.Display = []byte("MIRAI.373480.001")
+	client.SystemDeviceInfo.Product = []byte("mirai")
+	client.SystemDeviceInfo.Device = []byte("mirai")
+	client.SystemDeviceInfo.Board = []byte("mirai")
+	client.SystemDeviceInfo.Model = []byte("mirai")
+	client.SystemDeviceInfo.FingerPrint = []byte("mamoe/mirai/mirai:10/MIRAI.200122.001/6671789:user/release-keys")
+	client.SystemDeviceInfo.BootId = []byte("7794a02c-d854-18ac-649e-35fedfd0b37a")
+	client.SystemDeviceInfo.ProcVersion = []byte("Linux version 3.0.31-47Fxpwhn (android-build@xxx.xxx.xxx.xxx.com)")
+	client.SystemDeviceInfo.IMEI = "678319144775066"
 }
 
 // setLogger 设置日志打印
@@ -54,6 +59,7 @@ func (q *QQ) login() (err error) {
 	}
 
 	loggerr.Info("登录成功：" + q.client.Nickname)
+
 	return
 }
 

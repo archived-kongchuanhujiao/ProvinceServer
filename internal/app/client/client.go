@@ -1,8 +1,8 @@
 package client
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
 	"coding.net/kongchuanhujiao/server/internal/app/client/internal"
+	"coding.net/kongchuanhujiao/server/internal/app/client/message"
 	"coding.net/kongchuanhujiao/server/internal/pkg/configs"
 )
 
@@ -19,4 +19,4 @@ func NewClient() {
 func GetClient() *internal.QQ { return cli }
 
 // SetCallback 设置回调
-func SetCallback(f clientmsg.Callback) { cli.SetCallback(f) }
+func SetCallback(f message.Callback) { cli.SetCallback(f) }

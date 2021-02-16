@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
+	"coding.net/kongchuanhujiao/server/internal/app/client/message"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
@@ -13,8 +13,8 @@ var loggerr = logger.Named("QQ") // loggerr 日志
 
 // QQ 客户端
 type QQ struct {
-	client   *client.QQClient   // 客户端
-	callback clientmsg.Callback // 回调
+	client   *client.QQClient // 客户端
+	callback message.Callback // 回调
 }
 
 // NewClient 新建 QQ 客户端
@@ -31,11 +31,12 @@ func NewClient(a uint64, p string) (q *QQ) {
 		loggerr.Panic("登录失败", zap.Error(err))
 	}
 	q.setEventHandle()
+
 	return
 }
 
 // SendMessage 发送消息
-func (q *QQ) SendMessage(m *clientmsg.Message) {
+func (q *QQ) SendMessage(m *message.Message) {
 	ms := q.transformToMiraiGO(m)
 	if m.Target.Group != nil {
 		q.client.SendGroupMessage(int64(m.Target.Group.ID), ms)
@@ -46,7 +47,7 @@ func (q *QQ) SendMessage(m *clientmsg.Message) {
 }
 
 // ReceiveMessage 接收消息
-func (q *QQ) ReceiveMessage(m *clientmsg.Message) {
+func (q *QQ) ReceiveMessage(m *message.Message) {
 	loggerr.Debug("接收消息", zap.Any("消息", m))
 	if q.callback != nil && len(m.Chain) != 0 {
 		q.callback(m)
@@ -54,7 +55,7 @@ func (q *QQ) ReceiveMessage(m *clientmsg.Message) {
 }
 
 // SetCallback 设置回调
-func (q *QQ) SetCallback(f clientmsg.Callback) {
+func (q *QQ) SetCallback(f message.Callback) {
 	q.callback = f
 }
 

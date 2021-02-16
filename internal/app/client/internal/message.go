@@ -2,7 +2,7 @@ package internal
 
 import (
 	"bytes"
-	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
+	message2 "coding.net/kongchuanhujiao/server/internal/app/client/message"
 
 	"github.com/Mrs4s/MiraiGo/client"
 	"github.com/Mrs4s/MiraiGo/message"
@@ -10,15 +10,15 @@ import (
 )
 
 // transformToChain 转化为消息链
-func (q *QQ) transformToChain(ms *clientmsg.Message, m []message.IMessageElement) {
+func (q *QQ) transformToChain(ms *message2.Message, m []message.IMessageElement) {
 	for _, v := range m {
 		switch e := v.(type) {
 		case *message.TextElement:
-			ms.Chain = append(ms.Chain, &clientmsg.Text{Content: e.Content})
+			ms.Chain = append(ms.Chain, &message2.Text{Content: e.Content})
 		case *message.AtElement:
-			ms.Chain = append(ms.Chain, &clientmsg.At{Target: uint64(e.Target)})
+			ms.Chain = append(ms.Chain, &message2.At{Target: uint64(e.Target)})
 		case *message.ImageElement:
-			ms.Chain = append(ms.Chain, &clientmsg.Image{URL: e.Url})
+			ms.Chain = append(ms.Chain, &message2.Image{URL: e.Url})
 		}
 	}
 }
@@ -26,12 +26,12 @@ func (q *QQ) transformToChain(ms *clientmsg.Message, m []message.IMessageElement
 // receiveGroupMessage 接收群消息
 func (q *QQ) receiveGroupMessage(_ *client.QQClient, m *message.GroupMessage) {
 
-	ms := &clientmsg.Message{
-		Chain: []clientmsg.Element{},
-		Target: &clientmsg.Target{
+	ms := &message2.Message{
+		Chain: []message2.Element{},
+		Target: &message2.Target{
 			ID:    uint64(m.Sender.Uin),
 			Name:  m.Sender.DisplayName(),
-			Group: &clientmsg.Group{ID: uint64(m.GroupCode), Name: m.GroupName},
+			Group: &message2.Group{ID: uint64(m.GroupCode), Name: m.GroupName},
 		},
 	}
 
@@ -42,9 +42,9 @@ func (q *QQ) receiveGroupMessage(_ *client.QQClient, m *message.GroupMessage) {
 // receiveFriendMessage 接收好友消息
 func (q *QQ) receiveFriendMessage(_ *client.QQClient, m *message.PrivateMessage) {
 
-	ms := &clientmsg.Message{
-		Chain:  []clientmsg.Element{},
-		Target: &clientmsg.Target{ID: uint64(m.Sender.Uin), Name: m.Sender.DisplayName()},
+	ms := &message2.Message{
+		Chain:  []message2.Element{},
+		Target: &message2.Target{ID: uint64(m.Sender.Uin), Name: m.Sender.DisplayName()},
 	}
 
 	q.transformToChain(ms, m.Elements)
@@ -52,7 +52,7 @@ func (q *QQ) receiveFriendMessage(_ *client.QQClient, m *message.PrivateMessage)
 }
 
 // transformToMiraiGO 转化为 MiraiGO
-func (q *QQ) transformToMiraiGO(ms *clientmsg.Message) (m *message.SendingMessage) {
+func (q *QQ) transformToMiraiGO(ms *message2.Message) (m *message.SendingMessage) {
 
 	m = &message.SendingMessage{
 		Elements: []message.IMessageElement{},
@@ -60,12 +60,12 @@ func (q *QQ) transformToMiraiGO(ms *clientmsg.Message) (m *message.SendingMessag
 
 	for _, v := range ms.Chain {
 		switch e := v.(type) {
-		case *clientmsg.Text:
+		case *message2.Text:
 			m.Elements = append(m.Elements, message.NewText(e.Content))
-		case *clientmsg.At:
+		case *message2.At:
 			mem := q.client.FindGroupByUin(int64(ms.Target.Group.ID)).FindMember(int64(e.Target))
 			m.Elements = append(m.Elements, message.NewAt(int64(e.Target), "@"+mem.DisplayName()))
-		case *clientmsg.Image:
+		case *message2.Image:
 			if ms.Target.Group != nil {
 				se, err := q.client.UploadGroupImage(int64(ms.Target.Group.ID), bytes.NewReader(e.Data))
 				if err != nil {
@@ -81,5 +81,6 @@ func (q *QQ) transformToMiraiGO(ms *clientmsg.Message) (m *message.SendingMessag
 			m.Elements = append(m.Elements, se)
 		}
 	}
+
 	return
 }

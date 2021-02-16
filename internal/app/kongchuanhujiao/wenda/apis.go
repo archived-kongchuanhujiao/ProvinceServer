@@ -2,11 +2,12 @@ package wenda
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/client"
-	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
+	"coding.net/kongchuanhujiao/server/internal/app/client/message"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/accounts"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
+
 	"github.com/kataras/iris/v12/context"
 	"go.uber.org/zap"
 )
@@ -140,11 +141,11 @@ func (a *APIs) PostPraise(v *PostPraisePeq) *kongchuanhujiao.Response {
 
 	details := wenda.CalculateQuestion(wenda.Caches[q[0].ID])
 
-	msg := clientmsg.NewTextMessage("表扬下列答对的同学：\n")
+	msg := message.NewTextMessage("表扬下列答对的同学：\n")
 	for _, mem := range details.Right {
 		msg.AddAt(mem)
 	}
-	client.GetClient().SendMessage(msg.SetTarget(&clientmsg.Target{Group: &clientmsg.Group{ID: q[0].Target}}))
+	client.GetClient().SendMessage(msg.SetTarget(&message.Target{Group: &message.Group{ID: q[0].Target}}))
 	return &kongchuanhujiao.Response{Message: "ok"}
 }
 

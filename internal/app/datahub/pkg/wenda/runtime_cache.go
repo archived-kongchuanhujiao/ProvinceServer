@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 
 	"coding.net/kongchuanhujiao/server/internal/app/client"
-	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
+	"coding.net/kongchuanhujiao/server/internal/app/client/message"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	"go.uber.org/zap"
@@ -18,7 +18,7 @@ var (
 // sendQuestionMsg 发送问答题干
 func sendQuestionMsg(q *QuestionsTab) (err error) {
 
-	m := clientmsg.NewTextMessage("问题:\n")
+	m := message.NewTextMessage("问题:\n")
 	for _, v := range q.Question {
 		if v.Type == "img" {
 			f, err := ioutil.ReadFile("assets/pictures/questions/" + v.Data)
@@ -44,6 +44,6 @@ func sendQuestionMsg(q *QuestionsTab) (err error) {
 		m.AddText("\n@+回答内容即可作答")
 	}
 
-	client.GetClient().SendMessage(m.SetGroupTarget(&clientmsg.Group{ID: q.Target}))
+	client.GetClient().SendMessage(m.SetGroupTarget(&message.Group{ID: q.Target}))
 	return
 }

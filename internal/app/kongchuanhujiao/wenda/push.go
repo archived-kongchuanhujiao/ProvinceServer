@@ -1,11 +1,13 @@
 package wenda
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	"fmt"
-	"github.com/CatchZeng/dingtalk"
 	"strings"
+
+	"coding.net/kongchuanhujiao/server/internal/app/client/message"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
+
+	"github.com/CatchZeng/dingtalk"
 )
 
 // convertToMarkDown 将问题数据转换为钉钉 Markdown 消息
@@ -19,8 +21,8 @@ func ConvertToDTMessage(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
 
 // convertToChain 将问题数据转换为消息链
 // TODO 详见 apis.go@PostPushcenter()
-func ConvertToChain(tab *wenda.QuestionsTab) *clientmsg.Message {
-	return clientmsg.NewTextMessage(digestQuestionData(tab, false))
+func ConvertToChain(tab *wenda.QuestionsTab) *message.Message {
+	return message.NewTextMessage(digestQuestionData(tab, false))
 }
 
 // digestQuestionData 摘要答题数据

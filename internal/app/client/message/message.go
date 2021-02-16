@@ -1,4 +1,4 @@
-package clientmsg
+package message
 
 type (
 	Callback func(*Message) // Callback 回调
