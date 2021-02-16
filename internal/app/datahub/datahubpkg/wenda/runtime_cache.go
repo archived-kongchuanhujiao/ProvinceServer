@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	Caches      = map[wendapkg.QuestionID]*wendapkg.WendaDetails{} // Caches 缓存
-	ActiveGroup = map[uint64]wendapkg.QuestionID{}                 // ActiveGroup 活动的群
+	Caches      = map[uint32]*wendapkg.WendaDetails{} // Caches 缓存
+	ActiveGroup = map[uint64]uint32{}                 // ActiveGroup 活动的群
 )
 
 // sendQuestionMsg 发送问答题干

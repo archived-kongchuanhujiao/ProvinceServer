@@ -39,16 +39,16 @@ func SelectQuestions(v *wendapkg.QuestionsTab, page uint32) (data []*wendapkg.Qu
 	}
 
 	type questionsTab struct { // questionsTab 问题
-		ID       wendapkg.QuestionID `db:"id"`       // 唯一标识符
-		Type     uint8               `db:"type"`     // 类型
-		Subject  uint8               `db:"subject"`  // 学科
-		Question string              `db:"question"` // 问题
-		Creator  string              `db:"creator"`  // 创建者
-		Target   uint64              `db:"target"`   // 目标
-		Status   uint8               `db:"status"`   // 状态
-		Options  string              `db:"options"`  // 选项
-		Key      string              `db:"key"`      // 答案
-		Market   bool                `db:"market"`   // 存在市场
+		ID       uint32 `db:"id"`       // 唯一标识符
+		Type     uint8  `db:"type"`     // 类型
+		Subject  uint8  `db:"subject"`  // 学科
+		Question string `db:"question"` // 问题
+		Creator  string `db:"creator"`  // 创建者
+		Target   uint64 `db:"target"`   // 目标
+		Status   uint8  `db:"status"`   // 状态
+		Options  string `db:"options"`  // 选项
+		Key      string `db:"key"`      // 答案
+		Market   bool   `db:"market"`   // 存在市场
 	}
 
 	var d []*questionsTab
@@ -122,6 +122,7 @@ func UpdateQuestionStatus(q *wendapkg.QuestionsTab, status uint8) (err error) {
 
 // InsertQuestion 新增问题
 func InsertQuestion(q *wendapkg.QuestionsTab) (err error) {
+
 	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question, q.Creator,
 		q.Target, 0, q.Options, q.Key, q.Market).ToSql()
 	if err != nil {
@@ -133,11 +134,13 @@ func InsertQuestion(q *wendapkg.QuestionsTab) (err error) {
 	if err != nil {
 		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
+
 	return
 }
 
 // UpdateQuestion 更新问题
 func UpdateQuestion(q *wendapkg.QuestionsTab) (err error) {
+
 	sql, args, err := sqrl.Update("questions").Where("id=?", q.ID).
 		Set("`subject`", q.Subject).
 		Set("question", q.Question).
@@ -154,11 +157,13 @@ func UpdateQuestion(q *wendapkg.QuestionsTab) (err error) {
 	if err != nil {
 		maria.Logger.Error("更新失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
+
 	return
 }
 
 // CopyQuestions 复制问题
-func CopyQuestions(id wendapkg.QuestionID, creator string, target uint64) (err error) {
+func CopyQuestions(id uint32, creator string, target uint64) (err error) {
+
 	q, err := SelectQuestions(&wendapkg.QuestionsTab{ID: id, Market: true}, 0)
 	if err != nil {
 		return
@@ -168,11 +173,13 @@ func CopyQuestions(id wendapkg.QuestionID, creator string, target uint64) (err e
 	que.Target = target
 	que.Market = false
 	err = InsertQuestion(que)
+
 	return
 }
 
 // DeleteQuestion 删除问题
 func DeleteQuestion(id uint32) (err error) {
+
 	sql, args, err := sqrl.Delete("questions").Where("id=?", id).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
@@ -182,5 +189,6 @@ func DeleteQuestion(id uint32) (err error) {
 	if err != nil {
 		maria.Logger.Error("删除失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
+
 	return
 }

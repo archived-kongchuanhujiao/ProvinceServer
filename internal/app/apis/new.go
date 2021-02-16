@@ -33,7 +33,5 @@ func NewApis() {
 		); err != nil {
 			loggerr.Panic("监听端口失败", zap.Error(err))
 		}
-
 	}()
-
 }

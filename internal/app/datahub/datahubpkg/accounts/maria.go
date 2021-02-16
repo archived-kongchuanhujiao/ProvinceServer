@@ -9,6 +9,7 @@ import (
 
 // SelectAccount 获取账号
 func SelectAccount(id string, qq uint64) (data []*Tab, err error) {
+
 	sqr := sqrl.Select("*").From("accounts")
 	if id != "" {
 		sqr = sqr.Where("id=?", id)
@@ -27,5 +28,6 @@ func SelectAccount(id string, qq uint64) (data []*Tab, err error) {
 		maria.Logger.Error("查询失败", zap.Error(err), zap.String("SQL语句", sql))
 		return
 	}
+
 	return
 }

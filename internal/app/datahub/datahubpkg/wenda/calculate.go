@@ -3,6 +3,7 @@ package wenda
 import "coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 
 func CalculateQuestion(w *wendapkg.WendaDetails) (calc *wendapkg.CalculationsTab) {
+
 	var (
 		rightStus []uint64
 		wrongStus [][]uint64

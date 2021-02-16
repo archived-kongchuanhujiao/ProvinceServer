@@ -1,7 +1,7 @@
 package maria
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal"
+	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -10,7 +10,7 @@ import (
 
 var (
 	DB     *sqlx.DB
-	Logger = internal.Logger.Named("Maria")
+	Logger = logger.Named("Maria")
 )
 
 // Connect 连接至 Maria 数据库

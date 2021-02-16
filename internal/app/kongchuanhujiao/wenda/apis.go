@@ -70,7 +70,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	)
 
 	if v.ID != 0 {
-		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, 0)
+		d, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: v.ID}, 0)
 		t := d[0].Target
 		n = client.GetClient().GetGroupName(t)
 		m = client.GetClient().GetGroupMembers(t)
@@ -93,12 +93,12 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Response {
 
 	var (
-		q   = &wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}
+		q   = &wendapkg.QuestionsTab{ID: v.ID}
 		err error
 	)
 
 	var qs []*wendapkg.QuestionsTab
-	qs, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, 0)
+	qs, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: v.ID}, 0)
 	q = qs[0]
 
 	if err != nil {
@@ -134,7 +134,7 @@ func (a *APIs) PutQuestions(v *wendapkg.QuestionsTab) *kongchuanhujiao.Response 
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
 func (a *APIs) PostPraise(v *PostPraisePeq) *kongchuanhujiao.Response {
-	q, err := wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, 0)
+	q, err := wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: v.ID}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -164,7 +164,7 @@ func (a *APIs) GetMarkets(v *GetMarketsReq) *kongchuanhujiao.Response {
 func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *kongchuanhujiao.Response {
 	user := c.GetCookie("account")
 	for _, t := range v.Target {
-		err := wenda.CopyQuestions(wendapkg.QuestionID(v.ID), user, t)
+		err := wenda.CopyQuestions(v.ID, user, t)
 		if err != nil {
 			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 		}

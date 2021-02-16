@@ -2,15 +2,15 @@ package wendapkg
 
 type (
 	AnswersTab struct { // AnswersTab 回答
-		ID       uint32     `json:"id" db:"id"`             // 唯一标识符
-		Question QuestionID `json:"question" db:"question"` // 问题
-		QQ       uint64     `json:"qq" db:"qq"`             // QQ
-		Answer   string     `json:"answer" db:"answer"`     // 回答
-		Time     string     `json:"time" db:"time"`         // 时刻
+		ID       uint32 `json:"id" db:"id"`             // 唯一标识符
+		Question uint32 `json:"question" db:"question"` // 问题
+		QQ       uint64 `json:"qq" db:"qq"`             // QQ
+		Answer   string `json:"answer" db:"answer"`     // 回答
+		Time     string `json:"time" db:"time"`         // 时刻
 	}
 
 	CalculationsTab struct { // CalculationsTab 计算结果
-		Question    QuestionID `json:"question" db:"question"`         // 问题
+		Question    uint32     `json:"question" db:"question"`         // 问题
 		AnswerCount uint8      `json:"answer_count" db:"answer_count"` // 作答人数
 		Right       []uint64   `json:"right" db:"right"`               // 正确
 		Wrong       [][]uint64 `json:"wrong" db:"wrong"`               // 错误
