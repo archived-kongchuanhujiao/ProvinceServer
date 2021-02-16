@@ -34,8 +34,7 @@ type (
 	}
 
 	PostPraisePeq struct { // PostPraisePeq 表扬请求
-		ID   uint32   // 唯一识别码
-		List []uint64 // 名单
+		ID uint32 // 唯一识别码
 	}
 
 	GetMarketsReq struct { // GetMarketsReq 市场请求
@@ -141,8 +140,11 @@ func (a *APIs) PostPraise(v *PostPraisePeq) *kongchuanhujiao.Response {
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
+
+	details := wenda.CalculateQuestion(wenda.Caches[q[0].ID])
+
 	msg := clientmsg.NewTextMessage("表扬下列答对的同学：\n")
-	for _, mem := range v.List {
+	for _, mem := range details.Right {
 		msg.AddAt(mem)
 	}
 	client.GetClient().SendMessage(msg.SetTarget(&clientmsg.Target{Group: &clientmsg.Group{ID: q[0].Target}}))
