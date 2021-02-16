@@ -12,7 +12,7 @@ import (
 // main 启动函数
 func main() {
 
-	logger.Info("Copyright (C) 2020-present | version：21.01.XX")
+	logger.Info("Copyright (C) 2020-present | version：21.02.XX")
 
 	datahubpkg.ConnectDatabase()
 	client.NewClient()
