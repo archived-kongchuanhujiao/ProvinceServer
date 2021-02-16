@@ -9,7 +9,7 @@ import (
 
 	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/accounts"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/accounts"
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 

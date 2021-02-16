@@ -2,7 +2,7 @@ package internal
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
-	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/Mrs4s/MiraiGo/client"
@@ -59,8 +59,8 @@ func (q *QQ) SetCallback(f clientmsg.Callback) {
 }
 
 // GetGroups 获取群
-func (q *QQ) GetGroups() *wendapkg.Groups {
-	g := wendapkg.Groups{}
+func (q *QQ) GetGroups() *wenda.Groups {
+	g := wenda.Groups{}
 	for _, v := range q.client.GroupList {
 		g[uint64(v.Code)] = v.Name
 	}
@@ -71,8 +71,8 @@ func (q *QQ) GetGroups() *wendapkg.Groups {
 func (q *QQ) GetGroupName(i uint64) string { return q.client.FindGroup(int64(i)).Name }
 
 // GetGroupMembers 获取群成员
-func (q *QQ) GetGroupMembers(i uint64) *wendapkg.GroupMembers {
-	m := wendapkg.GroupMembers{}
+func (q *QQ) GetGroupMembers(i uint64) *wenda.GroupMembers {
+	m := wenda.GroupMembers{}
 	for _, v := range q.client.FindGroup(int64(i)).Members {
 		m[uint64(v.Uin)] = v.DisplayName()
 	}

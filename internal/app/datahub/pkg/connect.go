@@ -1,4 +1,4 @@
-package datahubpkg
+package pkg
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"

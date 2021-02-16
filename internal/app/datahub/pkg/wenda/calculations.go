@@ -2,8 +2,6 @@ package wenda
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
-	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
-
 	"github.com/elgris/sqrl"
 	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
@@ -11,7 +9,7 @@ import (
 
 // SelectCalculations 获取数据
 // qid 问题 ID
-func SelectCalculations(qid wendapkg.QuestionID) (data []*wendapkg.CalculationsTab, err error) {
+func SelectCalculations(qid uint32) (data []*CalculationsTab, err error) {
 
 	sql, args, err := sqrl.Select("*").From("calculations").Where("question=?", qid).ToSql()
 	if err != nil {
@@ -50,7 +48,7 @@ func SelectCalculations(qid wendapkg.QuestionID) (data []*wendapkg.CalculationsT
 			return nil, err
 		}
 
-		data = append(data, &wendapkg.CalculationsTab{
+		data = append(data, &CalculationsTab{
 			Question: v.Question, AnswerCount: v.AnswerCount,
 			Right: r,
 			Wrong: w,

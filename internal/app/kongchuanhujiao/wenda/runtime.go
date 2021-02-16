@@ -1,11 +1,10 @@
 package wenda
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 	"net/http"
 	"strconv"
 
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/gorilla/websocket"
@@ -38,8 +37,8 @@ func (a *APIs) GetRuntime(c *context.Context) {
 	}
 	id := uint32(i)
 
-	wenda.AddClient(wendapkg.QuestionID(id), conn)
-	defer wenda.RemoveClient(wendapkg.QuestionID(id), conn)
+	wenda.AddClient(id, conn)
+	defer wenda.RemoveClient(id, conn)
 	go func() {
 		for {
 			if _, _, err := conn.ReadMessage(); err != nil {

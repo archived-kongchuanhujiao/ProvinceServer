@@ -6,8 +6,7 @@ import (
 
 	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/client/clientmsg"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/datahubpkg/wenda"
-	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 )
 
 // HandleAnswer 处理回答
@@ -36,7 +35,7 @@ func HandleAnswer(m *clientmsg.Message) {
 		if !checkAnswerForSelect(answer) {
 			return
 		}
-		_ = wenda.InsertAnswer(&wendapkg.AnswersTab{
+		_ = wenda.InsertAnswer(&wenda.AnswersTab{
 			Question: qid,
 			QQ:       m.Target.ID,
 			Answer:   strings.ToUpper(answer),
@@ -47,7 +46,7 @@ func HandleAnswer(m *clientmsg.Message) {
 		if !checkAnswerForFill(answer) {
 			return
 		}
-		_ = wenda.InsertAnswer(&wendapkg.AnswersTab{
+		_ = wenda.InsertAnswer(&wenda.AnswersTab{
 			Question: qid,
 			QQ:       m.Target.ID,
 			Answer:   strings.TrimPrefix(answer, "#"),

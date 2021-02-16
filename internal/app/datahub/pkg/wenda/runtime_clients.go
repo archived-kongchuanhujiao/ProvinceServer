@@ -1,7 +1,6 @@
 package wenda
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 )
@@ -9,13 +8,13 @@ import (
 var wendaRuntime = runtime{}
 
 // AddClient 新增客户端
-func AddClient(id wendapkg.QuestionID, conn *websocket.Conn) {
+func AddClient(id uint32, conn *websocket.Conn) {
 	wendaRuntime[id] = append(wendaRuntime[id], conn)
 	loggerr.Info("新增连接", zap.String("连接", conn.RemoteAddr().String()))
 }
 
 // RemoveClient 移除客户端
-func RemoveClient(id wendapkg.QuestionID, conn *websocket.Conn) {
+func RemoveClient(id uint32, conn *websocket.Conn) {
 	for k, v := range wendaRuntime[id] {
 		if v == conn {
 			wendaRuntime[id] = append(wendaRuntime[id][:k], wendaRuntime[id][k+1:]...)
@@ -25,7 +24,7 @@ func RemoveClient(id wendapkg.QuestionID, conn *websocket.Conn) {
 }
 
 // PushData 推送数据 TODO 数据结构
-func PushData(id wendapkg.QuestionID, data []*wendapkg.AnswersTab) {
+func PushData(id uint32, data []*AnswersTab) {
 	for _, v := range wendaRuntime[id] {
 		err := v.WriteJSON(data)
 		if err != nil {

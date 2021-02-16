@@ -1,8 +1,6 @@
 package wenda
 
-import "coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
-
-func CalculateQuestion(w *wendapkg.WendaDetails) (calc *wendapkg.CalculationsTab) {
+func CalculateQuestion(w *Detail) (calc *CalculationsTab) {
 
 	var (
 		rightStus []uint64
@@ -34,7 +32,7 @@ func CalculateQuestion(w *wendapkg.WendaDetails) (calc *wendapkg.CalculationsTab
 		}
 	}
 
-	calc = &wendapkg.CalculationsTab{
+	calc = &CalculationsTab{
 		Question:    w.Questions.ID,
 		AnswerCount: uint8(len(w.Answers)),
 		Right:       rightStus,
