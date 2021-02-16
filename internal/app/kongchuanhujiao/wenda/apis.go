@@ -8,7 +8,6 @@ import (
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao"
 	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/public/wendapkg"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
-
 	"github.com/kataras/iris/v12/context"
 	"go.uber.org/zap"
 )
@@ -98,11 +97,10 @@ func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Resp
 		err error
 	)
 
-	if v.Status == 1 {
-		var qs []*wendapkg.QuestionsTab
-		qs, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, 0)
-		q = qs[0]
-	}
+	var qs []*wendapkg.QuestionsTab
+	qs, err = wenda.SelectQuestions(&wendapkg.QuestionsTab{ID: wendapkg.QuestionID(v.ID)}, 0)
+	q = qs[0]
+
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
