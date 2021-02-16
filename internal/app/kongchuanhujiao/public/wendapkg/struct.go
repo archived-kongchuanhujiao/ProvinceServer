@@ -1,16 +1,12 @@
 package wendapkg
 
-import (
-	"time"
-)
-
 type (
 	AnswersTab struct { // AnswersTab 回答
 		ID       uint32     `json:"id" db:"id"`             // 唯一标识符
 		Question QuestionID `json:"question" db:"question"` // 问题
 		QQ       uint64     `json:"qq" db:"qq"`             // QQ
 		Answer   string     `json:"answer" db:"answer"`     // 回答
-		Time     time.Time  `json:"time" db:"time"`         // 时刻
+		Time     string     `json:"time" db:"time"`         // 时刻
 	}
 
 	CalculationsTab struct { // CalculationsTab 计算结果
