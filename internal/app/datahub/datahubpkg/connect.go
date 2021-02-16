@@ -8,5 +8,5 @@ import (
 // ConnectDatabase 连接所有数据库
 func ConnectDatabase() {
 	conf := configs.GetConfigs()
-	maria.Connect(conf.DBURL)
+	maria.Connect(conf.Database)
 }

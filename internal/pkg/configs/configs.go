@@ -11,9 +11,9 @@ import (
 
 // Configs 配置
 type Configs struct {
-	QQNumber   uint64 `yaml:"number"`
-	QQPassword string `yaml:"password"`
-	DBURL      string `yaml:"database"`
+	Number   uint64 `yaml:"number"`
+	Password string `yaml:"password"`
+	Database string `yaml:"database"`
 }
 
 // GetConfigs 获取配置
