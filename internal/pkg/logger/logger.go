@@ -33,8 +33,8 @@ func init() {
 
 	logger = zap.New(
 		zapcore.NewTee(
-			zapcore.NewCore(zapcore.NewJSONEncoder(conf), zapcore.AddSync(lumber), zapcore.DebugLevel),
-			zapcore.NewCore(zapcore.NewConsoleEncoder(conf), zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
+			zapcore.NewCore(zapcore.NewJSONEncoder(file), zapcore.AddSync(lumber), zapcore.DebugLevel),
+			zapcore.NewCore(zapcore.NewConsoleEncoder(console), zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
 		),
 		zap.AddCaller(),
 	)
