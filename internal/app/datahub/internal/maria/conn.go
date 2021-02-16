@@ -14,8 +14,8 @@ var (
 )
 
 // Connect 连接至 Maria 数据库
-func Connect() {
-	db, err := sqlx.Connect("mysql", "root:QianjuKasuNa94@PD@/kongchuanhujiao")
+func Connect(url string) {
+	db, err := sqlx.Connect("mysql", url)
 	if err != nil {
 		Logger.Panic("连接失败", zap.Error(err))
 	}
