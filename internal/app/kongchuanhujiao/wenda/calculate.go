@@ -7,11 +7,11 @@ func CalculateQuestion(w *wenda.Detail) (calc *wenda.CalculationsTab) {
 
 	var (
 		rightStus []uint64
-		wrongStus [][]uint64
+		wrongStus []wenda.CalculationsWrong
 	)
 
 	rightStus = []uint64{}
-	wrongStus = [][]uint64{}
+	wrongStus = []wenda.CalculationsWrong{}
 
 	correctAnswer := w.Questions.Key
 
@@ -25,11 +25,14 @@ func CalculateQuestion(w *wenda.Detail) (calc *wenda.CalculationsTab) {
 				}
 
 				op := wrongStus[i]
-				if op == nil {
-					op = []uint64{}
+				if &op == nil {
+					op = wenda.CalculationsWrong{
+						Type:   option,
+						Member: []uint64{ans.QQ},
+					}
 				}
 
-				op = append(op, ans.QQ)
+				op.Member = append(op.Member, ans.QQ)
 				wrongStus[i] = op
 			}
 		}

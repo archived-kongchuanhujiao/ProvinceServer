@@ -60,7 +60,7 @@ func SelectCalculations(qid uint32) (data []*wenda.CalculationsTab, err error) {
 	for _, v := range d {
 
 		var r []uint64
-		var w [][]uint64
+		var w []wenda.CalculationsWrong
 
 		err := jsoniter.UnmarshalFromString(v.Right, &r)
 		if err != nil {
