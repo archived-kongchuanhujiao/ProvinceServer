@@ -9,7 +9,26 @@ import (
 	"go.uber.org/zap"
 )
 
-// SelectCalculations 获取数据
+// InsertCalculations 插入计算结果
+func InsertCalculations(c *wenda.CalculationsTab) (err error) {
+
+	loggerr.Info("插入计算结果", zap.Uint32("问答ID", c.Question))
+
+	sql, args, err := sqrl.Insert("calculations").Values(c.Question, c.AnswerCount, c.Right, c.Wrong).ToSql()
+	if err != nil {
+		loggerr.Error("生成SQL语句失败", zap.Error(err))
+		return
+	}
+
+	_, err = maria.DB.Exec(sql, args...)
+	if err != nil {
+		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
+	}
+
+	return
+}
+
+// SelectCalculations 获取计算结果
 // qid 问题 ID
 func SelectCalculations(qid uint32) (data []*wenda.CalculationsTab, err error) {
 
