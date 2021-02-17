@@ -19,21 +19,15 @@ func CalculateQuestion(w *wenda.Detail) (calc *wenda.CalculationsTab) {
 		if ans.Answer == correctAnswer {
 			rightStus = append(rightStus, ans.QQ)
 		} else {
-			for i, option := range w.Questions.Options {
-				if option != ans.Answer {
-					continue
-				}
+			status := getWrongStatusByOption(wrongStus, ans.Answer)
 
-				op := wrongStus[i]
-				if &op == nil {
-					op = wenda.CalculationsWrong{
-						Type:   option,
-						Member: []uint64{ans.QQ},
-					}
-				}
-
-				op.Member = append(op.Member, ans.QQ)
-				wrongStus[i] = op
+			if status == nil {
+				wrongStus = append(wrongStus, wenda.CalculationsWrong{
+					Type:   ans.Answer,
+					Member: []uint64{ans.QQ},
+				})
+			} else {
+				status.Member = append(status.Member, ans.QQ)
 			}
 		}
 	}
@@ -46,4 +40,14 @@ func CalculateQuestion(w *wenda.Detail) (calc *wenda.CalculationsTab) {
 	}
 
 	return
+}
+
+func getWrongStatusByOption(wrongStus []wenda.CalculationsWrong, option string) *wenda.CalculationsWrong {
+	for _, status := range wrongStus {
+		if status.Type == option {
+			return &status
+		}
+	}
+
+	return nil
 }
