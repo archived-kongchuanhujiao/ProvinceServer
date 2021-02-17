@@ -85,19 +85,23 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
-	var calc []*public.CalculationsTab
+	var calcs []*public.CalculationsTab
 
 	for _, e := range d {
-		cache := wenda.GetCaches(e.ID)
+		calc, err := wenda.SelectCalculations(e.ID)
 
-		if cache != nil {
-			calc = append(calc, CalculateQuestion(cache))
+		if err != nil {
+			continue
+		}
+
+		if calc != nil {
+			calcs = append(calcs, calc...)
 		}
 	}
 
 	return &kongchuanhujiao.Response{
 		Message: "ok",
-		Data:    &GetQuestionsRes{d, g, n, m, calc},
+		Data:    &GetQuestionsRes{d, g, n, m, calcs},
 	}
 }
 
@@ -152,13 +156,13 @@ func (a *APIs) PostPraise(v *PostPraisePeq) *kongchuanhujiao.Response {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
-	cache := wenda.GetCaches(q[0].ID)
+	cache, err := wenda.SelectCalculations(q[0].ID)
 
-	if cache == nil {
+	if err == nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
-	details := CalculateQuestion(cache)
+	details := cache[0]
 
 	msg := message.NewTextMessage("表扬下列答对的同学：\n")
 	for _, mem := range details.Right {
