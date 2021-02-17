@@ -32,10 +32,15 @@ type (
 	}
 
 	CalculationsTab struct { // CalculationsTab 计算结果
-		Question uint32     `json:"question" db:"question"` // 问题
-		Count    uint8      `json:"count" db:"count"`       // 作答人数
-		Right    []uint64   `json:"right" db:"right"`       // 正确
-		Wrong    [][]uint64 `json:"wrong" db:"wrong"`       // 错误
+		Question uint32              `json:"question" db:"question"` // 问题 ID
+		Count    uint8               `json:"count" db:"count"`       // 作答人数
+		Right    []uint64            `json:"right" db:"right"`       // 正确学生
+		Wrong    []CalculationsWrong `json:"wrong" db:"wrong"`       // 错误学生
+	}
+
+	CalculationsWrong struct { // CalculationsWrong 计算错误学生
+		Type   string   `json:"type"`   // 错误类型
+		Member []string `json:"member"` // 错误学生
 	}
 
 	// Detail 问答详情
