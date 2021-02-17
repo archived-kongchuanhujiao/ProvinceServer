@@ -2,6 +2,7 @@ package wenda
 
 import "coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
+// CalculateQuestion 计算问答结果
 func CalculateQuestion(w *wenda.Detail) (calc *wenda.CalculationsTab) {
 
 	var (
