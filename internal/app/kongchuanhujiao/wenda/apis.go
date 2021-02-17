@@ -91,7 +91,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 		calc, err := wenda.SelectCalculations(e.ID)
 
 		if err != nil {
-			continue
+			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 		}
 
 		if calc != nil {
