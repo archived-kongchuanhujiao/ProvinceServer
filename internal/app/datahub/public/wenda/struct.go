@@ -40,7 +40,7 @@ type (
 
 	CalculationsWrong struct { // CalculationsWrong 计算错误学生
 		Type   string   `json:"type"`   // 错误类型
-		Member []string `json:"member"` // 错误学生
+		Member []uint64 `json:"member"` // 错误学生
 	}
 
 	// Detail 问答详情
