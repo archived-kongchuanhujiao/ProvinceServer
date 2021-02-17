@@ -52,7 +52,7 @@ func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.Question
 	}
 
 	var d []*questionsTab
-	err = maria.DB.Select(&d, sql, args...)
+	err = maria.Select(&d, sql, args...)
 	if err != nil {
 		maria.Logger.Error("查询失败", zap.Error(err), zap.String("SQL语句", sql))
 		return
@@ -97,7 +97,7 @@ func UpdateQuestionStatus(q *wenda.QuestionsTab, status uint8) (err error) {
 		return
 	}
 
-	_, err = maria.DB.Exec(sql, args...)
+	_, err = maria.Exec(sql, args...)
 	if err != nil {
 		maria.Logger.Error("更新失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
@@ -132,7 +132,7 @@ func InsertQuestion(q *wenda.QuestionsTab) (err error) {
 		return
 	}
 
-	_, err = maria.DB.Exec(sql, args...)
+	_, err = maria.Exec(sql, args...)
 	if err != nil {
 		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
@@ -155,7 +155,7 @@ func UpdateQuestion(q *wenda.QuestionsTab) (err error) {
 		return
 	}
 
-	_, err = maria.DB.Exec(sql, args...)
+	_, err = maria.Exec(sql, args...)
 	if err != nil {
 		maria.Logger.Error("更新失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
@@ -187,7 +187,7 @@ func DeleteQuestion(id uint32) (err error) {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
 	}
-	_, err = maria.DB.Exec(sql, args...)
+	_, err = maria.Exec(sql, args...)
 	if err != nil {
 		maria.Logger.Error("删除失败", zap.Error(err), zap.String("SQL语句", sql))
 	}

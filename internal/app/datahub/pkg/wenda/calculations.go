@@ -20,7 +20,7 @@ func InsertCalculations(c *wenda.CalculationsTab) (err error) {
 		return
 	}
 
-	_, err = maria.DB.Exec(sql, args...)
+	_, err = maria.Exec(sql, args...)
 	if err != nil {
 		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
 	}
@@ -46,7 +46,7 @@ func SelectCalculations(qid uint32) (data []*wenda.CalculationsTab, err error) {
 	}
 
 	var d []*calculationsTab
-	err = maria.DB.Select(&d, sql, args...)
+	err = maria.Select(&d, sql, args...)
 	if err != nil {
 		maria.Logger.Error("查询失败", zap.Error(err), zap.String("SQL语句", sql))
 		return

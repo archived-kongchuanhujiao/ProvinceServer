@@ -23,7 +23,7 @@ func SelectAccount(id string, qq uint64) (data []*Tab, err error) {
 		return
 	}
 
-	err = maria.DB.Select(&data, sql, args...)
+	err = maria.Select(&data, sql, args...)
 	if err != nil {
 		maria.Logger.Error("查询失败", zap.Error(err), zap.String("SQL语句", sql))
 		return

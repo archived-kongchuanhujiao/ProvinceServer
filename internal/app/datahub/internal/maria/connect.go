@@ -1,6 +1,8 @@
 package maria
 
 import (
+	"database/sql"
+
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -9,17 +11,29 @@ import (
 )
 
 var (
-	DB     *sqlx.DB
+	db     *sqlx.DB
 	Logger = logger.Named("Maria")
 )
 
 // Connect 连接至 Maria 数据库
 func Connect(url string) {
-	db, err := sqlx.Connect("mysql", url)
+	d, err := sqlx.Connect("mysql", url)
 	if err != nil {
 		Logger.Panic("连接失败", zap.Error(err))
 	}
 
 	Logger.Debug("连接成功")
-	DB = db
+	db = d
+}
+
+// Select using this db.
+// Any placeholder parameters are replaced with supplied args.
+func Select(dest interface{}, query string, args ...interface{}) error {
+	return db.Select(dest, query, args...)
+}
+
+// Exec executes a query without returning any rows.
+// The args are for any placeholder parameters in the query.
+func Exec(query string, args ...interface{}) (sql.Result, error) {
+	return db.Exec(query, args...)
 }
