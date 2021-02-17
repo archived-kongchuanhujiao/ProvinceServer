@@ -11,9 +11,10 @@ import (
 	"go.uber.org/zap"
 )
 
-// InsertAnswer 新增回答
+// InsertAnswer 插入回答
 // 结构体中无需传 ID、Time
 func InsertAnswer(a *wenda.AnswersTab) (err error) {
+
 	loggerr.Info("插入回答数据", zap.Uint32("问答ID", a.Question))
 	a.Time = time.Now().Format("2006-01-02 15:04:05")
 	sql, args, err := sqrl.Insert("answers").Values(nil, a.Question, a.QQ, a.Answer, a.Time).ToSql()

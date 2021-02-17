@@ -2,13 +2,17 @@ package accounts
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/accounts"
+	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/elgris/sqrl"
 	"go.uber.org/zap"
 )
 
+var loggerr = logger.Named("数据总线").Named("账号")
+
 // SelectAccount 获取账号
-func SelectAccount(id string, qq uint64) (data []*Tab, err error) {
+func SelectAccount(id string, qq uint64) (data []*accounts.Tab, err error) {
 
 	sqr := sqrl.Select("*").From("accounts")
 	if id != "" {
