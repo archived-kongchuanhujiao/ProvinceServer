@@ -41,6 +41,9 @@ func HandleAnswer(m *message.Message) {
 			QQ:       m.Target.ID,
 			Answer:   strings.ToUpper(answer),
 		})
+
+		_ = wenda.InsertCalculations(CalculateQuestion(wenda.GetCaches(qid)))
+
 	case 2: // 多选题
 
 	case 3: // 简答题

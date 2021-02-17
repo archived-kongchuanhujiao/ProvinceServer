@@ -1,7 +1,6 @@
 package wenda
 
 import (
-	wenda2 "coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
 	"time"
 
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
@@ -31,14 +30,6 @@ func InsertAnswer(a *wenda.AnswersTab) (err error) {
 
 	q := memory.Caches[a.Question]
 	q.Answers = append(q.Answers, a)
-
-	cacl := wenda2.CalculateQuestion(memory.Caches[a.Question])
-
-	err = InsertCalculations(cacl)
-
-	if err != nil {
-		maria.Logger.Error("插入失败", zap.Error(err), zap.String("SQL语句", sql))
-	}
 
 	PushData(q.Questions.ID, q.Answers)
 
