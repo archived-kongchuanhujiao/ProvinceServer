@@ -141,7 +141,7 @@ func (a *APIs) PostPraise(v *PostPraisePeq) *kongchuanhujiao.Response {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
-	details := wenda.CalculateQuestion(wenda.GetCaches(q[0].ID))
+	details := CalculateQuestion(wenda.GetCaches(q[0].ID))
 
 	msg := message.NewTextMessage("表扬下列答对的同学：\n")
 	for _, mem := range details.Right {
