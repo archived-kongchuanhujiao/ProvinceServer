@@ -43,7 +43,6 @@ func (q *QQ) SendMessage(m *message.Message) {
 	} else {
 		q.client.SendPrivateMessage(int64(m.Target.ID), ms)
 	}
-	loggerr.Info("发送消息", zap.Any("消息", m.Chain))
 }
 
 // ReceiveMessage 接收消息
