@@ -11,8 +11,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// NewApis 新建 API
-func NewApis() {
+// StartApis 启动 APIs
+func StartApis() {
 
 	app := iris.New()
 	app.Use(recover.New())

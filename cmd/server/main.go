@@ -20,7 +20,7 @@ func main() {
 		wenda.HandleTest(m)
 		wenda.HandleAnswer(m)
 	})
-	apis.NewApis()
+	apis.StartApis()
 
 	select {}
 }
