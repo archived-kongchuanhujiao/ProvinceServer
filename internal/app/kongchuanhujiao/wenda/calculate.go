@@ -35,10 +35,10 @@ func CalculateQuestion(w *wenda.Detail) (calc *wenda.CalculationsTab) {
 	}
 
 	calc = &wenda.CalculationsTab{
-		Question:    w.Questions.ID,
-		AnswerCount: uint8(len(w.Answers)),
-		Right:       rightStus,
-		Wrong:       wrongStus,
+		Question: w.Questions.ID,
+		Count:    uint8(len(w.Answers)),
+		Right:    rightStus,
+		Wrong:    wrongStus,
 	}
 
 	return

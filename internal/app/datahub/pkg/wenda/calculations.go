@@ -14,7 +14,7 @@ func InsertCalculations(c *wenda.CalculationsTab) (err error) {
 
 	loggerr.Info("插入计算结果", zap.Uint32("问答ID", c.Question))
 
-	sql, args, err := sqrl.Insert("calculations").Values(c.Question, c.AnswerCount, c.Right, c.Wrong).ToSql()
+	sql, args, err := sqrl.Insert("calculations").Values(c.Question, c.Count, c.Right, c.Wrong).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
@@ -70,7 +70,7 @@ func SelectCalculations(qid uint32) (data []*wenda.CalculationsTab, err error) {
 		}
 
 		data = append(data, &wenda.CalculationsTab{
-			Question: v.Question, AnswerCount: v.AnswerCount,
+			Question: v.Question, Count: v.AnswerCount,
 			Right: r,
 			Wrong: w,
 		})
