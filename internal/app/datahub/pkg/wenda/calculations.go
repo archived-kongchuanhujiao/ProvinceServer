@@ -19,7 +19,7 @@ func InsertCalculations(c *wenda.CalculationsTab) (err error) {
 		wj, _ = jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(c.Wrong)
 	)
 
-	sql, args, err := sqrl.Insert("calculations").Values(c.Question, c.Count, rj, wj).ToSql()
+	sql, args, err := sqrl.Expr("REPLACE INTO calculations VALUES (?,?,?,?)", c.Question, c.Count, rj, wj).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
