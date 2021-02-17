@@ -3,6 +3,7 @@ package wenda
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
 	"github.com/elgris/sqrl"
 	jsoniter "github.com/json-iterator/go"
@@ -10,7 +11,7 @@ import (
 )
 
 // SelectQuestions 获取问题
-func SelectQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err error) {
+func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.QuestionsTab, err error) {
 
 	var sqr *sqrl.SelectBuilder
 	if v.ID != 0 {
@@ -60,7 +61,7 @@ func SelectQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err er
 	for _, v := range d {
 
 		var (
-			q   = QuestionField{}
+			q   = wenda.QuestionField{}
 			o   []string
 			err = jsoniter.UnmarshalFromString(v.Question, &q)
 		)
@@ -75,7 +76,7 @@ func SelectQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err er
 			return nil, err
 		}
 
-		data = append(data, &QuestionsTab{
+		data = append(data, &wenda.QuestionsTab{
 			ID: v.ID, Type: v.Type, Subject: v.Subject,
 			Question: q,
 			Creator:  v.Creator, Target: v.Target, Status: v.Status,
@@ -88,7 +89,7 @@ func SelectQuestions(v *QuestionsTab, page uint32) (data []*QuestionsTab, err er
 
 // UpdateQuestionStatus 更新问题状态
 // 当 status = 1 时， q 必须传入由 SelectQuestions 获取的
-func UpdateQuestionStatus(q *QuestionsTab, status uint8) (err error) {
+func UpdateQuestionStatus(q *wenda.QuestionsTab, status uint8) (err error) {
 
 	sql, args, err := sqrl.Update("questions").Set("`status`", status).Where("id=?", q.ID).ToSql()
 	if err != nil {
@@ -103,17 +104,18 @@ func UpdateQuestionStatus(q *QuestionsTab, status uint8) (err error) {
 
 	switch status {
 	case 0, 2: // 准备作答
-		delete(ActiveGroup, q.Target)
+		DeleteActiveGroup(q.Target)
 	case 1: // 开始作答
 		a, err := SelectAnswers(q.ID)
 		if err != nil {
 			return err
 		}
-		Caches[q.ID] = &Detail{
+
+		WriteCaches(q.ID, &wenda.Detail{
 			Questions: q, Answers: a,
 			Members: client.GetClient().GetGroupMembers(q.Target),
-		}
-		ActiveGroup[q.Target] = q.ID
+		})
+		WriteActiveGroup(q.Target, q.ID)
 		return sendQuestionMsg(q)
 	}
 
@@ -121,7 +123,7 @@ func UpdateQuestionStatus(q *QuestionsTab, status uint8) (err error) {
 }
 
 // InsertQuestion 新增问题
-func InsertQuestion(q *QuestionsTab) (err error) {
+func InsertQuestion(q *wenda.QuestionsTab) (err error) {
 
 	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question, q.Creator,
 		q.Target, 0, q.Options, q.Key, q.Market).ToSql()
@@ -139,7 +141,7 @@ func InsertQuestion(q *QuestionsTab) (err error) {
 }
 
 // UpdateQuestion 更新问题
-func UpdateQuestion(q *QuestionsTab) (err error) {
+func UpdateQuestion(q *wenda.QuestionsTab) (err error) {
 
 	sql, args, err := sqrl.Update("questions").Where("id=?", q.ID).
 		Set("`subject`", q.Subject).
@@ -164,7 +166,7 @@ func UpdateQuestion(q *QuestionsTab) (err error) {
 // CopyQuestions 复制问题
 func CopyQuestions(id uint32, creator string, target uint64) (err error) {
 
-	q, err := SelectQuestions(&QuestionsTab{ID: id, Market: true}, 0)
+	q, err := SelectQuestions(&wenda.QuestionsTab{ID: id, Market: true}, 0)
 	if err != nil {
 		return
 	}

@@ -1,11 +1,15 @@
 package wenda
 
 import (
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
+
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
 )
 
-var wendaRuntime = runtime{}
+var loggerr = logger.Named("数据总线").Named("问答")
+var wendaRuntime = wenda.Runtime{}
 
 // AddClient 新增客户端
 func AddClient(id uint32, conn *websocket.Conn) {
@@ -24,7 +28,7 @@ func RemoveClient(id uint32, conn *websocket.Conn) {
 }
 
 // PushData 推送数据 TODO 数据结构
-func PushData(id uint32, data []*AnswersTab) {
+func PushData(id uint32, data []*wenda.AnswersTab) {
 	for _, v := range wendaRuntime[id] {
 		err := v.WriteJSON(data)
 		if err != nil {
@@ -32,5 +36,5 @@ func PushData(id uint32, data []*AnswersTab) {
 			continue
 		}
 	}
-	loggerr.Info("推送数据成功", zap.Uint32("ID", uint32(id)))
+	loggerr.Info("推送数据成功", zap.Uint32("ID", id))
 }

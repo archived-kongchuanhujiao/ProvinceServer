@@ -7,13 +7,14 @@ import (
 	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/client/message"
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
+	public "coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 )
 
 // HandleAnswer 处理回答
 func HandleAnswer(m *message.Message) {
 
-	qid, ok := wenda.ActiveGroup[m.Target.Group.ID]
-	if !ok {
+	qid := wenda.GetActiveGroup(m.Target.Group.ID)
+	if qid == 0 {
 		return
 	}
 
@@ -23,7 +24,7 @@ func HandleAnswer(m *message.Message) {
 	}
 	answer := ans.Content
 
-	q := wenda.Caches[qid]
+	q := wenda.GetCaches(qid)
 	for _, v := range q.Answers {
 		if v.QQ == m.Target.ID {
 			return
@@ -35,7 +36,7 @@ func HandleAnswer(m *message.Message) {
 		if !checkAnswerForSelect(answer) {
 			return
 		}
-		_ = wenda.InsertAnswer(&wenda.AnswersTab{
+		_ = wenda.InsertAnswer(&public.AnswersTab{
 			Question: qid,
 			QQ:       m.Target.ID,
 			Answer:   strings.ToUpper(answer),
@@ -46,7 +47,7 @@ func HandleAnswer(m *message.Message) {
 		if !checkAnswerForFill(answer) {
 			return
 		}
-		_ = wenda.InsertAnswer(&wenda.AnswersTab{
+		_ = wenda.InsertAnswer(&public.AnswersTab{
 			Question: qid,
 			QQ:       m.Target.ID,
 			Answer:   strings.TrimPrefix(answer, "#"),
@@ -69,7 +70,7 @@ func HandleTest(m *message.Message) {
 		)
 	case "活动的群":
 		client.GetClient().SendMessage(
-			message.NewTextMessage(fmt.Sprintln(wenda.ActiveGroup)).SetGroupTarget(m.Target.Group),
+			message.NewTextMessage(fmt.Sprintln(wenda.GetAllActiveGroup())).SetGroupTarget(m.Target.Group),
 		)
 	}
 }

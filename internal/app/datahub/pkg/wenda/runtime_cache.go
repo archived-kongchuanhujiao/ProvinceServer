@@ -5,18 +5,14 @@ import (
 
 	"coding.net/kongchuanhujiao/server/internal/app/client"
 	"coding.net/kongchuanhujiao/server/internal/app/client/message"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
 
 	"go.uber.org/zap"
 )
 
-var (
-	Caches      = map[uint32]*Detail{} // Caches 缓存
-	ActiveGroup = map[uint64]uint32{}  // ActiveGroup 活动的群
-)
-
 // sendQuestionMsg 发送问答题干
-func sendQuestionMsg(q *QuestionsTab) (err error) {
+func sendQuestionMsg(q *wenda.QuestionsTab) (err error) {
 
 	m := message.NewTextMessage("问题:\n")
 	for _, v := range q.Question {

@@ -2,6 +2,7 @@ package wenda
 
 import (
 	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
 	"github.com/elgris/sqrl"
 	jsoniter "github.com/json-iterator/go"
@@ -10,7 +11,7 @@ import (
 
 // SelectCalculations 获取数据
 // qid 问题 ID
-func SelectCalculations(qid uint32) (data []*CalculationsTab, err error) {
+func SelectCalculations(qid uint32) (data []*wenda.CalculationsTab, err error) {
 
 	sql, args, err := sqrl.Select("*").From("calculations").Where("question=?", qid).ToSql()
 	if err != nil {
@@ -49,7 +50,7 @@ func SelectCalculations(qid uint32) (data []*CalculationsTab, err error) {
 			return nil, err
 		}
 
-		data = append(data, &CalculationsTab{
+		data = append(data, &wenda.CalculationsTab{
 			Question: v.Question, AnswerCount: v.AnswerCount,
 			Right: r,
 			Wrong: w,

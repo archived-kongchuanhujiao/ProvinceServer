@@ -5,14 +5,14 @@ import (
 	"strings"
 
 	"coding.net/kongchuanhujiao/server/internal/app/client/message"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
+	public "coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
 	"github.com/CatchZeng/dingtalk"
 )
 
 // convertToMarkDown 将问题数据转换为钉钉 Markdown 消息
 // FIXME 详见 apis.go@PostPushcenter()
-func ConvertToDTMessage(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
+func ConvertToDTMessage(tab *public.QuestionsTab) *dingtalk.MarkdownMessage {
 	builder := dingtalk.NewMarkdownMessage()
 	builder.Markdown.Title = "答题数据："
 	builder.Markdown.Text = digestQuestionData(tab, true)
@@ -21,12 +21,12 @@ func ConvertToDTMessage(tab *wenda.QuestionsTab) *dingtalk.MarkdownMessage {
 
 // convertToChain 将问题数据转换为消息链
 // TODO 详见 apis.go@PostPushcenter()
-func ConvertToChain(tab *wenda.QuestionsTab) *message.Message {
+func ConvertToChain(tab *public.QuestionsTab) *message.Message {
 	return message.NewTextMessage(digestQuestionData(tab, false))
 }
 
 // digestQuestionData 摘要答题数据
-func digestQuestionData(tab *wenda.QuestionsTab, isMarkdown bool) (sum string) {
+func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) {
 	sum = digestQuestion(tab)
 	template := ""
 	if !isMarkdown {
@@ -39,7 +39,7 @@ func digestQuestionData(tab *wenda.QuestionsTab, isMarkdown bool) (sum string) {
 }
 
 // digestQuestion 摘要题干
-func digestQuestion(q *wenda.QuestionsTab) (s string) {
+func digestQuestion(q *public.QuestionsTab) (s string) {
 
 	var questionText string
 	for _, v := range q.Question {

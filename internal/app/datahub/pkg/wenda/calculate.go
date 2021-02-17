@@ -1,6 +1,8 @@
 package wenda
 
-func CalculateQuestion(w *Detail) (calc *CalculationsTab) {
+import "coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+
+func CalculateQuestion(w *wenda.Detail) (calc *wenda.CalculationsTab) {
 
 	var (
 		rightStus []uint64
@@ -32,7 +34,7 @@ func CalculateQuestion(w *Detail) (calc *CalculationsTab) {
 		}
 	}
 
-	calc = &CalculationsTab{
+	calc = &wenda.CalculationsTab{
 		Question:    w.Questions.ID,
 		AnswerCount: uint8(len(w.Answers)),
 		Right:       rightStus,
