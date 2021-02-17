@@ -39,10 +39,10 @@ func SelectCalculations(qid uint32) (data []*wenda.CalculationsTab, err error) {
 	}
 
 	type calculationsTab struct { // calculationsTab 计算结果
-		Question    uint32 `db:"question"`     // 问题
-		AnswerCount uint8  `db:"answer_count"` // 作答人数
-		Right       string `db:"right"`        // 正确
-		Wrong       string `db:"wrong"`        // 错误
+		Question uint32 `db:"question"` // 问题
+		Count    uint8  `db:"count"`    // 作答人数
+		Right    string `db:"right"`    // 正确
+		Wrong    string `db:"wrong"`    // 错误
 	}
 
 	var d []*calculationsTab
@@ -70,7 +70,7 @@ func SelectCalculations(qid uint32) (data []*wenda.CalculationsTab, err error) {
 		}
 
 		data = append(data, &wenda.CalculationsTab{
-			Question: v.Question, Count: v.AnswerCount,
+			Question: v.Question, Count: v.Count,
 			Right: r,
 			Wrong: w,
 		})
