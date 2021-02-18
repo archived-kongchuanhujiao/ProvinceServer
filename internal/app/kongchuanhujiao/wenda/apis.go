@@ -109,22 +109,15 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 // PUT /apis/wenda/questions/status
 func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Response {
 
-	var (
-		q   = &public.QuestionsTab{ID: v.ID}
-		err error
-	)
-
-	var qs []*public.QuestionsTab
-	qs, err = wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
-	q = qs[0]
-
+	qs, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
-	if wenda.UpdateQuestionStatus(q, v.Status) != nil {
+	if wenda.UpdateQuestionStatus(qs[0], v.Status) != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
+
 	return &kongchuanhujiao.Response{Message: "ok"}
 }
 
