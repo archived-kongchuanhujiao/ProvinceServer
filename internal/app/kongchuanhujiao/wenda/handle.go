@@ -42,7 +42,11 @@ func HandleAnswer(m *message.Message) {
 			Answer:   strings.ToUpper(answer),
 		})
 
-		_ = wenda.InsertCalculations(CalculateQuestion(wenda.GetCaches(qid)))
+		calc := CalculateQuestion(wenda.GetCaches(qid))
+
+		wenda.PushData(q.Questions.ID, calc)
+
+		_ = wenda.InsertCalculations(calc)
 
 	case 2: // 多选题
 

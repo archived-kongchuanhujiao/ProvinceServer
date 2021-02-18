@@ -31,8 +31,6 @@ func InsertAnswer(a *wenda.AnswersTab) (err error) {
 	q := memory.Caches[a.Question]
 	q.Answers = append(q.Answers, a)
 
-	PushData(q.Questions.ID, q.Answers)
-
 	return
 }
 

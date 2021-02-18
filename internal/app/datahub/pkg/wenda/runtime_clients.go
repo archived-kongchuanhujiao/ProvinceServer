@@ -28,7 +28,7 @@ func RemoveClient(id uint32, conn *websocket.Conn) {
 }
 
 // PushData 推送数据 TODO 数据结构
-func PushData(id uint32, data []*wenda.AnswersTab) {
+func PushData(id uint32, data *wenda.CalculationsTab) {
 	for _, v := range wendaRuntime[id] {
 		err := v.WriteJSON(data)
 		if err != nil {
