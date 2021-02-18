@@ -35,7 +35,7 @@ type (
 		Status uint8  // 状态
 	}
 
-	PostPraisePeq struct { // PostPraisePeq 表扬请求
+	PostPraiseReq struct { // PostPraiseReq 表扬请求
 		ID uint32 // 唯一识别码
 	}
 
@@ -143,7 +143,7 @@ func (a *APIs) PutQuestions(v *public.QuestionsTab) *kongchuanhujiao.Response {
 
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
-func (a *APIs) PostPraise(v *PostPraisePeq) *kongchuanhujiao.Response {
+func (a *APIs) PostPraise(v *PostPraiseReq) *kongchuanhujiao.Response {
 	q, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
