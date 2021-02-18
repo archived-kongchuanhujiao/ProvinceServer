@@ -23,11 +23,11 @@ type (
 	}
 
 	GetQuestionsRes struct { // GetQuestionsReq 问题响应
-		Questions    []*public.QuestionsTab    `json:"questions"`    // 问题
-		Groups       *public.Groups            `json:"groups"`       // 群
-		GroupName    string                    `json:"group_name"`   // 群名称
-		Members      *public.GroupMembers      `json:"members"`      // 群成员
-		Calculations []*public.CalculationsTab `json:"calculations"` // 问题计算结果
+		Questions    []*public.QuestionsTab  `json:"questions"`    // 问题
+		Groups       *public.Groups          `json:"groups"`       // 群
+		GroupName    string                  `json:"group_name"`   // 群名称
+		Members      *public.GroupMembers    `json:"members"`      // 群成员
+		Calculations *public.CalculationsTab `json:"calculations"` // 问题计算结果
 	}
 
 	PutQuestionStatusReq struct { // PutQuestionStatusReq 问题更新
@@ -65,18 +65,23 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 
 	// FIXME 需要拆分出更细的颗粒密度
 	var (
-		d   []*public.QuestionsTab
-		g   *public.Groups
-		n   string // 群名称
-		m   *public.GroupMembers
-		err error
+		d    []*public.QuestionsTab
+		g    *public.Groups
+		n    string // 群名称
+		m    *public.GroupMembers
+		calc []*public.CalculationsTab
+		err  error
 	)
 
 	if v.ID != 0 {
 		d, err = wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+		if err != nil {
+			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		}
 		t := d[0].Target
 		n = client.GetClient().GetGroupName(t)
 		m = client.GetClient().GetGroupMembers(t)
+		calc, err = wenda.SelectCalculations(v.ID)
 	} else {
 		d, err = wenda.SelectQuestions(&public.QuestionsTab{Creator: c.GetCookie("account")}, v.Page)
 		g = client.GetClient().GetGroups()
@@ -84,24 +89,13 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
-
-	var calcs []*public.CalculationsTab
-
-	for _, e := range d {
-		calc, err := wenda.SelectCalculations(e.ID)
-
-		if err != nil {
-			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
-		}
-
-		if calc != nil {
-			calcs = append(calcs, calc...)
-		}
+	if len(calc) == 0 {
+		calc = append(calc, nil)
 	}
 
 	return &kongchuanhujiao.Response{
 		Message: "ok",
-		Data:    &GetQuestionsRes{d, g, n, m, calcs},
+		Data:    &GetQuestionsRes{d, g, n, m, calc[0]},
 	}
 }
 
