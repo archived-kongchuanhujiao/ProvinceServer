@@ -55,6 +55,8 @@ type (
 	}
 
 	DeleteQuestionsReq struct{ ID uint32 } // DeleteQuestionsReq 问题删除
+
+	GetAnswersReq struct{ ID uint32 } // GetAnswersReq 获取对应问题答案
 )
 
 // TODO 中间件安全校验
@@ -214,4 +216,12 @@ func (a *APIs) DeleteQuestions(v *DeleteQuestionsReq) *kongchuanhujiao.Response 
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 	return &kongchuanhujiao.Response{Message: "ok"}
+}
+
+func (a *APIs) GetAnswers(v *GetAnswersReq) *kongchuanhujiao.Response {
+	ans, err := wenda.SelectAnswers(v.ID)
+	if err != nil {
+		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+	}
+	return &kongchuanhujiao.Response{Message: "ok", Data: ans}
 }
