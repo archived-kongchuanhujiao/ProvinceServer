@@ -146,7 +146,7 @@ func (a *APIs) PostPraise(v *PostPraiseReq) *kongchuanhujiao.Response {
 
 	cache, err := wenda.SelectCalculations(q[0].ID)
 
-	if err == nil {
+	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
