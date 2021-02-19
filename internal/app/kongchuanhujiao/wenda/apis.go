@@ -119,6 +119,7 @@ func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Resp
 // POST /apis/wenda/questions
 func (a *APIs) PostQuestions(v *public.QuestionsTab) *kongchuanhujiao.Response {
 	err := wenda.InsertQuestion(v)
+	err = wenda.InsertCalculations(&public.CalculationsTab{})
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
