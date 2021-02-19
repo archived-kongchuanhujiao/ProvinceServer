@@ -27,10 +27,12 @@ func RemoveClient(id uint32, conn *websocket.Conn) {
 	loggerr.Info("移除连接", zap.String("连接", conn.RemoteAddr().String()))
 }
 
-// PushData 推送数据 TODO 数据结构
+// PushData 推送数据
 func PushData(id uint32, data *wenda.CalculationsTab) {
 	for _, v := range wendaRuntime[id] {
-		err := v.WriteJSON(data)
+
+		type wrapper struct{ Calculation *wenda.CalculationsTab }
+		err := v.WriteJSON(wrapper{data})
 		if err != nil {
 			loggerr.Error("推送数据失败", zap.Error(err))
 			continue
