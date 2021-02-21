@@ -1,9 +1,9 @@
 package apis
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/accounts"
-	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
-	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
+	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/accounts"
+	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
+	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/recover"

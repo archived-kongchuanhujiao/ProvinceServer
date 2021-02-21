@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"coding.net/kongchuanhujiao/server/internal/app/client"
-	"coding.net/kongchuanhujiao/server/internal/app/client/message"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
-	public "coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+	"github.com/kongchuanhujiao/server/internal/app/client"
+	"github.com/kongchuanhujiao/server/internal/app/client/message"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
+	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 )
 
 // HandleAnswer 处理回答

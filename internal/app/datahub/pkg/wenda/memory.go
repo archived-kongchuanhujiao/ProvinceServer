@@ -1,8 +1,8 @@
 package wenda
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/memory"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/memory"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 )
 
 // GetActiveGroup 获取 ActiveGroup 字段

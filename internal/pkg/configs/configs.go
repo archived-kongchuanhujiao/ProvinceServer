@@ -3,7 +3,7 @@ package configs
 import (
 	"io/ioutil"
 
-	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
+	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"

@@ -1,8 +1,8 @@
 package wenda
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
-	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"

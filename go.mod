@@ -1,4 +1,4 @@
-module coding.net/kongchuanhujiao/server
+module github.com/kongchuanhujiao/server
 
 go 1.16
 

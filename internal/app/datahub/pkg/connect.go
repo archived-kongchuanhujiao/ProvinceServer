@@ -1,8 +1,8 @@
 package pkg
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
-	"coding.net/kongchuanhujiao/server/internal/pkg/configs"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+	"github.com/kongchuanhujiao/server/internal/pkg/configs"
 )
 
 // ConnectDatabase 连接所有数据库

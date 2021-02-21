@@ -1,12 +1,12 @@
 package main
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/apis"
-	"coding.net/kongchuanhujiao/server/internal/app/client"
-	"coding.net/kongchuanhujiao/server/internal/app/client/message"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg"
-	"coding.net/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
-	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
+	"github.com/kongchuanhujiao/server/internal/app/apis"
+	"github.com/kongchuanhujiao/server/internal/app/client"
+	"github.com/kongchuanhujiao/server/internal/app/client/message"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg"
+	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
+	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 )
 
 // main 启动函数

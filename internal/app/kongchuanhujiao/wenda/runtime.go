@@ -3,8 +3,8 @@ package wenda
 import (
 	"net/http"
 
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
-	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
+	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/gorilla/websocket"
 	"github.com/kataras/iris/v12/context"

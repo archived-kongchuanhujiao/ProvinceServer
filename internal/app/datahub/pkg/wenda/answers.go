@@ -3,9 +3,9 @@ package wenda
 import (
 	"time"
 
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/memory"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/memory"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
 	"github.com/elgris/sqrl"
 	"go.uber.org/zap"

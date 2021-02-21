@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"coding.net/kongchuanhujiao/server/internal/app/client/message"
-	public "coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+	"github.com/kongchuanhujiao/server/internal/app/client/message"
+	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
 	"github.com/CatchZeng/dingtalk"
 )

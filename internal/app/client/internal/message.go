@@ -3,9 +3,9 @@ package internal
 import (
 	"bytes"
 
-	clientmessage "coding.net/kongchuanhujiao/server/internal/app/client/message"
 	"github.com/Mrs4s/MiraiGo/client"
 	"github.com/Mrs4s/MiraiGo/message"
+	clientmessage "github.com/kongchuanhujiao/server/internal/app/client/message"
 	"go.uber.org/zap"
 )
 

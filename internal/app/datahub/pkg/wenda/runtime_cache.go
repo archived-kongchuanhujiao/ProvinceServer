@@ -3,10 +3,10 @@ package wenda
 import (
 	"io/ioutil"
 
-	"coding.net/kongchuanhujiao/server/internal/app/client"
-	"coding.net/kongchuanhujiao/server/internal/app/client/message"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
-	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
+	"github.com/kongchuanhujiao/server/internal/app/client"
+	"github.com/kongchuanhujiao/server/internal/app/client/message"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"go.uber.org/zap"
 )

@@ -1,9 +1,9 @@
 package wenda
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/client"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+	"github.com/kongchuanhujiao/server/internal/app/client"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
 	"github.com/elgris/sqrl"
 	jsoniter "github.com/json-iterator/go"

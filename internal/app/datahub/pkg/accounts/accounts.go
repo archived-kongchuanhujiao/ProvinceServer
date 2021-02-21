@@ -1,9 +1,9 @@
 package accounts
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/internal/maria"
-	"coding.net/kongchuanhujiao/server/internal/app/datahub/public/accounts"
-	"coding.net/kongchuanhujiao/server/internal/pkg/logger"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/maria"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/public/accounts"
+	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/elgris/sqrl"
 	"go.uber.org/zap"

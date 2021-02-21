@@ -1,9 +1,9 @@
 package client
 
 import (
-	"coding.net/kongchuanhujiao/server/internal/app/client/internal"
-	"coding.net/kongchuanhujiao/server/internal/app/client/message"
-	"coding.net/kongchuanhujiao/server/internal/pkg/configs"
+	"github.com/kongchuanhujiao/server/internal/app/client/internal"
+	"github.com/kongchuanhujiao/server/internal/app/client/message"
+	"github.com/kongchuanhujiao/server/internal/pkg/configs"
 )
 
 var cli *internal.QQ // client 客户端

@@ -1,6 +1,6 @@
 package memory
 
-import "coding.net/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+import "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
 var (
 	Caches      = map[uint32]*wenda.Detail{} // Caches 缓存
