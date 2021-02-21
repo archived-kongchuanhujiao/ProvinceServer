@@ -11,8 +11,8 @@ go vet ${main}
 
 "开始编译..."
 
-#$env:GOOS="linux"
-#$env:GOARCH="amd64"
+$env:GOOS="linux"
+$env:GOARCH="amd64"
 go build -ldflags "-w -s -X main.Commit=${commit}" ${main}
 
 "编译完成，按任意键退出..."
