@@ -58,7 +58,7 @@ type (
 	GetAnswersReq struct{ ID uint32 } // GetAnswersReq 获取对应问题答案
 
 	GetWrongQuestionReq struct {
-		ID uint32
+		UserQQ uint32
 	}
 )
 
@@ -232,5 +232,6 @@ func (a *APIs) GetAnswers(v *GetAnswersReq) *kongchuanhujiao.Response {
 // GetWrongQuestion 获取错题
 func (a *APIs) GetWrongQuestion(v *GetWrongQuestionReq) *kongchuanhujiao.Response {
 	_ = v
+	// TODO: 数据库交互
 	return &kongchuanhujiao.Response{Message: "ok"}
 }

@@ -81,3 +81,41 @@ func HandleTest(m *message.Message) {
 		)
 	}
 }
+
+// HandleWrongQuestion 处理添加错题逻辑
+func HandleWrongQuestion(m *message.Message) {
+	t, ok := m.Chain[0].(*message.Text)
+	if !ok {
+		return
+	}
+
+	if !strings.HasPrefix(t.Content, "/") {
+		return
+	}
+
+	switch strings.TrimPrefix(t.Content, "/") {
+	case "ct", "错题":
+		args := strings.Split(t.Content, " ")
+
+		defaultMsg := message.NewAtMessage(m.Target.ID).
+			AddText("/ct add 添加错题\n" +
+				"/ct del 删除错题\n" +
+				"/ct zc 查看错题").
+			SetGroupTarget(m.Target.Group)
+
+		if len(args) == 1 {
+			client.GetClient().SendMessage(defaultMsg)
+		} else {
+			switch args[1] {
+			case "add":
+
+			case "del":
+
+			case "zc":
+
+			default:
+				client.GetClient().SendMessage(defaultMsg)
+			}
+		}
+	}
+}
