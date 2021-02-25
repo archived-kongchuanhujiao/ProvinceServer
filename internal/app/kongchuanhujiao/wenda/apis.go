@@ -56,6 +56,10 @@ type (
 	DeleteQuestionsReq struct{ ID uint32 } // DeleteQuestionsReq 问题删除
 
 	GetAnswersReq struct{ ID uint32 } // GetAnswersReq 获取对应问题答案
+
+	GetWrongQuestionReq struct {
+		ID uint32
+	}
 )
 
 // TODO 中间件安全校验
@@ -223,4 +227,10 @@ func (a *APIs) GetAnswers(v *GetAnswersReq) *kongchuanhujiao.Response {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 	return &kongchuanhujiao.Response{Message: "ok", Data: ans}
+}
+
+// GetWrongQuestion 获取错题
+func (a *APIs) GetWrongQuestion(v *GetWrongQuestionReq) *kongchuanhujiao.Response {
+	_ = v
+	return &kongchuanhujiao.Response{Message: "ok"}
 }
