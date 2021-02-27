@@ -3,6 +3,7 @@ package wenda
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -16,11 +17,20 @@ func checkAnswerForSelect(a string) (ok bool) {
 // checkAnswerForFill 检查为合法的 [简答题] 答案
 func checkAnswerForFill(a string) bool { return strings.HasPrefix(a, "#") }
 
-// HashForSHA1 SHA1 散列 FIXME 如果没有引用则应该废弃该函数
+// HashForSHA1 SHA1 散列
 func HashForSHA1(d string) string {
 	h := sha1.New()
 	_, _ = h.Write([]byte(d))
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+// 判断所给路径文件/文件夹是否存在
+func Exists(path string) bool {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
 
 /* TODO 分词功能由其他包实现

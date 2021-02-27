@@ -1,6 +1,8 @@
 package wenda
 
 import (
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/context"
 	"github.com/kongchuanhujiao/server/internal/app/client"
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/accounts"
@@ -8,9 +10,10 @@ import (
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
-
-	"github.com/kataras/iris/v12/context"
 	"go.uber.org/zap"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 type (
@@ -234,4 +237,75 @@ func (a *APIs) GetWrongQuestion(v *GetWrongQuestionReq) *kongchuanhujiao.Respons
 	_ = v
 	// TODO: 数据库交互
 	return &kongchuanhujiao.Response{Message: "ok"}
+}
+
+// UploadPicture 上传图片
+// POST /apis/wenda/upload
+func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
+	const maxSize = 15 * iris.MB
+
+	uname := c.GetCookie("account")
+
+	if uname == "" {
+		return &kongchuanhujiao.Response{
+			Status:  1,
+			Message: "请先登陆",
+		}
+	}
+
+	_, fh, err := c.FormFile("file")
+	if err != nil {
+		logger.Warn("解析文件失败", zap.Error(err))
+		return &kongchuanhujiao.Response{
+			Status:  1,
+			Message: "服务器错误",
+		}
+	}
+
+	if fh.Size > maxSize {
+		return &kongchuanhujiao.Response{
+			Status:  1,
+			Message: "上传的文件大小不能超过 15 MB!",
+		}
+	}
+
+	fnamePart := strings.Split(fh.Filename, ".")
+	saltedName := ""
+
+	for i, n := range fnamePart {
+		if i != len(fnamePart)-1 {
+			saltedName += n
+		}
+	}
+
+	saltedName += "_" + HashForSHA1(saltedName) + "." + fnamePart[len(fnamePart)-1]
+	folderName := "assets/pictures/" + uname
+
+	if !Exists(folderName) {
+		err = os.MkdirAll(folderName, os.ModePerm)
+
+		if err != nil {
+			logger.Warn("创建文件夹失败", zap.Error(err))
+
+			return &kongchuanhujiao.Response{
+				Status:  1,
+				Message: "服务器错误",
+			}
+		}
+	}
+
+	// Upload the file to specific destination.
+	dest := filepath.Join(folderName+uname, saltedName)
+	_, err = c.SaveFormFile(fh, dest)
+
+	if err != nil {
+		logger.Warn("解析文件失败", zap.Error(err))
+
+		return &kongchuanhujiao.Response{
+			Status:  1,
+			Message: "服务器错误",
+		}
+	}
+
+	return &kongchuanhujiao.Response{Status: 0, Message: "ok"}
 }
