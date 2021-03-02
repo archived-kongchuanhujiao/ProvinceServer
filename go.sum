@@ -26,8 +26,8 @@ github.com/CloudyKit/jet/v6 v6.0.2/go.mod h1:d3ypHeIRNo2+XyqnGA8s+aphtcVpjP5hPwP
 github.com/DataDog/zstd v1.4.1/go.mod h1:1jcaCB/ufaK+sKp1NBhlGmpz41jOoPQ35bpF36t7BBo=
 github.com/Joker/hpp v1.0.0 h1:65+iuJYdRXv/XyN62C1uEmmOx3432rNG/rKlX6V7Kkc=
 github.com/Joker/hpp v1.0.0/go.mod h1:8x5n+M1Hp5hC0g8okX3sR3vFQwynaX/UgSOM9MeBKzY=
-github.com/Mrs4s/MiraiGo v0.0.0-20210220103625-420583e1c56a h1:pBIkeU4bjC9IYC9Noftm6uNxRivnekKWkxYmgEK6+Nc=
-github.com/Mrs4s/MiraiGo v0.0.0-20210220103625-420583e1c56a/go.mod h1:yhqA0NyKxUf7I/0HR/1OMchveFggX8wde04gqdGrNfU=
+github.com/Mrs4s/MiraiGo v0.0.0-20210302014646-2cd960566b8c h1:4l6nvQGDIZkbkXEPlUMcmeTfnQDCzgAqMOmShbUpLg8=
+github.com/Mrs4s/MiraiGo v0.0.0-20210302014646-2cd960566b8c/go.mod h1:yhqA0NyKxUf7I/0HR/1OMchveFggX8wde04gqdGrNfU=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398 h1:WDC6ySpJzbxGWFh4aMxFFC28wwGp5pEuoTtvA4q/qQ4=
 github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398/go.mod h1:a1uqRtAwp2Xwc6WNPJEufxJ7fx3npB4UV/JOLmbu5I0=
