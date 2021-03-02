@@ -1,6 +1,10 @@
 package wenda
 
-import "github.com/gorilla/websocket"
+import (
+	"time"
+
+	"github.com/gorilla/websocket"
+)
 
 type (
 	Runtime map[uint32][]*websocket.Conn // Runtime 运行时
@@ -10,12 +14,13 @@ type (
 		Type     uint8         `json:"type" db:"type"`         // 类型
 		Subject  uint8         `json:"subject" db:"subject"`   // 学科
 		Question QuestionField `json:"question" db:"question"` // 问题
+		Date     time.Time     `json:"date" db:"date"`         // 创建日期
 		Creator  string        `json:"creator" db:"creator"`   // 创建者
 		Target   uint64        `json:"target" db:"target"`     // 目标
 		Status   uint8         `json:"status" db:"status"`     // 状态
 		Options  []string      `json:"options" db:"options"`   // 选项
 		Key      string        `json:"key" db:"key"`           // 答案
-		Market   bool          `json:"market" db:"market"`     // 存在市场
+		Market   bool          `json:"market" db:"market"`     // 是否发布至问题市场
 	}
 
 	QuestionField []struct { // QuestionField 问题字段

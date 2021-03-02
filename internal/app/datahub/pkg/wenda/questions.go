@@ -1,6 +1,8 @@
 package wenda
 
 import (
+	"time"
+
 	"github.com/kongchuanhujiao/server/internal/app/client"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/maria"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
@@ -38,17 +40,18 @@ func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.Question
 		return
 	}
 
-	type questionsTab struct { // questionsTab 问题
-		ID       uint32 `db:"id"`       // 唯一标识符
-		Type     uint8  `db:"type"`     // 类型
-		Subject  uint8  `db:"subject"`  // 学科
-		Question string `db:"question"` // 问题
-		Creator  string `db:"creator"`  // 创建者
-		Target   uint64 `db:"target"`   // 目标
-		Status   uint8  `db:"status"`   // 状态
-		Options  string `db:"options"`  // 选项
-		Key      string `db:"key"`      // 答案
-		Market   bool   `db:"market"`   // 存在市场
+	type questionsTab struct {
+		ID       uint32 `db:"id"`
+		Type     uint8  `db:"type"`
+		Subject  uint8  `db:"subject"`
+		Question string `db:"question"`
+		Data     string `db:"question"`
+		Creator  string `db:"creator"`
+		Target   uint64 `db:"target"`
+		Status   uint8  `db:"status"`
+		Options  string `db:"options"`
+		Key      string `db:"key"`
+		Market   bool   `db:"market"`
 	}
 
 	var d []*questionsTab
@@ -76,10 +79,15 @@ func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.Question
 			return nil, err
 		}
 
+		t, err := time.Parse("2006-01-02", v.Data)
+		if err != nil {
+			loggerr.Error("解析创建日期字段失败", zap.Error(err))
+		}
+
 		data = append(data, &wenda.QuestionsTab{
 			ID: v.ID, Type: v.Type, Subject: v.Subject,
 			Question: q,
-			Creator:  v.Creator, Target: v.Target, Status: v.Status,
+			Date:     t, Creator: v.Creator, Target: v.Target, Status: v.Status,
 			Options: o,
 			Key:     v.Key, Market: v.Market,
 		})
@@ -125,7 +133,7 @@ func UpdateQuestionStatus(q *wenda.QuestionsTab, status uint8) (err error) {
 // InsertQuestion 新增问题
 func InsertQuestion(q *wenda.QuestionsTab) (err error) {
 
-	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question, q.Creator,
+	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question, q.Date, q.Creator,
 		q.Target, 0, q.Options, q.Key, q.Market).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
@@ -171,6 +179,7 @@ func CopyQuestions(id uint32, creator string, target uint64) (err error) {
 		return
 	}
 	que := q[0]
+	que.Date = time.Now()
 	que.Creator = creator
 	que.Target = target
 	que.Market = false
