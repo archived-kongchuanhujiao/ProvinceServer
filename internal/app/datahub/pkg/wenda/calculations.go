@@ -37,7 +37,8 @@ func InsertCalculations(c *wenda.CalculationsTab) (err error) {
 // qid 问题 ID
 func SelectCalculations(qid uint32) (data []*wenda.CalculationsTab, err error) {
 
-	sql, args, err := sqrl.Select("*").From("calculations").Where("question=?", qid).ToSql()
+	sql, args, err := sqrl.Select("*").From("calculations").
+		Where("question=?", qid).Limit(20).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
