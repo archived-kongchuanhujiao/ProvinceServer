@@ -43,16 +43,6 @@ type (
 		ID uint32 // 唯一识别码
 	}
 
-	GetMarketsReq struct { // GetMarketsReq 市场请求
-		Page    uint32 // 页面
-		Subject uint8  // 学科
-	}
-
-	PostMarketsReq struct { // PostMarketsReq 市场复制
-		ID     uint32   // 唯一识别码
-		Target []uint64 // 目标集
-	}
-
 	PostPushcenterReq struct { // PostPushcenterReq 推送激活
 		ID     uint32 // 唯一识别码
 		Target string // 目标
@@ -167,29 +157,6 @@ func (a *APIs) PostPraise(v *PostPraiseReq) *kongchuanhujiao.Response {
 		msg.AddAt(mem)
 	}
 	client.GetClient().SendMessage(msg.SetTarget(&message.Target{Group: &message.Group{ID: q[0].Target}}))
-	return &kongchuanhujiao.Response{Message: "ok"}
-}
-
-// GetMarkets 获取市场列表。
-// GET /apis/wenda/markets
-func (a *APIs) GetMarkets(v *GetMarketsReq) *kongchuanhujiao.Response {
-	q, err := wenda.SelectQuestions(&public.QuestionsTab{Market: true, Subject: v.Subject}, v.Page)
-	if err != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
-	}
-	return &kongchuanhujiao.Response{Message: "ok", Data: q}
-}
-
-// PostMarkets 复制市场问题。
-// POST /apis/wenda/markets
-func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *kongchuanhujiao.Response {
-	user := c.GetCookie("account")
-	for _, t := range v.Target {
-		err := wenda.CopyQuestions(v.ID, user, t)
-		if err != nil {
-			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
-		}
-	}
 	return &kongchuanhujiao.Response{Message: "ok"}
 }
 
