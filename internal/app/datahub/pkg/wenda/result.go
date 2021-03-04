@@ -11,9 +11,8 @@ func CalculateResult(i uint32) (r *public.Result, err error) {
 		return
 	}
 
-	r = new(public.Result)
+	r = &public.Result{Count: uint8(len(a)), Right: []uint64{}, Wrong: []public.ResultWrongField{}}
 	wrong := map[string][]uint64{}
-	r.Count = uint8(len(a))
 
 	for _, i := range a {
 		if m := i.Mark; m != "" {
