@@ -12,7 +12,6 @@ type (
 		Date    time.Time           `db:"date"`    // 创建日期
 		Topic   QuestionsTopicField `db:"topic"`   // 主题
 		Status  uint8               `db:"status"`  // 状态
-		Target  uint64              `db:"target"`  // 目标
 		Market  bool                `db:"market"`  // 是否发布至问题市场
 	}
 
