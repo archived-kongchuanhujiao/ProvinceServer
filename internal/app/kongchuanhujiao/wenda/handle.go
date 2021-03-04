@@ -36,18 +36,20 @@ func HandleAnswer(m *message.Message) {
 		if !checkAnswerForSelect(answer) {
 			return
 		}
+
+		mark := ""
+		if answer != wenda.GetCaches(qid).Questions.Topic.Key {
+			mark = answer
+		}
 		_ = wenda.InsertAnswer(&public.AnswersTab{
 			Question: qid,
 			QQ:       m.Target.ID,
 			Answer:   strings.ToUpper(answer),
+			Mark:     mark,
 		})
 
-		calc := CalculateQuestion(wenda.GetCaches(qid))
-
+		calc, _ := wenda.CalculateResult(wenda.GetCaches(qid).Questions.ID)
 		wenda.PushData(q.Questions.ID, calc)
-
-		_ = wenda.InsertCalculations(calc)
-
 	case 2: // 多选题
 
 	case 3: // 简答题
