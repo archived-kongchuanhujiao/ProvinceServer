@@ -12,6 +12,20 @@ import (
 	"go.uber.org/zap"
 )
 
+type (
+	// questionsTab 问题表
+	questionsTab struct {
+		ID      uint32 `db:"id"`      // 标识号
+		Type    uint8  `db:"type"`    // 类型
+		Subject uint8  `db:"subject"` // 学科
+		Creator string `db:"creator"` // 创建者
+		Date    string `db:"date"`    // 创建日期
+		Topic   string `db:"topic"`   // 主题
+		Status  uint8  `db:"status"`  // 状态
+		Market  bool   `db:"market"`  // 是否发布至问题市场
+	}
+)
+
 // SelectQuestions 获取问题
 func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.QuestionsTab, err error) {
 
@@ -40,20 +54,6 @@ func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.Question
 		return
 	}
 
-	type questionsTab struct {
-		ID       uint32 `db:"id"`
-		Type     uint8  `db:"type"`
-		Subject  uint8  `db:"subject"`
-		Question string `db:"question"`
-		Data     string `db:"question"`
-		Creator  string `db:"creator"`
-		Target   uint64 `db:"target"`
-		Status   uint8  `db:"status"`
-		Options  string `db:"options"`
-		Key      string `db:"key"`
-		Market   bool   `db:"market"`
-	}
-
 	var d []*questionsTab
 	err = maria.Select(&d, sql, args...)
 	if err != nil {
@@ -63,40 +63,27 @@ func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.Question
 
 	for _, v := range d {
 
-		var (
-			q   = wenda.QuestionField{}
-			o   []string
-			err = jsoniter.UnmarshalFromString(v.Question, &q)
-		)
+		to := wenda.QuestionsTopicField{}
+		err := jsoniter.UnmarshalFromString(v.Topic, &to)
 		if err != nil {
-			loggerr.Error("解析问题字段失败", zap.Error(err))
+			loggerr.Error("解析主题字段失败", zap.Error(err))
 			return nil, err
 		}
 
-		err = jsoniter.UnmarshalFromString(v.Options, &o)
-		if err != nil {
-			loggerr.Error("解析选项字段失败", zap.Error(err))
-			return nil, err
-		}
-
-		t, err := time.Parse("2006-01-02", v.Data)
+		ti, err := time.Parse("2006-01-02", v.Date)
 		if err != nil {
 			loggerr.Error("解析创建日期字段失败", zap.Error(err))
 		}
 
 		data = append(data, &wenda.QuestionsTab{
-			ID: v.ID, Type: v.Type, Subject: v.Subject,
-			Question: q,
-			Date:     t, Creator: v.Creator, Target: v.Target, Status: v.Status,
-			Options: o,
-			Key:     v.Key, Market: v.Market,
+			ID: v.ID, Type: v.Type, Subject: v.Subject, Topic: to,
+			Date: ti, Creator: v.Creator, Status: v.Status, Market: v.Market,
 		})
 	}
 	return
 }
 
 // UpdateQuestionStatus 更新问题状态
-// 当 status = 1 时， q 必须传入由 SelectQuestions 获取的
 func UpdateQuestionStatus(q *wenda.QuestionsTab, status uint8) (err error) {
 
 	sql, args, err := sqrl.Update("questions").Set("`status`", status).Where("id=?", q.ID).ToSql()
@@ -112,7 +99,7 @@ func UpdateQuestionStatus(q *wenda.QuestionsTab, status uint8) (err error) {
 
 	switch status {
 	case 0, 2: // 准备作答
-		DeleteActiveGroup(q.Target)
+		DeleteActiveGroup(q.Topic.Target)
 	case 1: // 开始作答
 		a, err := SelectAnswers(q.ID)
 		if err != nil {
@@ -120,10 +107,9 @@ func UpdateQuestionStatus(q *wenda.QuestionsTab, status uint8) (err error) {
 		}
 
 		WriteCaches(q.ID, &wenda.Detail{
-			Questions: q, Answers: a,
-			Members: client.GetClient().GetGroupMembers(q.Target),
+			Questions: q, Answers: a, Members: client.GetClient().GetGroupMembers(q.Topic.Target),
 		})
-		WriteActiveGroup(q.Target, q.ID)
+		WriteActiveGroup(q.Topic.Target, q.ID)
 		return sendQuestionMsg(q)
 	}
 
@@ -133,8 +119,8 @@ func UpdateQuestionStatus(q *wenda.QuestionsTab, status uint8) (err error) {
 // InsertQuestion 新增问题
 func InsertQuestion(q *wenda.QuestionsTab) (err error) {
 
-	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Question, q.Date, q.Creator,
-		q.Target, 0, q.Options, q.Key, q.Market).ToSql()
+	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Creator, q.Date, q.Topic,
+		nil, q.Market).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
@@ -152,12 +138,7 @@ func InsertQuestion(q *wenda.QuestionsTab) (err error) {
 func UpdateQuestion(q *wenda.QuestionsTab) (err error) {
 
 	sql, args, err := sqrl.Update("questions").Where("id=?", q.ID).
-		Set("`subject`", q.Subject).
-		Set("question", q.Question).
-		Set("target", q.Target).
-		Set("`options`", q.Options).
-		Set("`key`", q.Key).
-		Set("market", q.Market).ToSql()
+		Set("`subject`", q.Subject).Set("topic", q.Topic).Set("market", q.Market).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
@@ -181,7 +162,7 @@ func CopyQuestions(id uint32, creator string, target uint64) (err error) {
 	que := q[0]
 	que.Date = time.Now()
 	que.Creator = creator
-	que.Target = target
+	que.Topic.Target = target
 	que.Market = false
 	err = InsertQuestion(que)
 
