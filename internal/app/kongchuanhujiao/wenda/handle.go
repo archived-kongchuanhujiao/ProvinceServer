@@ -32,24 +32,30 @@ func HandleAnswer(m *message.Message) {
 	}
 
 	switch q.Questions.Type {
-	case 0, 1: // 选择题、填空题
+	case 0: // 选择题
 		if !checkAnswerForSelect(answer) {
 			return
 		}
 
-		mark := ""
-		if answer != wenda.GetCaches(qid).Questions.Topic.Key {
-			mark = answer
+		var (
+			ans  = strings.ToUpper(answer)
+			mark string
+		)
+		if ans != wenda.GetCaches(qid).Questions.Topic.Key {
+			mark = ans
 		}
 		_ = wenda.InsertAnswer(&public.AnswersTab{
 			Question: qid,
 			QQ:       m.Target.ID,
-			Answer:   strings.ToUpper(answer),
+			Answer:   ans,
 			Mark:     mark,
 		})
 
 		calc, _ := wenda.CalculateResult(wenda.GetCaches(qid).Questions.ID)
 		wenda.PushData(q.Questions.ID, calc)
+
+	case 1: // 填空题
+
 	case 2: // 多选题
 
 	case 3: // 简答题
