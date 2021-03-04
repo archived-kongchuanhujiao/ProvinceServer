@@ -42,7 +42,7 @@ func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) 
 func digestQuestion(q *public.QuestionsTab) (s string) {
 
 	var questionText string
-	for _, v := range q.Question {
+	for _, v := range q.Topic.Question {
 		if v.Type == "img" {
 			questionText += "[图片]"
 		}
@@ -52,7 +52,7 @@ func digestQuestion(q *public.QuestionsTab) (s string) {
 	var optionsText string
 
 	abc := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I"} // FIXME 弄到全局public去
-	for k, v := range q.Options {
+	for k, v := range q.Topic.Options {
 		optionsText += abc[k] + ". " + v + "\n"
 	}
 

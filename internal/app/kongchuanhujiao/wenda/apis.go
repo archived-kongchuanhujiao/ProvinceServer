@@ -27,11 +27,11 @@ type (
 	}
 
 	GetQuestionsRes struct { // GetQuestionsReq 问题响应
-		Questions    []*public.QuestionsTab  `json:"questions"`    // 问题
-		Groups       *public.Groups          `json:"groups"`       // 群
-		GroupName    string                  `json:"group_name"`   // 群名称
-		Members      *public.GroupMembers    `json:"members"`      // 群成员
-		Calculations *public.CalculationsTab `json:"calculations"` // 问题计算结果
+		Questions []*public.QuestionsTab `json:"questions"`  // 问题
+		Groups    *public.Groups         `json:"groups"`     // 群
+		GroupName string                 `json:"group_name"` // 群名称
+		Members   *public.GroupMembers   `json:"members"`    // 群成员
+		Result    *public.Result         `json:"result"`     // 结果
 	}
 
 	PutQuestionStatusReq struct { // PutQuestionStatusReq 问题更新
@@ -69,7 +69,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 		g    *public.Groups
 		n    string // 群名称
 		m    *public.GroupMembers
-		calc []*public.CalculationsTab
+		calc *public.Result
 		err  error
 	)
 
@@ -78,10 +78,10 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 		if err != nil {
 			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 		}
-		t := d[0].Target
+		t := d[0].Topic.Target
 		n = client.GetClient().GetGroupName(t)
 		m = client.GetClient().GetGroupMembers(t)
-		calc, err = wenda.SelectCalculations(v.ID)
+		calc, err = wenda.CalculateResult(v.ID)
 	} else {
 		d, err = wenda.SelectQuestions(&public.QuestionsTab{Creator: c.GetCookie("account")}, v.Page)
 		g = client.GetClient().GetGroups()
@@ -89,13 +89,9 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
-	if len(calc) == 0 {
-		calc = append(calc, nil)
-	}
 
 	return &kongchuanhujiao.Response{
-		Message: "ok",
-		Data:    &GetQuestionsRes{d, g, n, m, calc[0]},
+		Message: "ok", Data: &GetQuestionsRes{d, g, n, m, calc},
 	}
 }
 
@@ -118,9 +114,7 @@ func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Resp
 // PostQuestions 新建问题。
 // POST /apis/wenda/questions
 func (a *APIs) PostQuestions(v *public.QuestionsTab) *kongchuanhujiao.Response {
-	err := wenda.InsertQuestion(v)
-	err = wenda.InsertCalculations(&public.CalculationsTab{})
-	if err != nil {
+	if wenda.InsertQuestion(v) != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 	return &kongchuanhujiao.Response{Message: "ok"}
@@ -144,19 +138,16 @@ func (a *APIs) PostPraise(v *PostPraiseReq) *kongchuanhujiao.Response {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
-	cache, err := wenda.SelectCalculations(q[0].ID)
-
+	details, err := wenda.CalculateResult(q[0].ID)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
-
-	details := cache[0]
 
 	msg := message.NewTextMessage("表扬下列答对的同学：\n")
 	for _, mem := range details.Right {
 		msg.AddAt(mem)
 	}
-	client.GetClient().SendMessage(msg.SetTarget(&message.Target{Group: &message.Group{ID: q[0].Target}}))
+	client.GetClient().SendMessage(msg.SetTarget(&message.Target{Group: &message.Group{ID: q[0].Topic.Target}}))
 	return &kongchuanhujiao.Response{Message: "ok"}
 }
 
