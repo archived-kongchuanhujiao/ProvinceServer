@@ -8,6 +8,11 @@ import (
 	"go.uber.org/zap"
 )
 
+// wrapper 封装
+type wrapper struct {
+	Result *wenda.Result `json:"result"`
+}
+
 var loggerr = logger.Named("数据总线").Named("问答")
 var wendaRuntime = wenda.Runtime{}
 
@@ -30,8 +35,6 @@ func RemoveClient(id uint32, conn *websocket.Conn) {
 // PushData 推送数据
 func PushData(id uint32, data *wenda.Result) {
 	for _, v := range wendaRuntime[id] {
-
-		type wrapper struct{ Result *wenda.Result }
 		err := v.WriteJSON(wrapper{data})
 		if err != nil {
 			loggerr.Error("推送数据失败", zap.Error(err))
