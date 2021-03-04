@@ -33,8 +33,7 @@ func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.Question
 	if v.ID != 0 {
 		sqr = sqrl.Select("*").Where("id=?", v.ID).Limit(1)
 	} else {
-		sqr = sqrl.Select("id", "question", "target", "`status`", `options`).Limit(20).
-			Offset(uint64(page * 20))
+		sqr = sqrl.Select("id", "topic", "`status`").Limit(20).Offset(uint64(page * 20))
 	}
 
 	sqr = sqr.From("questions").OrderBy("id DESC")
@@ -62,7 +61,6 @@ func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.Question
 	}
 
 	for _, v := range d {
-
 		to := wenda.QuestionsTopicField{}
 		err := jsoniter.UnmarshalFromString(v.Topic, &to)
 		if err != nil {
@@ -70,14 +68,9 @@ func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.Question
 			return nil, err
 		}
 
-		ti, err := time.Parse("2006-01-02", v.Date)
-		if err != nil {
-			loggerr.Error("解析创建日期字段失败", zap.Error(err))
-		}
-
 		data = append(data, &wenda.QuestionsTab{
-			ID: v.ID, Type: v.Type, Subject: v.Subject, Topic: to,
-			Date: ti, Creator: v.Creator, Status: v.Status, Market: v.Market,
+			ID: v.ID, Type: v.Type, Subject: v.Subject, Topic: to, Creator: v.Creator, Status: v.Status,
+			Market: v.Market,
 		})
 	}
 	return
