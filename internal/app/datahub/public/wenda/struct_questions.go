@@ -5,14 +5,14 @@ import "time"
 type (
 	// QuestionsTab 问题表
 	QuestionsTab struct {
-		ID      uint32              `db:"id"`      // 标识号
-		Type    uint8               `db:"type"`    // 类型
-		Subject uint8               `db:"subject"` // 学科
-		Creator string              `db:"creator"` // 创建者
-		Date    time.Time           `db:"date"`    // 创建日期
-		Topic   QuestionsTopicField `db:"topic"`   // 主题
-		Status  uint8               `db:"status"`  // 状态
-		Market  bool                `db:"market"`  // 是否发布至问题市场
+		ID      uint32              `json:"id"      db:"id"`      // 标识号
+		Type    uint8               `json:"type"    db:"type"`    // 类型
+		Subject uint8               `json:"subject" db:"subject"` // 学科
+		Creator string              `json:"creator" db:"creator"` // 创建者
+		Date    time.Time           `json:"date"    db:"date"`    // 创建日期
+		Topic   QuestionsTopicField `json:"topic"   db:"topic"`   // 主题
+		Status  uint8               `json:"status"  db:"status"`  // 状态
+		Market  bool                `json:"market"  db:"market"`  // 是否发布至问题市场
 	}
 
 	// QuestionsTopicField 问题主题字段

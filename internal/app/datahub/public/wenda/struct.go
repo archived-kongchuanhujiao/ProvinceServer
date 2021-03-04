@@ -1,26 +1,24 @@
 package wenda
 
-import (
-	"github.com/gorilla/websocket"
-)
+import "github.com/gorilla/websocket"
 
 type (
 	Runtime map[uint32][]*websocket.Conn // Runtime 运行时
 
 	// AnswersTab 回答表
 	AnswersTab struct {
-		Question uint32 `db:"question"` // 问题标识号
-		QQ       uint64 `db:"qq"`       // QQ 标识号
-		Answer   string `db:"answer"`   // 作答内容
-		Time     string `db:"time"`     // 时刻
-		Mark     string `db:"mark"`     // 标记
+		Question uint32 `json:"question" db:"question"` // 问题标识号
+		QQ       uint64 `json:"qq"       db:"qq"`       // QQ 标识号
+		Answer   string `json:"answer"   db:"answer"`   // 作答内容
+		Time     string `json:"time"     db:"time"`     // 时刻
+		Mark     string `json:"mark"     db:"mark"`     // 标记
 	}
 
 	// Result 结果
 	Result struct {
-		Count uint8              `db:"count"` // 作答人数
-		Right []uint64           `db:"right"` // 正确学生
-		Wrong []ResultWrongField `db:"wrong"` // 错误学生
+		Count uint8              `json:"count" db:"count"` // 作答人数
+		Right []uint64           `json:"right" db:"right"` // 正确学生
+		Wrong []ResultWrongField `json:"wrong" db:"wrong"` // 错误学生
 	}
 
 	// ResultWrongField 结果错误学生字段
