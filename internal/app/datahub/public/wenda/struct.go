@@ -1,51 +1,32 @@
 package wenda
 
 import (
-	"time"
-
 	"github.com/gorilla/websocket"
 )
 
 type (
 	Runtime map[uint32][]*websocket.Conn // Runtime 运行时
 
-	QuestionsTab struct { // QuestionsTab 问题
-		ID       uint32        `json:"id" db:"id"`             // 唯一标识符
-		Type     uint8         `json:"type" db:"type"`         // 类型
-		Subject  uint8         `json:"subject" db:"subject"`   // 学科
-		Question QuestionField `json:"question" db:"question"` // 问题
-		Date     time.Time     `json:"date" db:"date"`         // 创建日期
-		Creator  string        `json:"creator" db:"creator"`   // 创建者
-		Target   uint64        `json:"target" db:"target"`     // 目标
-		Status   uint8         `json:"status" db:"status"`     // 状态
-		Options  []string      `json:"options" db:"options"`   // 选项
-		Key      string        `json:"key" db:"key"`           // 答案
-		Market   bool          `json:"market" db:"market"`     // 是否发布至问题市场
+	// AnswersTab 回答表
+	AnswersTab struct {
+		Question uint32 `db:"question"` // 问题标识号
+		QQ       uint64 `db:"qq"`       // QQ 标识号
+		Answer   string `db:"answer"`   // 作答内容
+		Time     string `db:"time"`     // 时刻
+		Mark     string `db:"mark"`     // 标记
 	}
 
-	QuestionField []struct { // QuestionField 问题字段
-		Type string `json:"type"` // 类型
-		Data string `json:"data"` // 数据
+	// Result 结果
+	Result struct {
+		Count uint8              `db:"count"` // 作答人数
+		Right []uint64           `db:"right"` // 正确学生
+		Wrong []ResultWrongField `db:"wrong"` // 错误学生
 	}
 
-	AnswersTab struct { // AnswersTab 回答
-		ID       uint32 `json:"id" db:"id"`             // 唯一标识符
-		Question uint32 `json:"question" db:"question"` // 问题
-		QQ       uint64 `json:"qq" db:"qq"`             // QQ
-		Answer   string `json:"answer" db:"answer"`     // 回答
-		Time     string `json:"time" db:"time"`         // 时刻
-	}
-
-	CalculationsTab struct { // CalculationsTab 计算结果
-		Question uint32              `json:"question" db:"question"` // 问题 ID
-		Count    uint8               `json:"count" db:"count"`       // 作答人数
-		Right    []uint64            `json:"right" db:"right"`       // 正确学生
-		Wrong    []CalculationsWrong `json:"wrong" db:"wrong"`       // 错误学生
-	}
-
-	CalculationsWrong struct { // CalculationsWrong 计算错误学生
-		Type   string   `json:"type"`   // 错误类型
-		Member []uint64 `json:"member"` // 错误学生
+	// ResultWrongField 结果错误学生字段
+	ResultWrongField struct {
+		Type  string   `json:"type"`  // 类型
+		Value []uint64 `json:"value"` // 学生
 	}
 
 	// Detail 问答详情
