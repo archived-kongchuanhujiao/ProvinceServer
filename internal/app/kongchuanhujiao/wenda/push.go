@@ -25,7 +25,7 @@ func PushDigestData(platform string, tab *public.QuestionsTab) (err error) {
 			return errr
 		}
 
-		if acc[0].Token == "" {
+		if acc[0].Token == "" || acc[0].Push == "" {
 			return
 		}
 
