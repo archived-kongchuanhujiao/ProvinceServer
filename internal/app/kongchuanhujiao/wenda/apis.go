@@ -160,11 +160,15 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchu
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
+	q, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+
+	if err != nil {
+		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+	}
+
 	if v.Target == "dingtalk" {
 
-		// FIXME 取消使用问题数据，而是学生作答数据，作答数据结果和作答数据是两张表
-		// FIXME 有关作答数据计算结果的内容需要确定
-		err := PushDigestToDingtalk(ac[0].Token, ac[0].Push, ConvertToDTMessage(&public.QuestionsTab{}))
+		err := PushDigestData("dingtalk", q[0])
 
 		if err != nil {
 			logger.Error("发送钉钉消息失败", zap.Error(err))
