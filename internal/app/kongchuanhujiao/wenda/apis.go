@@ -73,8 +73,14 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 		err  error
 	)
 
+	un := c.GetCookie("account")
+
+	if un == "" {
+		return &kongchuanhujiao.Response{Status: 1, Message: "请先登入"}
+	}
+
 	if v.ID != 0 {
-		d, err = wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, 0)
+		d, err = wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID, Creator: un}, 0)
 		if err != nil {
 			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 		}
@@ -83,7 +89,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 		m = client.GetClient().GetGroupMembers(t)
 		calc, err = wenda.SelectCalculations(v.ID)
 	} else {
-		d, err = wenda.SelectQuestions(&public.QuestionsTab{Creator: c.GetCookie("account")}, v.Page)
+		d, err = wenda.SelectQuestions(&public.QuestionsTab{Creator: un}, v.Page)
 		g = client.GetClient().GetGroups()
 	}
 	if err != nil {
@@ -103,7 +109,13 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 // PUT /apis/wenda/questions/status
 func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq, c *context.Context) *kongchuanhujiao.Response {
 
-	qs, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, 0)
+	un := c.GetCookie("account")
+
+	if un == "" {
+		return &kongchuanhujiao.Response{Status: 1, Message: "请先登入"}
+	}
+
+	qs, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID, Creator: un}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -139,7 +151,13 @@ func (a *APIs) PutQuestions(v *public.QuestionsTab) *kongchuanhujiao.Response {
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
 func (a *APIs) PostPraise(v *PostPraiseReq, c *context.Context) *kongchuanhujiao.Response {
-	q, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, 0)
+	un := c.GetCookie("account")
+
+	if un == "" {
+		return &kongchuanhujiao.Response{Status: 1, Message: "请先登入"}
+	}
+
+	q, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID, Creator: un}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
