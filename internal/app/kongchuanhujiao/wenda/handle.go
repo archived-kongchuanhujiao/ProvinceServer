@@ -2,12 +2,17 @@ package wenda
 
 import (
 	"fmt"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wrongquestion"
 	"strings"
 
 	"github.com/kongchuanhujiao/server/internal/app/client"
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+)
+
+var (
+	sessionPool = []uint64{}
 )
 
 // HandleAnswer 处理回答
@@ -108,7 +113,7 @@ func HandleWrongQuestion(m *message.Message) {
 		defaultMsg := message.NewAtMessage(m.Target.ID).
 			AddText("/ct add 添加错题\n" +
 				"/ct del 删除错题\n" +
-				"/ct zc 查看错题").
+				"/ct ck 查看错题").
 			SetGroupTarget(m.Target.Group)
 
 		if len(args) == 1 {
@@ -116,11 +121,26 @@ func HandleWrongQuestion(m *message.Message) {
 		} else {
 			switch args[1] {
 			case "add":
+				for _, u := range sessionPool {
+					if u == m.Target.ID {
+						sessionPool = append(sessionPool, m.Target.ID)
+						client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("请发送欲添加错题的题目:"))
+						return
+					}
+				}
 
+				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("你还有正在进行添加的错题!"))
 			case "del":
+				return
+			case "ck":
+				wq, err := wrongquestion.SelectWrongQuestions(0, uint32(m.Target.ID))
 
-			case "zc":
+				if err != nil {
+					client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("发生了意外错误, 无法查询错题列表."))
+					return
+				}
 
+				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText(fmt.Sprint(wq)))
 			default:
 				client.GetClient().SendMessage(defaultMsg)
 			}

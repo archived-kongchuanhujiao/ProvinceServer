@@ -15,3 +15,9 @@ func InsertWrongQuestion(data *wrongquestion.Tab) (err error) {
 func SelectWrongQuestions(id uint32, qid uint32) (data []*wrongquestion.Tab, err error) {
 	return
 }
+
+// RemoveWrongQuestions 删除错题
+// TODO: 数据库交互
+func RemoveWrongQuestions(id uint32, qid uint32) (ok bool, err error) {
+	return
+}
