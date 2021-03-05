@@ -74,7 +74,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	)
 
 	if v.ID != 0 {
-		d, err = wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+		d, err = wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, 0)
 		if err != nil {
 			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 		}
@@ -101,9 +101,9 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 
 // PutQuestionsStatus 更新问题状态。
 // PUT /apis/wenda/questions/status
-func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Response {
+func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq, c *context.Context) *kongchuanhujiao.Response {
 
-	qs, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+	qs, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -138,8 +138,8 @@ func (a *APIs) PutQuestions(v *public.QuestionsTab) *kongchuanhujiao.Response {
 
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
-func (a *APIs) PostPraise(v *PostPraiseReq) *kongchuanhujiao.Response {
-	q, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+func (a *APIs) PostPraise(v *PostPraiseReq, c *context.Context) *kongchuanhujiao.Response {
+	q, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID, Creator: c.GetCookie("account")}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
