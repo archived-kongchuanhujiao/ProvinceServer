@@ -171,8 +171,15 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchu
 
 	if v.Target == "dingtalk" {
 
-		// FIXME 取消使用问题数据，而是学生作答数据，作答数据结果和作答数据是两张表
-		// FIXME 有关作答数据计算结果的内容需要确定
+		cac := ac[0]
+
+		if cac.Token == "" || cac.Push == "" {
+			return &kongchuanhujiao.Response{
+				Status:  1,
+				Message: "账号错误",
+			}
+		}
+
 		err := PushDigestToDingtalk(ac[0].Token, ac[0].Push, ConvertToDTMessage(&public.QuestionsTab{}))
 
 		if err != nil {
