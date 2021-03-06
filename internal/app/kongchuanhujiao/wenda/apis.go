@@ -75,6 +75,8 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 
 	un := c.GetCookie("account")
 
+	// FIXME 该改动源自 MAIN-FIX
+	// FIXME 修改意见：应当由 Iris 中间件统一鉴权
 	if un == "" {
 		return &kongchuanhujiao.Response{Status: 1, Message: "请先登入"}
 	}
