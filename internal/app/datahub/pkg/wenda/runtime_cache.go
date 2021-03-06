@@ -15,7 +15,7 @@ import (
 func sendQuestionMsg(q *wenda.QuestionsTab) (err error) {
 
 	m := message.NewTextMessage("问题:\n")
-	for _, v := range q.Question {
+	for _, v := range q.Topic.Question {
 		if v.Type == "img" {
 			f, err := ioutil.ReadFile("assets/pictures/questions/" + v.Data)
 			if err != nil {
@@ -30,7 +30,7 @@ func sendQuestionMsg(q *wenda.QuestionsTab) (err error) {
 
 	m.AddText("选项:\n")
 	abc := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
-	for k, v := range q.Options {
+	for k, v := range q.Topic.Options {
 		m.AddText(abc[k] + ". " + v + "\n")
 	}
 
@@ -40,6 +40,6 @@ func sendQuestionMsg(q *wenda.QuestionsTab) (err error) {
 		m.AddText("\n@+回答内容即可作答")
 	}
 
-	client.GetClient().SendMessage(m.SetGroupTarget(&message.Group{ID: q.Target}))
+	client.GetClient().SendMessage(m.SetGroupTarget(&message.Group{ID: q.Topic.Target}))
 	return
 }
