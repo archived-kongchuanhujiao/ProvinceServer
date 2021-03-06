@@ -10,8 +10,7 @@ var cli *internal.QQ // client 客户端
 
 // NewClient 新建客户端
 func NewClient() {
-	conf := configs.GetConfigs()
-	cli = internal.NewClient(conf.Number, conf.Password)
+	cli = internal.NewClient(configs.GetQQConf())
 }
 
 // GetClient 获取客户端。

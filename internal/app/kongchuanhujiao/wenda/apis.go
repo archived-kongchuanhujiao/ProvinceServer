@@ -57,24 +57,27 @@ type (
 	}
 )
 
-// TODO 中间件安全校验
-
 // GetQuestions 获取问题列表或问题。
 // GET /apis/wenda/questions
 func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhujiao.Response {
 
 	// FIXME 需要拆分出更细的颗粒密度
 	var (
-		d    []*public.QuestionsTab
-		g    *public.Groups
-		n    string // 群名称
-		m    *public.GroupMembers
-		calc *public.Result
-		err  error
+		d       []*public.QuestionsTab
+		g       *public.Groups
+		n       string // 群名称
+		m       *public.GroupMembers
+		calc    *public.Result
+		err     error
+		account = c.Values().Get("account").(string)
 	)
 
 	if v.ID != 0 {
-		d, err = wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+
+		d, err = wenda.SelectQuestions(&public.QuestionsTab{
+			ID:      v.ID,
+			Creator: account,
+		}, 0)
 		if err != nil {
 			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 		}
@@ -82,9 +85,12 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 		n = client.GetClient().GetGroupName(t)
 		m = client.GetClient().GetGroupMembers(t)
 		calc, err = wenda.CalculateResult(v.ID)
+
 	} else {
-		d, err = wenda.SelectQuestions(&public.QuestionsTab{Creator: c.GetCookie("account")}, v.Page)
+
+		d, err = wenda.SelectQuestions(&public.QuestionsTab{Creator: account}, v.Page)
 		g = client.GetClient().GetGroups()
+
 	}
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
@@ -97,9 +103,12 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 
 // PutQuestionsStatus 更新问题状态。
 // PUT /apis/wenda/questions/status
-func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq) *kongchuanhujiao.Response {
+func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq, c *context.Context) *kongchuanhujiao.Response {
 
-	qs, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+	qs, err := wenda.SelectQuestions(&public.QuestionsTab{
+		ID:      v.ID,
+		Creator: c.Values().Get("account").(string),
+	}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -132,8 +141,12 @@ func (a *APIs) PutQuestions(v *public.QuestionsTab) *kongchuanhujiao.Response {
 
 // PostPraise 推送表扬列表。
 // POST /apis/wenda/praise
-func (a *APIs) PostPraise(v *PostPraiseReq) *kongchuanhujiao.Response {
-	q, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+func (a *APIs) PostPraise(v *PostPraiseReq, c *context.Context) *kongchuanhujiao.Response {
+
+	q, err := wenda.SelectQuestions(&public.QuestionsTab{
+		ID:      v.ID,
+		Creator: c.Values().Get("account").(string),
+	}, 0)
 	if err != nil {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -155,7 +168,7 @@ func (a *APIs) PostPraise(v *PostPraiseReq) *kongchuanhujiao.Response {
 // POST /apis/wenda/pushcenter
 func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchuanhujiao.Response {
 
-	ac, err := accounts.SelectAccount(c.GetCookie("account"), 0)
+	ac, err := accounts.SelectAccount(c.Values().Get("account").(string), 0)
 	if err != nil || len(ac) == 0 {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
@@ -209,31 +222,17 @@ func (a *APIs) GetWrongQuestion(v *GetWrongQuestionReq) *kongchuanhujiao.Respons
 // UploadPicture 上传图片
 // POST /apis/wenda/upload
 func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
-	const maxSize = 15 * iris.MB
 
-	uname := c.GetCookie("account")
-
-	if uname == "" {
-		return &kongchuanhujiao.Response{
-			Status:  1,
-			Message: "请先登陆",
-		}
-	}
+	account := c.Values().Get("account").(string)
 
 	_, fh, err := c.FormFile("file")
 	if err != nil {
 		logger.Warn("解析文件失败", zap.Error(err))
-		return &kongchuanhujiao.Response{
-			Status:  1,
-			Message: "服务器错误",
-		}
+		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
-	if fh.Size > maxSize {
-		return &kongchuanhujiao.Response{
-			Status:  1,
-			Message: "上传的文件大小不能超过 15 MB!",
-		}
+	if fh.Size > 15*iris.MB {
+		return &kongchuanhujiao.Response{Status: 1, Message: "上传的文件大小不能超过 15 MB!"}
 	}
 
 	fnamePart := strings.Split(fh.Filename, ".")
@@ -246,7 +245,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 	}
 
 	saltedName += "_" + HashForSHA1(saltedName) + "." + fnamePart[len(fnamePart)-1]
-	folderName := "assets/pictures/" + uname
+	folderName := "assets/pictures/" + account
 
 	if !Exists(folderName) {
 		err = os.MkdirAll(folderName, os.ModePerm)
@@ -254,15 +253,12 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 		if err != nil {
 			logger.Warn("创建文件夹失败", zap.Error(err))
 
-			return &kongchuanhujiao.Response{
-				Status:  1,
-				Message: "服务器错误",
-			}
+			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 		}
 	}
 
 	// Upload the file to specific destination.
-	dest := filepath.Join(folderName+uname, saltedName)
+	dest := filepath.Join(folderName+account, saltedName)
 	_, err = c.SaveFormFile(fh, dest)
 
 	if err != nil {
