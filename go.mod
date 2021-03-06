@@ -9,6 +9,7 @@ require (
 	github.com/elgris/sqrl v0.0.0-20190909141434-5a439265eeec
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gorilla/websocket v1.4.2
+	github.com/iris-contrib/middleware/jwt v0.0.0-20210110101738-6d0a4d799b5d // indirect
 	github.com/jmoiron/sqlx v1.3.1
 	github.com/json-iterator/go v1.1.10
 	github.com/kataras/iris/v12 v12.2.0-alpha2.0.20210304161013-7272c76847eb

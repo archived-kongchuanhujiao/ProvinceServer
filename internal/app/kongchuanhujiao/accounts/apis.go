@@ -3,7 +3,6 @@ package accounts
 import (
 	"errors"
 	"math/rand"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -11,8 +10,10 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/accounts"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao"
+	"github.com/kongchuanhujiao/server/internal/pkg/configs"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
+	"github.com/iris-contrib/middleware/jwt"
 	"github.com/kataras/iris/v12/context"
 	"go.uber.org/zap"
 )
@@ -29,6 +30,7 @@ type (
 )
 
 var code = map[string]string{} // code 验证码
+var conf = configs.GetConfigs()
 
 // 验证码。
 // POST apis/accounts/code
@@ -43,18 +45,25 @@ func (a *APIs) PostCode(v *PostCodeReq) *kongchuanhujiao.Response {
 // 登录。
 // POST apis/accounts/login
 func (a *APIs) PostLogin(v *PostLoginReq, c *context.Context) *kongchuanhujiao.Response {
+
 	if v.Code != code[v.ID] || v.Code == "" {
 		return &kongchuanhujiao.Response{Status: 1, Message: "验证码有误"}
 	}
 
-	c.SetCookie(&http.Cookie{
-		Name: "account", Value: v.ID, Path: "/", Expires: time.Now().AddDate(0, 1, 0),
-	})
+	now := time.Now()
+	t, err := jwt.NewTokenWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+		"iss": conf.JWT.Iss,
+		"sub": v.ID,
+		"exp": now.AddDate(0, 1, 0).Unix(),
+		"nbf": now.Unix(),
+		"iat": now.Unix(),
+	}).SignedString(conf.JWT.Key)
+	if err != nil {
+		logger.Error("生成 JWT Token 失败", zap.Error(err))
+		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+	}
 
-	// TODO 生成Token
-
-	return &kongchuanhujiao.Response{Message: "ok"}
-
+	return &kongchuanhujiao.Response{Message: t}
 }
 
 // sendCode 发送验证码
