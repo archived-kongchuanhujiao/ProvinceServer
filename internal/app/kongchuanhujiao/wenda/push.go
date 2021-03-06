@@ -7,6 +7,7 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
@@ -68,11 +69,11 @@ func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) 
 	}
 
 	if !isMarkdown {
-		template = "## #%v 详细信息  \n  \n> 正确人数 > %v 人  \n> 正确率 > %v  \n> 易错选项 > %v"
+		template = "## #%v 详细信息  \n  \n> 正确人数 > %v 人  \n> 正确率 > %v  \n> 易错选项 > %v  \n> 最快答对同学 %v"
 	} else {
-		template = "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v"
+		template = "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n> 最快答对同学 %v"
 	}
-	sum += fmt.Sprintf(template, tab.ID, calc.Count, getRightRate(calc), getMostWrongOption(calc.Wrong), "最速同学")
+	sum += fmt.Sprintf(template, tab.ID, calc.Count, getRightRate(calc), getMostWrongOption(calc.Wrong), getFastestAnswerUser(tab))
 	return
 }
 
@@ -143,4 +144,20 @@ func getMostWrongOption(wrong []public.ResultWrongField) string {
 	wrap := wrongFieldWrapper(wrong)
 	sort.Sort(wrap)
 	return wrap[0].Type
+}
+
+func getFastestAnswerUser(tab *public.QuestionsTab) (name string) {
+	ans, err := wenda.SelectAnswers(tab.ID)
+
+	if err != nil {
+		return
+	}
+
+	for _, an := range ans {
+		if an.Answer == tab.Topic.Key {
+			return strconv.FormatUint(an.QQ, 10)
+		}
+	}
+
+	return
 }
