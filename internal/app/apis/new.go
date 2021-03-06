@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var jjj = jwt.New(jwt.Config{
+var jc = jwt.New(jwt.Config{
 	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 		return configs.GetJWTConf().Key.Public(), nil
 	},
@@ -23,7 +23,7 @@ var jjj = jwt.New(jwt.Config{
 // jwtMiddleware 处理鉴权
 func jwtMiddleware(c iris.Context) {
 
-	if err := jjj.CheckJWT(c); err != nil {
+	if err := jc.CheckJWT(c); err != nil {
 		c.StatusCode(403)
 		logger.Warn("未授权的访问", zap.Error(err), zap.String("客户", c.RemoteAddr()))
 		return

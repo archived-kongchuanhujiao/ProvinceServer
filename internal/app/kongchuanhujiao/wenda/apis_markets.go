@@ -35,9 +35,8 @@ func (a *APIs) GetMarkets(v *GetMarketsReq) *kongchuanhujiao.Response {
 // PostMarkets 复制市场问题。
 // POST /apis/wenda/markets
 func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *kongchuanhujiao.Response {
-	user := c.GetCookie("account")
 	for _, t := range v.Target {
-		err := wenda.CopyQuestions(v.ID, user, t)
+		err := wenda.CopyQuestions(v.ID, c.Values().Get("account").(string), t)
 		if err != nil {
 			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 		}
