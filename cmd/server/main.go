@@ -14,7 +14,7 @@ var Commit string
 // main 启动函数
 func main() {
 
-	logger.Named("主").Info("Copyright (C) 2020-present | version：21.02.XX+" + Commit)
+	logger.Named("主").Info("Copyright (C) 2020-present | version：21.03.06+" + Commit)
 
 	pkg.ConnectDatabase()
 	client.NewClient()
