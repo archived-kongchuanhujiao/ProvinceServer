@@ -6,6 +6,7 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
+	"github.com/kongchuanhujiao/server/internal/pkg/configs"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 )
 
@@ -15,6 +16,8 @@ var Commit string
 func main() {
 
 	logger.Named("主").Info("Copyright (C) 2020-present | version：21.03.06+" + Commit)
+
+	configs.ReadConfigs()
 
 	pkg.ConnectDatabase()
 	client.NewClient()

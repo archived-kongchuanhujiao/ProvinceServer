@@ -13,11 +13,9 @@ import (
 	"go.uber.org/zap"
 )
 
-var conf = configs.GetConfigs()
-
 var jjj = jwt.New(jwt.Config{
 	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-		return conf.JWT.Key.Public(), nil
+		return configs.GetJWTConf().Key.Public(), nil
 	},
 	SigningMethod: jwt.SigningMethodES256,
 })
@@ -40,7 +38,7 @@ func jwtMiddleware(c iris.Context) {
 	}
 
 	cla := t.Claims.(jwt.MapClaims)
-	if cla["iss"] != conf.JWT.Iss {
+	if cla["iss"] != configs.GetJWTConf().Iss {
 		c.StatusCode(403)
 		logger.Warn("危险的 Token", zap.Error(err), zap.String("客户", c.RemoteAddr()))
 		return

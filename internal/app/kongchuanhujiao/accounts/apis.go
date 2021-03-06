@@ -30,7 +30,6 @@ type (
 )
 
 var code = map[string]string{} // code 验证码
-var conf = configs.GetConfigs()
 
 // 验证码。
 // POST apis/accounts/code
@@ -52,12 +51,12 @@ func (a *APIs) PostLogin(v *PostLoginReq, c *context.Context) *kongchuanhujiao.R
 
 	now := time.Now()
 	t, err := jwt.NewTokenWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
-		"iss": conf.JWT.Iss,
+		"iss": configs.GetJWTConf().Iss,
 		"sub": v.ID,
 		"exp": now.AddDate(0, 1, 0).Unix(),
 		"nbf": now.Unix(),
 		"iat": now.Unix(),
-	}).SignedString(conf.JWT.Key)
+	}).SignedString(configs.GetJWTConf().Key)
 	if err != nil {
 		logger.Error("生成 JWT Token 失败", zap.Error(err))
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
