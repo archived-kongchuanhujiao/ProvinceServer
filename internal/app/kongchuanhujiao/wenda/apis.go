@@ -51,10 +51,6 @@ type (
 	DeleteQuestionsReq struct{ ID uint32 } // DeleteQuestionsReq 问题删除
 
 	GetAnswersReq struct{ ID uint32 } // GetAnswersReq 获取对应问题答案
-
-	GetWrongQuestionReq struct {
-		UserQQ uint32
-	}
 )
 
 // GetQuestions 获取问题列表或问题。
@@ -173,18 +169,14 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchu
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 
+	q, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+	if err != nil {
+		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+	}
+
 	if v.Target == "dingtalk" {
 
-		cac := ac[0]
-
-		if cac.Token == "" || cac.Push == "" {
-			return &kongchuanhujiao.Response{
-				Status:  1,
-				Message: "账号错误",
-			}
-		}
-
-		err := PushDigestToDingtalk(ac[0].Token, ac[0].Push, ConvertToDTMessage(&public.QuestionsTab{}))
+		err := PushDigestData("dingtalk", q[0])
 
 		if err != nil {
 			logger.Error("发送钉钉消息失败", zap.Error(err))
@@ -210,13 +202,6 @@ func (a *APIs) GetAnswers(v *GetAnswersReq) *kongchuanhujiao.Response {
 		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
 	}
 	return &kongchuanhujiao.Response{Message: "ok", Data: ans}
-}
-
-// GetWrongQuestion 获取错题
-func (a *APIs) GetWrongQuestion(v *GetWrongQuestionReq) *kongchuanhujiao.Response {
-	_ = v
-	// TODO: 数据库交互
-	return &kongchuanhujiao.Response{Message: "ok"}
 }
 
 // UploadPicture 上传图片

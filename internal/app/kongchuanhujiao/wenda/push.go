@@ -1,7 +1,13 @@
 package wenda
 
 import (
+	"errors"
 	"fmt"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/accounts"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
+	"github.com/kongchuanhujiao/server/internal/pkg/logger"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
@@ -10,9 +16,36 @@ import (
 	"github.com/CatchZeng/dingtalk"
 )
 
+// PushDigestData 推送答题数据
+func PushDigestData(platform string, tab *public.QuestionsTab) (err error) {
+	switch platform {
+	case "dingtalk":
+		acc, errr := accounts.SelectAccount(tab.Creator, 0)
+
+		if errr != nil {
+			return errr
+		}
+
+		if acc[0].Token == "" || acc[0].Push == "" {
+			return
+		}
+
+		if len(acc) < 1 {
+			return errors.New("couldn't find account by given name")
+		}
+
+		err = PushDigestToDingtalk(acc[0].Token, acc[0].Push, convertToDTMessage(tab))
+
+		return
+	case "qq":
+		return
+	default:
+		return errors.New("Unknown push platform: " + platform)
+	}
+}
+
 // convertToMarkDown 将问题数据转换为钉钉 Markdown 消息
-// FIXME 详见 apis.go@PostPushcenter()
-func ConvertToDTMessage(tab *public.QuestionsTab) *dingtalk.MarkdownMessage {
+func convertToDTMessage(tab *public.QuestionsTab) *dingtalk.MarkdownMessage {
 	builder := dingtalk.NewMarkdownMessage()
 	builder.Markdown.Title = "答题数据："
 	builder.Markdown.Text = digestQuestionData(tab, true)
@@ -20,8 +53,7 @@ func ConvertToDTMessage(tab *public.QuestionsTab) *dingtalk.MarkdownMessage {
 }
 
 // convertToChain 将问题数据转换为消息链
-// TODO 详见 apis.go@PostPushcenter()
-func ConvertToChain(tab *public.QuestionsTab) *message.Message {
+func convertToChain(tab *public.QuestionsTab) *message.Message {
 	return message.NewTextMessage(digestQuestionData(tab, false))
 }
 
@@ -29,12 +61,19 @@ func ConvertToChain(tab *public.QuestionsTab) *message.Message {
 func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) {
 	sum = digestQuestion(tab)
 	template := ""
-	if !isMarkdown {
-		template = "## #%v 详细信息  \n  \n> 正确人数 > %v 人  \n> 正确率 > %v  \n> 易错选项 > %v  \n> 最快答对的同学 > %v"
-	} else {
-		template = "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n 最快答对的同学 > %v"
+
+	calc, err := wenda.CalculateResult(tab.ID)
+
+	if err != nil {
+		return
 	}
-	sum += fmt.Sprintf(template, tab.ID, "人数", "正确率", "易错选项", "最速同学")
+
+	if !isMarkdown {
+		template = "## #%v 详细信息  \n  \n> 正确人数 > %v 人  \n> 正确率 > %v  \n> 易错选项 > %v  \n> 最快答对同学 %v"
+	} else {
+		template = "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n> 最快答对同学 %v"
+	}
+	sum += fmt.Sprintf(template, tab.ID, calc.Count, getRightRate(calc), getMostWrongOption(calc.Wrong), getFastestAnswerUser(tab))
 	return
 }
 
@@ -59,8 +98,8 @@ func digestQuestion(q *public.QuestionsTab) (s string) {
 	optionsText = strings.TrimSuffix(optionsText, "\n")
 
 	s = "题目: " + questionText + " 选项：" + optionsText
-	if len(s) > 20 {
-		s = s[0:20] + "..."
+	if len(s) > 25 {
+		s = s[0:25] + "..."
 	}
 	return
 }
@@ -72,10 +111,53 @@ func PushDigestToQQ() (err error) {
 
 // PushDigestToDingtalk 推送摘要至钉钉平台
 func PushDigestToDingtalk(accessToken string, secret string, md dingtalk.Message) (err error) {
+	logger.Info("正在推送答题概要至钉钉")
+
 	client := dingtalk.Client{
 		AccessToken: accessToken,
 		Secret:      secret,
 	}
 	_, err = client.Send(md)
+	return
+}
+
+// wrongFieldWrapper 包装类
+type wrongFieldWrapper []public.ResultWrongField
+
+func (a wrongFieldWrapper) Len() int {
+	return len(a)
+}
+func (a wrongFieldWrapper) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+func (a wrongFieldWrapper) Less(i, j int) bool {
+	return len(a[j].Value) < len(a[i].Value)
+}
+
+// getRightRate 获取答题正答率
+func getRightRate(result *public.Result) string {
+	return fmt.Sprintf("%.2f", float32(len(result.Right))/float32(result.Count)*100) + "%"
+}
+
+// getMostWrongOption 获取易错选项
+func getMostWrongOption(wrong []public.ResultWrongField) string {
+	wrap := wrongFieldWrapper(wrong)
+	sort.Sort(wrap)
+	return wrap[0].Type
+}
+
+func getFastestAnswerUser(tab *public.QuestionsTab) (name string) {
+	ans, err := wenda.SelectAnswers(tab.ID)
+
+	if err != nil {
+		return
+	}
+
+	for _, an := range ans {
+		if an.Answer == tab.Topic.Key {
+			return strconv.FormatUint(an.QQ, 10)
+		}
+	}
+
 	return
 }
