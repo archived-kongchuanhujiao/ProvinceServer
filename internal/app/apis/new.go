@@ -17,6 +17,7 @@ var jc = jwt.New(jwt.Config{
 	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 		return configs.GetJWTConf().Key.Public(), nil
 	},
+	Extractor:     jwt.FromFirst(jwt.FromAuthHeader, jwt.FromParameter("token")),
 	SigningMethod: jwt.SigningMethodES256,
 })
 
