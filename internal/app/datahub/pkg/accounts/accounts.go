@@ -5,7 +5,7 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/public/accounts"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
-	"github.com/elgris/sqrl"
+	"github.com/Masterminds/squirrel"
 	"go.uber.org/zap"
 )
 
@@ -14,7 +14,7 @@ var loggerr = logger.Named("数据总线").Named("账号")
 // SelectAccount 获取账号
 func SelectAccount(id string, qq uint64) (data []*accounts.Tab, err error) {
 
-	sqr := sqrl.Select("*").From("accounts")
+	sqr := squirrel.Select("*").From("accounts")
 	if id != "" {
 		sqr = sqr.Where("id=?", id)
 	} else {

@@ -7,7 +7,7 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/memory"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
-	"github.com/elgris/sqrl"
+	"github.com/Masterminds/squirrel"
 	"go.uber.org/zap"
 )
 
@@ -16,7 +16,7 @@ import (
 func InsertAnswer(a *wenda.AnswersTab) (err error) {
 
 	loggerr.Info("插入回答数据", zap.Uint32("问答ID", a.Question))
-	sql, args, err := sqrl.Insert("answers").Values(a.Question, a.QQ, a.Answer,
+	sql, args, err := squirrel.Insert("answers").Values(a.Question, a.QQ, a.Answer,
 		time.Now().Format("2006-01-02 15:04:05"), a.Mark).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
@@ -37,7 +37,7 @@ func InsertAnswer(a *wenda.AnswersTab) (err error) {
 // SelectAnswers 获取回答
 // qid 问题 ID
 func SelectAnswers(qid uint32) (data []*wenda.AnswersTab, err error) {
-	sql, args, err := sqrl.Select("*").From("answers").Where("question=?", qid).
+	sql, args, err := squirrel.Select("*").From("answers").Where("question=?", qid).
 		OrderBy("time DESC").ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))

@@ -7,7 +7,7 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/maria"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
-	"github.com/elgris/sqrl"
+	"github.com/Masterminds/squirrel"
 	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 )
@@ -29,11 +29,11 @@ type (
 // SelectQuestions 获取问题
 func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.QuestionsTab, err error) {
 
-	var sqr *sqrl.SelectBuilder
+	var sqr squirrel.SelectBuilder
 	if v.ID != 0 {
-		sqr = sqrl.Select("*").Where("id=?", v.ID).Limit(1)
+		sqr = squirrel.Select("*").Where("id=?", v.ID).Limit(1)
 	} else {
-		sqr = sqrl.Select("id", "topic", "`status`").Limit(20).Offset(uint64(page * 20))
+		sqr = squirrel.Select("id", "topic", "`status`").Limit(20).Offset(uint64(page * 20))
 	}
 
 	sqr = sqr.From("questions").OrderBy("id DESC")
@@ -79,7 +79,8 @@ func SelectQuestions(v *wenda.QuestionsTab, page uint32) (data []*wenda.Question
 // UpdateQuestionStatus 更新问题状态
 func UpdateQuestionStatus(q *wenda.QuestionsTab, status uint8) (err error) {
 
-	sql, args, err := sqrl.Update("questions").Set("`status`", status).Where("id=?", q.ID).ToSql()
+	sql, args, err := squirrel.Update("questions").Set("`status`", status).Where("id=?", q.ID).
+		ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
@@ -112,8 +113,8 @@ func UpdateQuestionStatus(q *wenda.QuestionsTab, status uint8) (err error) {
 // InsertQuestion 新增问题
 func InsertQuestion(q *wenda.QuestionsTab) (err error) {
 
-	sql, args, err := sqrl.Insert("questions").Values(nil, q.Type, q.Subject, q.Creator, q.Date, q.Topic,
-		nil, q.Market).ToSql()
+	sql, args, err := squirrel.Insert("questions").Values(nil, q.Type, q.Subject, q.Creator, q.Date,
+		q.Topic, nil, q.Market).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
@@ -130,7 +131,7 @@ func InsertQuestion(q *wenda.QuestionsTab) (err error) {
 // UpdateQuestion 更新问题
 func UpdateQuestion(q *wenda.QuestionsTab) (err error) {
 
-	sql, args, err := sqrl.Update("questions").Where("id=?", q.ID).
+	sql, args, err := squirrel.Update("questions").Where("id=?", q.ID).
 		Set("`subject`", q.Subject).Set("topic", q.Topic).Set("market", q.Market).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
@@ -165,7 +166,7 @@ func CopyQuestions(id uint32, creator string, target uint64) (err error) {
 // DeleteQuestion 删除问题
 func DeleteQuestion(id uint32) (err error) {
 
-	sql, args, err := sqrl.Delete("questions").Where("id=?", id).ToSql()
+	sql, args, err := squirrel.Delete("questions").Where("id=?", id).ToSql()
 	if err != nil {
 		loggerr.Error("生成SQL语句失败", zap.Error(err))
 		return
