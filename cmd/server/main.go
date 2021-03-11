@@ -10,12 +10,10 @@ import (
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 )
 
-var Commit string
-
 // main 启动函数
 func main() {
 
-	logger.Named("主").Info("Copyright (C) 2020-present | version：21.03.06+" + Commit)
+	logger.Named("主").Info("Copyright (C) 2020-present | version：21.03.06+" + configs.Commit)
 
 	configs.ReadConfigs()
 

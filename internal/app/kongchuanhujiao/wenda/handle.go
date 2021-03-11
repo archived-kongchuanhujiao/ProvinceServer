@@ -3,6 +3,7 @@ package wenda
 import (
 	"fmt"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wrongquestion"
+	"github.com/kongchuanhujiao/server/internal/pkg/configs"
 	"strings"
 
 	"github.com/kongchuanhujiao/server/internal/app/client"
@@ -84,13 +85,13 @@ func HandleTest(m *message.Message) {
 	}
 
 	switch t.Content {
-	case "你好":
+	case "空传你好":
 		client.GetClient().SendMessage(
 			message.NewAtMessage(m.Target.ID).AddText("你好").SetGroupTarget(m.Target.Group),
 		)
-	case "活动的群":
+	case "空传版本":
 		client.GetClient().SendMessage(
-			message.NewTextMessage(fmt.Sprintln(wenda.GetAllActiveGroup())).SetGroupTarget(m.Target.Group),
+			message.NewTextMessage(configs.Commit).SetGroupTarget(m.Target.Group),
 		)
 	}
 }

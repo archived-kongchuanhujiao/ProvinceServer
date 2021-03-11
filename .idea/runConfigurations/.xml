@@ -2,7 +2,7 @@
   <configuration default="false" name="运行" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="server" />
     <working_directory value="$PROJECT_DIR$" />
-    <go_parameters value="-ldflags &quot;-w -s -X main.Commit=非正式版本&quot;" />
+    <go_parameters value="-ldflags &quot;-w -s -X github.com/kongchuanhujiao/server/internal/pkg/configs.Commit=非正式版本&quot;" />
     <kind value="PACKAGE" />
     <filePath value="$PROJECT_DIR$/cmd/server/main.go" />
     <package value="github.com/kongchuanhujiao/server/cmd/server" />
