@@ -1,4 +1,4 @@
-package accounts
+package account
 
 type Tab struct { // Tab 账号
 	ID    string `json:"id" db:"id"`       // 唯一标识符

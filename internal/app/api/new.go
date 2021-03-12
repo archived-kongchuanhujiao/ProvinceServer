@@ -1,9 +1,9 @@
-package apis
+package api
 
 import (
-	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/accounts"
+	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/account"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
-	"github.com/kongchuanhujiao/server/internal/pkg/configs"
+	"github.com/kongchuanhujiao/server/internal/pkg/config"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/iris-contrib/middleware/jwt"
@@ -15,7 +15,7 @@ import (
 
 var jc = jwt.New(jwt.Config{
 	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-		return configs.GetJWTConf().Key.Public(), nil
+		return config.GetJWTConf().Key.Public(), nil
 	},
 	Extractor:     jwt.FromFirst(jwt.FromAuthHeader, jwt.FromParameter("token")),
 	SigningMethod: jwt.SigningMethodES256,
@@ -39,7 +39,7 @@ func jwtMiddleware(c iris.Context) {
 	}
 
 	cla := t.Claims.(jwt.MapClaims)
-	if cla["iss"] != configs.GetJWTConf().Iss {
+	if cla["iss"] != config.GetJWTConf().Iss {
 		c.StatusCode(403)
 		logger.Warn("危险的 Token", zap.Error(err), zap.String("客户", c.RemoteAddr()))
 		return
@@ -56,7 +56,7 @@ func StartApis() {
 	app.Use(recover.New())
 	APIs := mvc.New(app.Party("apis/"))
 
-	APIs.Party("accounts/").Handle(new(accounts.APIs))
+	APIs.Party("accounts/").Handle(new(account.APIs))
 	APIs.Party("wenda/", jwtMiddleware).Handle(new(wenda.APIs))
 
 	go func() {

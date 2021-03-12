@@ -1,4 +1,4 @@
-package configs
+package config
 
 // GetQQConf 获取 QQ 配置
 func GetQQConf() (uint64, string) {

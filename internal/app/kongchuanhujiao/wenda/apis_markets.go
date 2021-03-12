@@ -8,38 +8,38 @@ import (
 	"github.com/kataras/iris/v12/context"
 )
 
-type (
-	// GetMarketsReq 市场请求
-	GetMarketsReq struct {
-		Page    uint32 // 页面
-		Subject uint8  // 学科
-	}
+// GetMarketsReq 市场请求
+type GetMarketsReq struct {
+	Page    uint32 // 页面
+	Subject uint8  // 学科
+}
 
-	// PostMarketsReq 市场复制
-	PostMarketsReq struct {
-		ID     uint32   // 唯一识别码
-		Target []uint64 // 目标集
-	}
-)
-
-// GetMarkets 获取市场列表。
-// GET /apis/wenda/markets
+// GetMarkets 获取市场列表 APIs。
+// 调用方法：GET /apis/wenda/markets
 func (a *APIs) GetMarkets(v *GetMarketsReq) *kongchuanhujiao.Response {
 	q, err := wenda.SelectQuestions(&public.QuestionsTab{Market: true, Subject: v.Subject}, v.Page)
 	if err != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
 	return &kongchuanhujiao.Response{Message: "ok", Data: q}
 }
 
-// PostMarkets 复制市场问题。
-// POST /apis/wenda/markets
+// ====================================================================================================================
+
+// PostMarketsReq 复制市场问题 请求结构
+type PostMarketsReq struct {
+	ID     uint32   // 标识号
+	Target []uint64 // 目标集
+}
+
+// PostMarkets 复制市场问题 APIs。
+// 调用方法：POST /apis/wenda/markets
 func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *kongchuanhujiao.Response {
 	for _, t := range v.Target {
 		err := wenda.CopyQuestions(v.ID, c.Values().Get("account").(string), t)
 		if err != nil {
-			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+			return kongchuanhujiao.DefaultErrResp
 		}
 	}
-	return &kongchuanhujiao.Response{Message: "ok"}
+	return kongchuanhujiao.DefaultErrResp
 }

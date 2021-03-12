@@ -3,7 +3,7 @@ package wenda
 import (
 	"errors"
 	"fmt"
-	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/accounts"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 	"sort"
@@ -20,7 +20,7 @@ import (
 func PushDigestData(platform string, tab *public.QuestionsTab) (err error) {
 	switch platform {
 	case "dingtalk":
-		acc, errr := accounts.SelectAccount(tab.Creator, 0)
+		acc, errr := account.SelectAccount(tab.Creator, 0)
 
 		if errr != nil {
 			return errr

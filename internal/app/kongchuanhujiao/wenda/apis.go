@@ -7,7 +7,7 @@ import (
 
 	"github.com/kongchuanhujiao/server/internal/app/client"
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
-	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/accounts"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao"
@@ -18,43 +18,27 @@ import (
 	"go.uber.org/zap"
 )
 
-type (
-	APIs struct{} // APIs 问答 APIs
+type APIs struct{} // APIs 问答 APIs
 
-	GetQuestionsReq struct { // GetQuestionsReq 问题请求
+type (
+	// GetQuestionsReq 获取问题列表或问题 请求结构
+	GetQuestionsReq struct {
 		Page uint32 // 页面
-		ID   uint32 // 唯一识别码
+		ID   uint32 // 标识号
 	}
 
-	GetQuestionsRes struct { // GetQuestionsReq 问题响应
+	// GetQuestionsReq 获取问题列表或问题 数据响应结构
+	GetQuestionsRes struct {
 		Questions []*public.QuestionsTab `json:"questions"`  // 问题
 		Groups    *public.Groups         `json:"groups"`     // 群
 		GroupName string                 `json:"group_name"` // 群名称
 		Members   *public.GroupMembers   `json:"members"`    // 群成员
 		Result    *public.Result         `json:"result"`     // 结果
 	}
-
-	PutQuestionStatusReq struct { // PutQuestionStatusReq 问题更新
-		ID     uint32 // 唯一识别码
-		Status uint8  // 状态
-	}
-
-	PostPraiseReq struct { // PostPraiseReq 表扬请求
-		ID uint32 // 唯一识别码
-	}
-
-	PostPushcenterReq struct { // PostPushcenterReq 推送激活
-		ID     uint32 // 唯一识别码
-		Target string // 目标
-	}
-
-	DeleteQuestionsReq struct{ ID uint32 } // DeleteQuestionsReq 问题删除
-
-	GetAnswersReq struct{ ID uint32 } // GetAnswersReq 获取对应问题答案
 )
 
-// GetQuestions 获取问题列表或问题。
-// GET /apis/wenda/questions
+// GetQuestions 获取问题列表或问题 APIs。
+// 调用方法：GET /apis/wenda/questions
 func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhujiao.Response {
 
 	// FIXME 需要拆分出更细的颗粒密度
@@ -75,7 +59,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 			Creator: account,
 		}, 0)
 		if err != nil {
-			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+			return kongchuanhujiao.DefaultErrResp
 		}
 		t := d[0].Topic.Target
 		n = client.GetClient().GetGroupName(t)
@@ -89,7 +73,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 
 	}
 	if err != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
 
 	return &kongchuanhujiao.Response{
@@ -97,8 +81,16 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 	}
 }
 
-// PutQuestionsStatus 更新问题状态。
-// PUT /apis/wenda/questions/status
+// ====================================================================================================================
+
+// PutQuestionStatusReq 更新问题状态 请求结构
+type PutQuestionStatusReq struct {
+	ID     uint32 // 标识号
+	Status uint8  // 状态
+}
+
+// PutQuestionsStatus 更新问题状态 APIs。
+// 调用方法：PUT /apis/wenda/questions/status
 func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq, c *context.Context) *kongchuanhujiao.Response {
 
 	qs, err := wenda.SelectQuestions(&public.QuestionsTab{
@@ -106,37 +98,48 @@ func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq, c *context.Context) *
 		Creator: c.Values().Get("account").(string),
 	}, 0)
 	if err != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
 
 	if wenda.UpdateQuestionStatus(qs[0], v.Status) != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
 
-	return &kongchuanhujiao.Response{Message: "ok"}
+	return kongchuanhujiao.DefaultSuccResp
 }
 
-// PostQuestions 新建问题。
-// POST /apis/wenda/questions
+// ====================================================================================================================
+
+// PostQuestions 新建问题 APIs。
+// 调用方法：POST /apis/wenda/questions
 func (a *APIs) PostQuestions(v *public.QuestionsTab) *kongchuanhujiao.Response {
 	if wenda.InsertQuestion(v) != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
-	return &kongchuanhujiao.Response{Message: "ok"}
+	return kongchuanhujiao.DefaultSuccResp
 }
 
-// PutQuestions 更新问题。
-// PUT /apis/wenda/questions
+// ====================================================================================================================
+
+// PutQuestions 更新问题 APIs。
+// 调用方法：PUT /apis/wenda/questions
 func (a *APIs) PutQuestions(v *public.QuestionsTab) *kongchuanhujiao.Response {
 	err := wenda.UpdateQuestion(v)
 	if err != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
-	return &kongchuanhujiao.Response{Message: "ok"}
+	return kongchuanhujiao.DefaultSuccResp
 }
 
-// PostPraise 推送表扬列表。
-// POST /apis/wenda/praise
+// ====================================================================================================================
+
+// PostPraiseReq 推送表扬列表 请求结构
+type PostPraiseReq struct {
+	ID uint32 // 标识号
+}
+
+// PostPraise 推送表扬列表 APIs。
+// 调用方法：POST /apis/wenda/praise
 func (a *APIs) PostPraise(v *PostPraiseReq, c *context.Context) *kongchuanhujiao.Response {
 
 	q, err := wenda.SelectQuestions(&public.QuestionsTab{
@@ -144,12 +147,12 @@ func (a *APIs) PostPraise(v *PostPraiseReq, c *context.Context) *kongchuanhujiao
 		Creator: c.Values().Get("account").(string),
 	}, 0)
 	if err != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
 
 	details, err := wenda.CalculateResult(q[0].ID)
 	if err != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
 
 	msg := message.NewTextMessage("表扬下列答对的同学：\n")
@@ -157,55 +160,81 @@ func (a *APIs) PostPraise(v *PostPraiseReq, c *context.Context) *kongchuanhujiao
 		msg.AddAt(mem)
 	}
 	client.GetClient().SendMessage(msg.SetTarget(&message.Target{Group: &message.Group{ID: q[0].Topic.Target}}))
-	return &kongchuanhujiao.Response{Message: "ok"}
+
+	return kongchuanhujiao.DefaultSuccResp
 }
 
-// PostPushcenter 推送数据到钉钉。
-// POST /apis/wenda/pushcenter
+// ====================================================================================================================
+
+// PostPushcenterReq 推送数据到钉钉 请求结构
+type PostPushcenterReq struct {
+	ID     uint32 // 标识号
+	Target string // 目标
+}
+
+// PostPushcenter 推送数据到钉钉 APIs。
+// 调用方法：POST /apis/wenda/pushcenter
 func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchuanhujiao.Response {
 
-	ac, err := accounts.SelectAccount(c.Values().Get("account").(string), 0)
+	ac, err := account.SelectAccount(c.Values().Get("account").(string), 0)
 	if err != nil || len(ac) == 0 {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
 
 	q, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
 	if err != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
 
 	if v.Target == "dingtalk" {
-
 		err := PushDigestData("dingtalk", q[0])
-
 		if err != nil {
 			logger.Error("发送钉钉消息失败", zap.Error(err))
-			return &kongchuanhujiao.Response{Status: 1, Message: "发送失败"}
+			return kongchuanhujiao.DefaultErrResp
 		}
 	}
-	return &kongchuanhujiao.Response{Message: "ok"}
+
+	return kongchuanhujiao.DefaultSuccResp
 }
 
-// DeleteQuestions 删除问题。
-// Delete /apis/wenda/questions
+// ====================================================================================================================
+
+// DeleteQuestionsReq 删除问题 请求结构
+type DeleteQuestionsReq struct {
+	ID uint32 // 标识号
+}
+
+// DeleteQuestions 删除问题 APIs。
+// 调用方法：Delete /apis/wenda/questions
 func (a *APIs) DeleteQuestions(v *DeleteQuestionsReq) *kongchuanhujiao.Response {
 	err := wenda.DeleteQuestion(v.ID)
 	if err != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
-	return &kongchuanhujiao.Response{Message: "ok"}
+	return kongchuanhujiao.DefaultSuccResp
 }
 
+// ====================================================================================================================
+
+// GetAnswersReq 获取作答 请求结构
+type GetAnswersReq struct {
+	ID uint32 // 标识号
+}
+
+// GetAnswers 获取作答 APIs。
+// 调用方法：GET /apis/wenda/answers
 func (a *APIs) GetAnswers(v *GetAnswersReq) *kongchuanhujiao.Response {
 	ans, err := wenda.SelectAnswers(v.ID)
 	if err != nil {
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
 	return &kongchuanhujiao.Response{Message: "ok", Data: ans}
 }
 
-// UploadPicture 上传图片
-// POST /apis/wenda/upload
+// ====================================================================================================================
+
+// PostUploadPicture 上传图片 APIs。
+// 调用方法：POST /apis/wenda/upload
 func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 
 	account := c.Values().Get("account").(string)
@@ -213,7 +242,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 	_, fh, err := c.FormFile("file")
 	if err != nil {
 		logger.Warn("解析文件失败", zap.Error(err))
-		return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+		return kongchuanhujiao.DefaultErrResp
 	}
 
 	if fh.Size > 15*iris.MB {
@@ -238,7 +267,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 		if err != nil {
 			logger.Warn("创建文件夹失败", zap.Error(err))
 
-			return &kongchuanhujiao.Response{Status: 1, Message: "服务器错误"}
+			return kongchuanhujiao.DefaultErrResp
 		}
 	}
 
@@ -249,11 +278,8 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 	if err != nil {
 		logger.Warn("解析文件失败", zap.Error(err))
 
-		return &kongchuanhujiao.Response{
-			Status:  1,
-			Message: "服务器错误",
-		}
+		return kongchuanhujiao.DefaultErrResp
 	}
 
-	return &kongchuanhujiao.Response{Status: 0, Message: "ok"}
+	return kongchuanhujiao.DefaultSuccResp
 }

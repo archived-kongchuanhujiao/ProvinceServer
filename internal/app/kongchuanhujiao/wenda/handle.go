@@ -3,7 +3,7 @@ package wenda
 import (
 	"fmt"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wrongquestion"
-	"github.com/kongchuanhujiao/server/internal/pkg/configs"
+	"github.com/kongchuanhujiao/server/internal/pkg/config"
 	"strings"
 
 	"github.com/kongchuanhujiao/server/internal/app/client"
@@ -12,9 +12,7 @@ import (
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 )
 
-var (
-	sessionPool = []uint64{}
-)
+var sessionPool []uint64
 
 // HandleAnswer 处理回答
 func HandleAnswer(m *message.Message) {
@@ -91,7 +89,7 @@ func HandleTest(m *message.Message) {
 		)
 	case "空传版本":
 		client.GetClient().SendMessage(
-			message.NewTextMessage(configs.Commit).SetGroupTarget(m.Target.Group),
+			message.NewTextMessage(config.Commit).SetGroupTarget(m.Target.Group),
 		)
 	}
 }

@@ -3,14 +3,14 @@ package client
 import (
 	"github.com/kongchuanhujiao/server/internal/app/client/internal"
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
-	"github.com/kongchuanhujiao/server/internal/pkg/configs"
+	"github.com/kongchuanhujiao/server/internal/pkg/config"
 )
 
 var cli *internal.QQ // client 客户端
 
 // NewClient 新建客户端
 func NewClient() {
-	cli = internal.NewClient(configs.GetQQConf())
+	cli = internal.NewClient(config.GetQQConf())
 }
 
 // GetClient 获取客户端。
