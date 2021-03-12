@@ -1,4 +1,4 @@
-package wrongquestion
+package cuoti
 
 type Tab struct {
 	ID             uint32 `json:"id" db:"id"`                             // 唯一标识符

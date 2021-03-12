@@ -2,7 +2,7 @@ package wenda
 
 import (
 	"fmt"
-	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wrongquestion"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/cuoti"
 	"github.com/kongchuanhujiao/server/internal/pkg/config"
 	"strings"
 
@@ -132,7 +132,7 @@ func HandleWrongQuestion(m *message.Message) {
 			case "del":
 				return
 			case "ck":
-				wq, err := wrongquestion.SelectWrongQuestions(0, uint32(m.Target.ID))
+				wq, err := cuoti.SelectWrongQuestions(0, uint32(m.Target.ID))
 
 				if err != nil {
 					client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("发生了意外错误, 无法查询错题列表."))

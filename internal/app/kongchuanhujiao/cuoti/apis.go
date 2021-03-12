@@ -1,4 +1,4 @@
-package wrongquestion
+package cuoti
 
 import "github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao"
 
