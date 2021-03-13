@@ -3,7 +3,9 @@ package wenda
 import (
 	"fmt"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/cuoti"
+	ct "github.com/kongchuanhujiao/server/internal/app/datahub/public/cuoti"
 	"github.com/kongchuanhujiao/server/internal/pkg/config"
+	"strconv"
 	"strings"
 
 	"github.com/kongchuanhujiao/server/internal/app/client"
@@ -12,7 +14,8 @@ import (
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 )
 
-var sessionPool []uint64
+// sessionPool 储存添加错题进度
+var sessionPool map[uint64]*ct.Tab
 
 // HandleAnswer 处理回答
 func HandleAnswer(m *message.Message) {
@@ -101,6 +104,11 @@ func HandleWrongQuestion(m *message.Message) {
 		return
 	}
 
+	if _, ok := sessionPool[m.Target.ID]; ok {
+		handleAddCuoti(m.Target.ID, m.Target.Group, m.Chain[0])
+		return
+	}
+
 	if !strings.HasPrefix(t.Content, "/") {
 		return
 	}
@@ -120,29 +128,63 @@ func HandleWrongQuestion(m *message.Message) {
 		} else {
 			switch args[1] {
 			case "add":
-				for _, u := range sessionPool {
-					if u == m.Target.ID {
-						sessionPool = append(sessionPool, m.Target.ID)
-						client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("请发送欲添加错题的题目:"))
-						return
-					}
+				if _, ok := sessionPool[m.Target.ID]; !ok {
+					sessionPool[m.Target.ID] = &ct.Tab{}
+					client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("请发送欲添加错题的题目:").SetGroupTarget(m.Target.Group))
+					return
 				}
 
-				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("你还有正在进行添加的错题!"))
+				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("你还有正在进行添加的错题!").SetGroupTarget(m.Target.Group))
 			case "del":
 				return
 			case "ck":
 				wq, err := cuoti.SelectWrongQuestions(0, uint32(m.Target.ID))
 
 				if err != nil {
-					client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("发生了意外错误, 无法查询错题列表."))
+					client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("发生了意外错误, 无法查询错题列表.").SetGroupTarget(m.Target.Group))
 					return
 				}
 
-				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText(fmt.Sprint(wq)))
+				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText(fmt.Sprint(wq)).SetGroupTarget(m.Target.Group))
 			default:
 				client.GetClient().SendMessage(defaultMsg)
 			}
 		}
 	}
+}
+
+// handleAddCuoti 处理添加错题逻辑
+func handleAddCuoti(user uint64, g *message.Group, chain message.Element) (ok bool) {
+	stat, ok := sessionPool[user]
+
+	if !ok {
+		return
+	}
+
+	switch {
+	case stat.ImageURL == "":
+		stat.Question = chain.(*message.Text).Content
+		client.GetClient().SendMessage(message.NewAtMessage(user).AddText("设置错题题目成功! 下一步请设置错题的正确答案.").SetGroupTarget(g))
+		return true
+	case stat.QuestionAnswer == "":
+		stat.QuestionAnswer = chain.(*message.Text).Content
+		client.GetClient().SendMessage(message.NewAtMessage(user).AddText("设置错题答案成功! 如果该题目有图片需要添加的话, 接下来请发送图片, 反之则发送提醒周期 (单位为天).").SetGroupTarget(g))
+		return true
+	case stat.ImageURL == "" || stat.Duration == 0:
+		i, success := chain.(*message.Image)
+		if success && stat.ImageURL != "" {
+			stat.ImageURL = i.URL
+			client.GetClient().SendMessage(message.NewAtMessage(user).AddText("设置错题图片成功! 接下来请发送提醒时间 (单位为天).").SetGroupTarget(g))
+		} else {
+			d, err := strconv.Atoi(chain.(*message.Text).Content)
+			if err != nil {
+				client.GetClient().SendMessage(message.NewAtMessage(user).AddText("时间错误! 请填写正确的数字.").SetGroupTarget(g))
+			} else {
+				stat.Duration = uint8(d)
+				client.GetClient().SendMessage(message.NewAtMessage(user).AddText("设置错题提醒周期成功! 错题创建成功.").SetGroupTarget(g))
+				// TODO 创建错题
+			}
+		}
+	}
+	return
 }
