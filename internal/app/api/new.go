@@ -25,7 +25,7 @@ var jc = jwt.New(jwt.Config{
 func jwtMiddleware(c iris.Context) {
 
 	if err := jc.CheckJWT(c); err != nil {
-		c.StatusCode(403)
+		c.StatusCode(401)
 		logger.Warn("未授权的访问", zap.Error(err), zap.String("客户", c.RemoteAddr()))
 		return
 	}
@@ -33,14 +33,14 @@ func jwtMiddleware(c iris.Context) {
 	t := c.Values().Get("jwt").(*jwt.Token)
 	err := t.Claims.Valid()
 	if err != nil {
-		c.StatusCode(403)
+		c.StatusCode(401)
 		logger.Warn("无效的 Token", zap.Error(err), zap.String("客户", c.RemoteAddr()))
 		return
 	}
 
 	cla := t.Claims.(jwt.MapClaims)
 	if cla["iss"] != config.GetJWTConf().Iss {
-		c.StatusCode(403)
+		c.StatusCode(401)
 		logger.Warn("危险的 Token", zap.Error(err), zap.String("客户", c.RemoteAddr()))
 		return
 	}
