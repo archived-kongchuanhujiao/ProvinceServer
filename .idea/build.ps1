@@ -9,6 +9,6 @@ $env:GOARCH = "amd64"
 
 "开始构建..."
 
-go build -ldflags "-w -s -X ${module}/internal/pkg/configs.Commit=${commit}" -o .kongchuanhujiao/serve ${main}
+go build -ldflags "-w -s -X ${module}/internal/pkg/config.Commit=${commit}" -o .kongchuanhujiao/serve ${main}
 
 "构建完成"
