@@ -283,3 +283,25 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 
 	return kongchuanhujiao.DefaultSuccResp
 }
+
+// ====================================================================================================================
+
+// GetAnswersReq 获取作答 请求结构
+type GetAnswerCSVReq struct {
+	ID uint32 // 标识号
+}
+
+// GetAnswers 获取作答 APIs。
+// 调用方法：GET /apis/wenda/answers
+func (a *APIs) GetAnswerCsv(v *GetAnswerCSVReq, c *context.Context) {
+	ans, err := wenda.SelectAnswers(v.ID)
+	csv, err := AnswerToCSV(ans)
+
+	c.Header("Transfer-Encoding", "chunked")
+	c.ContentType("application/octet-stream")
+	_, err = c.Write(csv)
+
+	if err != nil {
+		logger.Warn("写入作答 CSV 数据失败", zap.Error(err))
+	}
+}
