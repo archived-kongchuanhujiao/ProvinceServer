@@ -43,20 +43,20 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 
 	// FIXME 需要拆分出更细的颗粒密度
 	var (
-		d       []*public.QuestionsTab
-		g       *public.Groups
-		n       string // 群名称
-		m       *public.GroupMembers
-		calc    *public.Result
-		err     error
-		account = c.Values().Get("account").(string)
+		d    []*public.QuestionsTab
+		g    *public.Groups
+		n    string // 群名称
+		m    *public.GroupMembers
+		calc *public.Result
+		err  error
+		acct = c.Values().Get("account").(string)
 	)
 
 	if v.ID != 0 {
 
 		d, err = wenda.SelectQuestions(&public.QuestionsTab{
 			ID:      v.ID,
-			Creator: account,
+			Creator: acct,
 		}, 0)
 		if err != nil {
 			return kongchuanhujiao.DefaultErrResp
@@ -68,7 +68,7 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 
 	} else {
 
-		d, err = wenda.SelectQuestions(&public.QuestionsTab{Creator: account}, v.Page)
+		d, err = wenda.SelectQuestions(&public.QuestionsTab{Creator: acct}, v.Page)
 		g = client.GetClient().GetGroups()
 
 	}
@@ -237,7 +237,7 @@ func (a *APIs) GetAnswers(v *GetAnswersReq) *kongchuanhujiao.Response {
 // 调用方法：POST /apis/wenda/upload
 func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 
-	account := c.Values().Get("account").(string)
+	acct := c.Values().Get("account").(string)
 
 	_, fh, err := c.FormFile("file")
 	if err != nil {
@@ -259,7 +259,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 	}
 
 	saltedName += "_" + HashForSHA1(saltedName) + "." + fnamePart[len(fnamePart)-1]
-	folderName := "assets/pictures/" + account
+	folderName := "assets/pictures/" + acct
 
 	if !Exists(folderName) {
 		err = os.MkdirAll(folderName, os.ModePerm)
@@ -272,7 +272,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 	}
 
 	// Upload the file to specific destination.
-	dest := filepath.Join(folderName+account, saltedName)
+	dest := filepath.Join(folderName+acct, saltedName)
 	_, err = c.SaveFormFile(fh, dest)
 
 	if err != nil {
