@@ -291,17 +291,23 @@ type GetAnswerCSVReq struct {
 	ID uint32 // 标识号
 }
 
-// GetAnswers 获取作答 APIs。
-// 调用方法：GET /apis/wenda/answers
-func (a *APIs) GetAnswerCsv(v *GetAnswerCSVReq, c *context.Context) {
+// GetCsv 获取 CSV APIs。
+// 调用方法：GET /apis/wenda/csv
+func (a *APIs) GetCsv(v *GetAnswerCSVReq, c *context.Context) {
+
 	ans, err := wenda.SelectAnswers(v.ID)
-	csv, err := AnswerToCSV(ans)
-
-	c.Header("Transfer-Encoding", "chunked")
-	c.ContentType("application/octet-stream")
-	_, err = c.Write(csv)
-
 	if err != nil {
-		logger.Warn("写入作答 CSV 数据失败", zap.Error(err))
+		return
 	}
+	csv, err := AnswerToCSV(ans)
+	if err != nil {
+		logger.Error("转换答题数据至 CSV 二进制流失败", zap.Error(err))
+		return
+	}
+
+	c.ContentType("application/csv; charset=utf-8")
+	c.Header("Content-Disposition", `attachment; filename="所有数据.csv"`)
+
+	_, _ = c.Write([]byte{239, 187, 191}) // UTF-8 BOM
+	_, _ = c.Write(csv)
 }
