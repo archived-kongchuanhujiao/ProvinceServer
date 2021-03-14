@@ -5,6 +5,8 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/cuoti"
 	ct "github.com/kongchuanhujiao/server/internal/app/datahub/public/cuoti"
 	"github.com/kongchuanhujiao/server/internal/pkg/config"
+	"github.com/kongchuanhujiao/server/internal/pkg/logger"
+	"go.uber.org/zap"
 	"strconv"
 	"strings"
 
@@ -154,7 +156,7 @@ func HandleWrongQuestion(m *message.Message) {
 }
 
 // handleAddCuoti 处理添加错题逻辑
-func handleAddCuoti(user uint64, g *message.Group, chain message.Element) (ok bool) {
+func handleAddCuoti(user uint64, g *message.Group, chain message.Element) {
 	stat, ok := sessionPool[user]
 
 	if !ok {
@@ -162,14 +164,29 @@ func handleAddCuoti(user uint64, g *message.Group, chain message.Element) (ok bo
 	}
 
 	switch {
-	case stat.ImageURL == "":
-		stat.Question = chain.(*message.Text).Content
+	case stat.Question == "":
+		q := chain.(*message.Text).Content
+
+		tab, err := cuoti.SelectWrongQuestions(0, uint32(user))
+
+		if err != nil {
+			client.GetClient().SendMessage(message.NewAtMessage(user).AddText("添加问题失败, 服务器异常.").SetGroupTarget(g))
+			return
+		}
+
+		for _, t := range tab {
+			if t.Question == q {
+				client.GetClient().SendMessage(message.NewAtMessage(user).AddText("已经有相同题目的错题了!").SetGroupTarget(g))
+				return
+			}
+		}
+
+		stat.Question = q
+
 		client.GetClient().SendMessage(message.NewAtMessage(user).AddText("设置错题题目成功! 下一步请设置错题的正确答案.").SetGroupTarget(g))
-		return true
 	case stat.QuestionAnswer == "":
 		stat.QuestionAnswer = chain.(*message.Text).Content
 		client.GetClient().SendMessage(message.NewAtMessage(user).AddText("设置错题答案成功! 如果该题目有图片需要添加的话, 接下来请发送图片, 反之则发送提醒周期 (单位为天).").SetGroupTarget(g))
-		return true
 	case stat.ImageURL == "" || stat.Duration == 0:
 		i, success := chain.(*message.Image)
 		if success && stat.ImageURL != "" {
@@ -179,12 +196,17 @@ func handleAddCuoti(user uint64, g *message.Group, chain message.Element) (ok bo
 			d, err := strconv.Atoi(chain.(*message.Text).Content)
 			if err != nil {
 				client.GetClient().SendMessage(message.NewAtMessage(user).AddText("时间错误! 请填写正确的数字.").SetGroupTarget(g))
+				return
 			} else {
 				stat.Duration = uint8(d)
-				client.GetClient().SendMessage(message.NewAtMessage(user).AddText("设置错题提醒周期成功! 错题创建成功.").SetGroupTarget(g))
-				// TODO 创建错题
+				err := cuoti.InsertWrongQuestion(stat)
+				if err != nil {
+					client.GetClient().SendMessage(message.NewAtMessage(user).AddText("错题创建成功!").SetGroupTarget(g))
+				} else {
+					client.GetClient().SendMessage(message.NewAtMessage(user).AddText("添加错题失败!").SetGroupTarget(g))
+					logger.Warn("添加错题时遇到了意外", zap.Error(err))
+				}
 			}
 		}
 	}
-	return
 }
