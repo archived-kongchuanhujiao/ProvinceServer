@@ -1,7 +1,6 @@
 package wenda
 
 import (
-	"fmt"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/cuoti"
 	ct "github.com/kongchuanhujiao/server/internal/app/datahub/public/cuoti"
 	"github.com/kongchuanhujiao/server/internal/pkg/config"
@@ -121,8 +120,8 @@ func HandleWrongQuestion(m *message.Message) {
 
 		defaultMsg := message.NewAtMessage(m.Target.ID).
 			AddText("/ct add 添加错题\n" +
-				"/ct del 删除错题\n" +
-				"/ct ck 查看错题").
+				"/ct rm 删除错题\n" +
+				"/ct cx 查询错题列表").
 			SetGroupTarget(m.Target.Group)
 
 		if len(args) == 1 {
@@ -137,9 +136,7 @@ func HandleWrongQuestion(m *message.Message) {
 				}
 
 				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("你还有正在进行添加的错题!").SetGroupTarget(m.Target.Group))
-			case "del":
-				return
-			case "ck":
+			case "del", "rm":
 				wq, err := cuoti.SelectWrongQuestions(0, uint32(m.Target.ID))
 
 				if err != nil {
@@ -147,7 +144,16 @@ func HandleWrongQuestion(m *message.Message) {
 					return
 				}
 
-				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText(fmt.Sprint(wq)).SetGroupTarget(m.Target.Group))
+				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText(handleRemoveCuoti(m.Target.ID, wq, m.Chain[0])).SetGroupTarget(m.Target.Group))
+			case "cx", "ls":
+				wq, err := cuoti.SelectWrongQuestions(0, uint32(m.Target.ID))
+
+				if err != nil {
+					client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("发生了意外错误, 无法查询错题列表.").SetGroupTarget(m.Target.Group))
+					return
+				}
+
+				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText(handleListCuoti(wq)).SetGroupTarget(m.Target.Group))
 			default:
 				client.GetClient().SendMessage(defaultMsg)
 			}
@@ -209,4 +215,50 @@ func handleAddCuoti(user uint64, g *message.Group, chain message.Element) {
 			}
 		}
 	}
+}
+
+func handleListCuoti(cts []*ct.Tab) (m string) {
+	if len(cts) == 0 {
+		m = "还未添加过错题"
+		return
+	}
+
+	for _, tab := range cts {
+		m += strconv.Itoa(int(tab.ID)) + " " + tab.Question[0:20] + "\n"
+	}
+
+	strings.TrimSpace(m)
+	return
+}
+
+func handleRemoveCuoti(qid uint64, cts []*ct.Tab, chain message.Element) (m string) {
+	if len(cts) == 0 {
+		m = "还未添加过错题"
+		return
+	}
+
+	content := strings.Split(chain.(*message.Text).Content, " ")[2]
+
+	id := uint32(0)
+
+	if w, err := strconv.Atoi(content); err != nil {
+		return "请输入有效的错题 ID!"
+	} else {
+		id = uint32(w)
+	}
+
+	for _, tab := range cts {
+		if tab.ID == id {
+			err := cuoti.RemoveWrongQuestions(id, qid)
+			if err != nil {
+				logger.Warn("删除错题失败", zap.Error(err))
+				m = "删除错题失败"
+				return
+			}
+
+			m = "删除错题成功"
+		}
+	}
+
+	return
 }

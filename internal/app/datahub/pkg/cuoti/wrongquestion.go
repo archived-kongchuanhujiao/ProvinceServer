@@ -18,6 +18,6 @@ func SelectWrongQuestions(id uint32, qid uint32) (data []*cuoti.Tab, err error) 
 
 // RemoveWrongQuestions 删除错题
 // TODO: 数据库交互
-func RemoveWrongQuestions(id uint32, qid uint32) (ok bool, err error) {
+func RemoveWrongQuestions(id uint32, qid uint64) (err error) {
 	return
 }
