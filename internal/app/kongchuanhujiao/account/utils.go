@@ -35,7 +35,14 @@ func sendCode(id string) (err error) {
 			SetTarget(&message.Target{ID: a[0].QQ}),
 	)
 
-	code[id] = c // FIXME 验证码有效期后要删除
+	account.WriteCode(id, c)
+
+	go func() {
+		timer := time.NewTimer(5 * time.Minute)
+		defer timer.Stop()
+		<-timer.C
+		account.DeleteCode(id)
+	}()
 
 	return
 }
