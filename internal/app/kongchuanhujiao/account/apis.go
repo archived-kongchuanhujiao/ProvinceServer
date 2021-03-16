@@ -41,7 +41,7 @@ type PostLoginReq struct {
 // 调用方法：POST apis/accounts/login
 func (a *APIs) PostLogin(v *PostLoginReq) *kongchuanhujiao.Response {
 
-	if v.Code != account.GetCode(v.ID) || v.Code == "" { // FIXME datahub 鉴权
+	if account.VerifyCode(v.ID, v.Code) || v.Code == "" {
 		return kongchuanhujiao.GenerateErrResp(1, "验证码有误")
 	}
 
