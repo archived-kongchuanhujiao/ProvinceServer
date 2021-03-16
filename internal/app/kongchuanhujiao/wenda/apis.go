@@ -186,12 +186,10 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchu
 		return kongchuanhujiao.DefaultErrResp
 	}
 
-	if v.Target == "dingtalk" {
-		err := PushDigestData("dingtalk", q[0])
-		if err != nil {
-			logger.Error("发送钉钉消息失败", zap.Error(err))
-			return kongchuanhujiao.DefaultErrResp
-		}
+	err = PushDigestData(q[0])
+	if err != nil {
+		logger.Error("推送作答数据失败", zap.Error(err))
+		return kongchuanhujiao.DefaultErrResp
 	}
 
 	return kongchuanhujiao.DefaultSuccResp
