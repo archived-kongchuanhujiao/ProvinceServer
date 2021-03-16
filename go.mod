@@ -6,7 +6,7 @@ require (
 	github.com/CatchZeng/dingtalk v1.2.0
 	github.com/Joker/hpp v1.0.0 // indirect
 	github.com/Masterminds/squirrel v1.5.0
-	github.com/Mrs4s/MiraiGo v0.0.0-20210309145658-2826f14c1d23
+	github.com/Mrs4s/MiraiGo v0.0.0-20210316010642-701321c7139c
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/iris-contrib/middleware/jwt v0.0.0-20210110101738-6d0a4d799b5d

@@ -3,11 +3,20 @@ package account
 import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/maria"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/public/account"
+	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/account"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/Masterminds/squirrel"
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 )
+
+type tab struct {
+	ID    string `json:"id" db:"id"`       // 标识号
+	QQ    uint64 `json:"qq" db:"qq"`       // QQ
+	Class uint32 `json:"class" db:"class"` // 班级 FIXME 是否需要
+	Push  string `json:"push" db:"push"`   // 推送
+}
 
 var loggerr = logger.Named("数据总线").Named("账号")
 
@@ -27,11 +36,22 @@ func SelectAccount(id string, qq uint64) (data []*account.Tab, err error) {
 		return
 	}
 
-	err = maria.Select(&data, sql, args...)
+	var d []*tab
+	err = maria.Select(&d, sql, args...)
 	if err != nil {
 		maria.Logger.Error("查询失败", zap.Error(err), zap.String("SQL语句", sql))
 		return
 	}
 
+	for _, v := range d {
+		pu := public.PushField{}
+		err := jsoniter.UnmarshalFromString(v.Push, &pu)
+		if err != nil {
+			loggerr.Error("解析推送字段失败", zap.Error(err))
+			return nil, err
+		}
+
+		data = append(data, &public.Tab{ID: v.ID, QQ: v.QQ, Class: v.Class, Push: pu})
+	}
 	return
 }

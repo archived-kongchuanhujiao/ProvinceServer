@@ -17,31 +17,27 @@ import (
 )
 
 // PushDigestData 推送答题数据
-func PushDigestData(platform string, tab *public.QuestionsTab) (err error) {
-	switch platform {
-	case "dingtalk":
-		acc, errr := account.SelectAccount(tab.Creator, 0)
+func PushDigestData(tab *public.QuestionsTab) (err error) {
 
-		if errr != nil {
-			return errr
-		}
-
-		if acc[0].Token == "" || acc[0].Push == "" {
-			return
-		}
-
-		if len(acc) < 1 {
-			return errors.New("couldn't find account by given name")
-		}
-
-		err = PushDigestToDingtalk(acc[0].Token, acc[0].Push, convertToDTMessage(tab))
-
+	acc, err := account.SelectAccount(tab.Creator, 0)
+	if err != nil {
 		return
-	case "qq":
-		return
-	default:
-		return errors.New("Unknown push platform: " + platform)
 	}
+	if len(acc) < 1 {
+		return errors.New("couldn't find account by given name")
+	}
+
+	for _, p := range acc[0].Push {
+
+		switch p.Platform {
+		case "dingtalk":
+			err = PushDigestToDingtalk(p.Key, p.Secret, convertToDTMessage(tab))
+			// FIXME 错误处理
+		case "qq":
+			// TODO QQ群推送
+		}
+	}
+	return
 }
 
 // convertToMarkDown 将问题数据转换为钉钉 Markdown 消息
