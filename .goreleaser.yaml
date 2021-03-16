@@ -1,0 +1,7 @@
+builds:
+  - env: [ CGO_ENABLED=0 ]
+    goos: [ linux ]
+    goarch: [ amd64 ]
+    main: ./cmd/server/main.go
+    binary: server
+    ldflags: [ -w -s -X github.com/kongchuanhujiao/server/internal/pkg/config.Commit={{.Env.TAGNAME}} ]
