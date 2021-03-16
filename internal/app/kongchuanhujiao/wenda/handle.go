@@ -91,6 +91,14 @@ func HandleTest(m *message.Message) {
 		client.GetClient().SendMessage(
 			message.NewTextMessage(config.Commit).SetGroupTarget(m.Target.Group),
 		)
+	default:
+		if strings.HasPrefix(t.Content, "空传分词 ") {
+			client.GetClient().SendMessage(
+				message.NewTextMessage(
+					strings.Join(client.GetClient().ExtractWords(t.Content), "／"),
+				).SetGroupTarget(m.Target.Group),
+			)
+		}
 	}
 }
 
