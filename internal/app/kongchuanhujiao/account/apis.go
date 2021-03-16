@@ -1,6 +1,7 @@
 package account
 
 import (
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
 	"time"
 
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao"
@@ -13,8 +14,6 @@ import (
 
 // APIs 账号 APIs
 type APIs struct{}
-
-var code = map[string]string{} // code 验证码 FIXME 转移至 datahub 管辖
 
 // PostCodeReq 发送验证码 请求结构
 type PostCodeReq struct {
@@ -42,7 +41,7 @@ type PostLoginReq struct {
 // 调用方法：POST apis/accounts/login
 func (a *APIs) PostLogin(v *PostLoginReq) *kongchuanhujiao.Response {
 
-	if v.Code != code[v.ID] || v.Code == "" { // FIXME datahub 鉴权
+	if v.Code != account.GetCode(v.ID) || v.Code == "" { // FIXME datahub 鉴权
 		return kongchuanhujiao.GenerateErrResp(1, "验证码有误")
 	}
 
