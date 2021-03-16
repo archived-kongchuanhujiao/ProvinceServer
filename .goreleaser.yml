@@ -4,4 +4,5 @@ builds:
     goarch: [ amd64 ]
     main: ./cmd/server/main.go
     binary: server
-    ldflags: - -w -s -X github.com/kongchuanhujiao/server/internal/pkg/config.Commit={{.Env.TAGNAME}}
+    ldflags:
+      - -w -s -X github.com/kongchuanhujiao/server/internal/pkg/config.Commit={{.Env.TAGNAME}}
