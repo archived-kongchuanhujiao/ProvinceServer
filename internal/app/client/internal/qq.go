@@ -2,7 +2,6 @@ package internal
 
 import (
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
-	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/Mrs4s/MiraiGo/client"
@@ -56,25 +55,4 @@ func (q *QQ) ReceiveMessage(m *message.Message) {
 // SetCallback 设置回调
 func (q *QQ) SetCallback(f message.Callback) {
 	q.callback = f
-}
-
-// GetGroups 获取群
-func (q *QQ) GetGroups() *public.Groups {
-	g := public.Groups{}
-	for _, v := range q.client.GroupList {
-		g[uint64(v.Code)] = v.Name
-	}
-	return &g
-}
-
-// GetGroupName 获取群名称
-func (q *QQ) GetGroupName(i uint64) string { return q.client.FindGroup(int64(i)).Name }
-
-// GetGroupMembers 获取群成员
-func (q *QQ) GetGroupMembers(i uint64) *public.GroupMembers {
-	m := public.GroupMembers{}
-	for _, v := range q.client.FindGroup(int64(i)).Members {
-		m[uint64(v.Uin)] = v.DisplayName()
-	}
-	return &m
 }
