@@ -3,6 +3,7 @@ package wenda
 import (
 	"errors"
 	"fmt"
+	"github.com/kongchuanhujiao/server/internal/app/client"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
@@ -34,7 +35,12 @@ func PushDigestData(tab *public.QuestionsTab) (err error) {
 			err = PushDigestToDingtalk(p.Key, p.Secret, convertToDTMessage(tab))
 			// FIXME 错误处理
 		case "qq":
-			// TODO QQ群推送
+			t, err := strconv.ParseUint(p.Key, 10, 64)
+			if err != nil {
+				return err
+			}
+
+			PushDigestToQQ(t, convertToChain(tab))
 		}
 	}
 	return
@@ -56,7 +62,7 @@ func convertToChain(tab *public.QuestionsTab) *message.Message {
 // digestQuestionData 摘要答题数据
 func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) {
 	sum = digestQuestion(tab)
-	template := ""
+	temp := ""
 
 	calc, err := wenda.CalculateResult(tab.ID)
 
@@ -65,11 +71,11 @@ func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) 
 	}
 
 	if !isMarkdown {
-		template = "## #%v 详细信息  \n  \n> 正确人数 > %v 人  \n> 正确率 > %v  \n> 易错选项 > %v  \n> 最快答对同学 %v"
+		temp = "## #%v 详细信息  \n  \n> 正确人数 > %v 人  \n> 正确率 > %v  \n> 易错选项 > %v  \n> 最快答对同学 %v"
 	} else {
-		template = "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n> 最快答对同学 %v"
+		temp = "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n> 最快答对同学 %v"
 	}
-	sum += fmt.Sprintf(template, tab.ID, calc.Count, getRightRate(calc), getMostWrongOption(calc.Wrong), getFastestAnswerUser(tab))
+	sum += fmt.Sprintf(temp, tab.ID, calc.Count, getRightRate(calc), getMostWrongOption(calc.Wrong), getFastestAnswerUser(tab))
 	return
 }
 
@@ -101,8 +107,10 @@ func digestQuestion(q *public.QuestionsTab) (s string) {
 }
 
 // PushDigestToQQ TODO 推送摘要至QQ平台
-func PushDigestToQQ() (err error) {
-	return
+func PushDigestToQQ(target uint64, data *message.Message) {
+	logger.Info("正在推送答题概要至QQ")
+
+	client.GetClient().SendMessage(data.SetTarget(&message.Target{ID: target}))
 }
 
 // PushDigestToDingtalk 推送摘要至钉钉平台
