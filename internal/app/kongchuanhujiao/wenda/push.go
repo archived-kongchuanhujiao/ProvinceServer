@@ -144,6 +144,8 @@ func getFastestAnswerUser(tab *public.QuestionsTab) (name string) {
 		}
 	}
 
+	name = "无"
+
 	return
 }
 
