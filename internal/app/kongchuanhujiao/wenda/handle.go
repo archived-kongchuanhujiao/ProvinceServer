@@ -1,22 +1,14 @@
 package wenda
 
 import (
-	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/cuoti"
-	ct "github.com/kongchuanhujiao/server/internal/app/datahub/public/cuoti"
-	"github.com/kongchuanhujiao/server/internal/pkg/config"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
-	"go.uber.org/zap"
-	"strconv"
 	"strings"
 
 	"github.com/kongchuanhujiao/server/internal/app/client"
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+	"github.com/kongchuanhujiao/server/internal/pkg/config"
 )
-
-// sessionPool 储存添加错题进度
-var sessionPool map[uint64]*ct.Tab
 
 // HandleAnswer 处理回答
 func HandleAnswer(m *message.Message) {
@@ -96,169 +88,4 @@ func HandleTest(m *message.Message) {
 			message.NewTextMessage(config.Commit).SetGroupTarget(m.Target.Group),
 		)
 	}
-}
-
-// HandleWrongQuestion 处理添加错题逻辑
-func HandleWrongQuestion(m *message.Message) {
-	t, ok := m.Chain[0].(*message.Text)
-	if !ok {
-		return
-	}
-
-	if _, ok := sessionPool[m.Target.ID]; ok {
-		handleAddCuoti(m.Target.ID, m.Target.Group, m.Chain[0])
-		return
-	}
-
-	if !strings.HasPrefix(t.Content, "/") {
-		return
-	}
-
-	switch strings.TrimPrefix(t.Content, "/") {
-	case "ct", "错题":
-		args := strings.Split(t.Content, " ")
-
-		defaultMsg := message.NewAtMessage(m.Target.ID).
-			AddText("/ct add 添加错题\n" +
-				"/ct rm 删除错题\n" +
-				"/ct cx 查询错题列表").
-			SetGroupTarget(m.Target.Group)
-
-		if len(args) == 1 {
-			client.GetClient().SendMessage(defaultMsg)
-		} else {
-			switch args[1] {
-			case "add":
-				if _, ok := sessionPool[m.Target.ID]; !ok {
-					sessionPool[m.Target.ID] = &ct.Tab{}
-					client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("请发送欲添加错题的题目:").SetGroupTarget(m.Target.Group))
-					return
-				}
-
-				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("你还有正在进行添加的错题!").SetGroupTarget(m.Target.Group))
-			case "del", "rm":
-				wq, err := cuoti.SelectWrongQuestions(0, uint32(m.Target.ID))
-
-				if err != nil {
-					client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("发生了意外错误, 无法查询错题列表.").SetGroupTarget(m.Target.Group))
-					return
-				}
-
-				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText(handleRemoveCuoti(m.Target.ID, wq, m.Chain[0])).SetGroupTarget(m.Target.Group))
-			case "cx", "ls":
-				wq, err := cuoti.SelectWrongQuestions(0, uint32(m.Target.ID))
-
-				if err != nil {
-					client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText("发生了意外错误, 无法查询错题列表.").SetGroupTarget(m.Target.Group))
-					return
-				}
-
-				client.GetClient().SendMessage(message.NewAtMessage(m.Target.ID).AddText(handleListCuoti(wq)).SetGroupTarget(m.Target.Group))
-			default:
-				client.GetClient().SendMessage(defaultMsg)
-			}
-		}
-	}
-}
-
-// handleAddCuoti 处理添加错题逻辑
-func handleAddCuoti(user uint64, g *message.Group, chain message.Element) {
-	stat, ok := sessionPool[user]
-
-	if !ok {
-		return
-	}
-
-	switch {
-	case stat.Question == "":
-		q := chain.(*message.Text).Content
-
-		tab, err := cuoti.SelectWrongQuestions(0, uint32(user))
-
-		if err != nil {
-			client.GetClient().SendMessage(message.NewAtMessage(user).AddText("添加问题失败, 服务器异常.").SetGroupTarget(g))
-			return
-		}
-
-		for _, t := range tab {
-			if t.Question == q {
-				client.GetClient().SendMessage(message.NewAtMessage(user).AddText("已经有相同题目的错题了!").SetGroupTarget(g))
-				return
-			}
-		}
-
-		stat.Question = q
-
-		client.GetClient().SendMessage(message.NewAtMessage(user).AddText("设置错题题目成功! 下一步请设置错题的正确答案.").SetGroupTarget(g))
-	case stat.QuestionAnswer == "":
-		stat.QuestionAnswer = chain.(*message.Text).Content
-		client.GetClient().SendMessage(message.NewAtMessage(user).AddText("设置错题答案成功! 如果该题目有图片需要添加的话, 接下来请发送图片, 反之则发送提醒周期 (单位为天).").SetGroupTarget(g))
-	case stat.ImageURL == "" || stat.Duration == 0:
-		i, success := chain.(*message.Image)
-		if success && stat.ImageURL != "" {
-			stat.ImageURL = i.URL
-			client.GetClient().SendMessage(message.NewAtMessage(user).AddText("设置错题图片成功! 接下来请发送提醒时间 (单位为天).").SetGroupTarget(g))
-		} else {
-			d, err := strconv.Atoi(chain.(*message.Text).Content)
-			if err != nil {
-				client.GetClient().SendMessage(message.NewAtMessage(user).AddText("时间错误! 请填写正确的数字.").SetGroupTarget(g))
-				return
-			} else {
-				stat.Duration = uint8(d)
-				err := cuoti.InsertWrongQuestion(stat)
-				if err != nil {
-					client.GetClient().SendMessage(message.NewAtMessage(user).AddText("错题创建成功!").SetGroupTarget(g))
-				} else {
-					client.GetClient().SendMessage(message.NewAtMessage(user).AddText("添加错题失败!").SetGroupTarget(g))
-					logger.Warn("添加错题时遇到了意外", zap.Error(err))
-				}
-			}
-		}
-	}
-}
-
-func handleListCuoti(cts []*ct.Tab) (m string) {
-	if len(cts) == 0 {
-		m = "还未添加过错题"
-		return
-	}
-
-	for _, tab := range cts {
-		m += strconv.Itoa(int(tab.ID)) + " " + tab.Question[0:20] + "\n"
-	}
-
-	strings.TrimSpace(m)
-	return
-}
-
-func handleRemoveCuoti(qid uint64, cts []*ct.Tab, chain message.Element) (m string) {
-	if len(cts) == 0 {
-		m = "还未添加过错题"
-		return
-	}
-
-	content := strings.Split(chain.(*message.Text).Content, " ")[2]
-
-	id := uint32(0)
-
-	if w, err := strconv.Atoi(content); err != nil {
-		return "请输入有效的错题 ID!"
-	} else {
-		id = uint32(w)
-	}
-
-	for _, tab := range cts {
-		if tab.ID == id {
-			err := cuoti.RemoveWrongQuestions(id, qid)
-			if err != nil {
-				logger.Warn("删除错题失败", zap.Error(err))
-				m = "删除错题失败"
-				return
-			}
-
-			m = "删除错题成功"
-		}
-	}
-
-	return
 }
