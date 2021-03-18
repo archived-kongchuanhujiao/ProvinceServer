@@ -4,15 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/kongchuanhujiao/server/internal/app/client"
+	"github.com/kongchuanhujiao/server/internal/app/client/message"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
+	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 	"sort"
 	"strconv"
 	"strings"
-
-	"github.com/kongchuanhujiao/server/internal/app/client/message"
-	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 
 	"github.com/CatchZeng/dingtalk"
 )
@@ -21,6 +20,7 @@ import (
 func PushDigestData(tab *public.QuestionsTab) (err error) {
 
 	acc, err := account.SelectAccount(tab.Creator, 0)
+
 	if err != nil {
 		return
 	}
@@ -61,7 +61,6 @@ func convertToChain(tab *public.QuestionsTab) *message.Message {
 
 // digestQuestionData 摘要答题数据
 func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) {
-	sum = digestQuestion(tab)
 	temp := ""
 
 	calc, err := wenda.CalculateResult(tab.ID)
@@ -70,43 +69,21 @@ func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) 
 		return
 	}
 
-	if !isMarkdown {
-		temp = "## #%v 详细信息  \n  \n> 正确人数 > %v 人  \n> 正确率 > %v  \n> 易错选项 > %v  \n> 最快答对同学 %v"
-	} else {
-		temp = "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n> 最快答对同学 %v"
+	if isEmptyQuestion(calc) {
+		return fmt.Sprintf("题目 #%v 暂无数据", tab.ID)
 	}
+
+	temp = "题目 #%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n> 最快答对同学 %v"
+
+	if isMarkdown {
+		temp = strings.ReplaceAll(temp, "\n", "  \n")
+	}
+
 	sum += fmt.Sprintf(temp, tab.ID, calc.Count, getRightRate(calc), getMostWrongOption(calc.Wrong), getFastestAnswerUser(tab))
 	return
 }
 
-// digestQuestion 摘要题干
-func digestQuestion(q *public.QuestionsTab) (s string) {
-
-	var questionText string
-	for _, v := range q.Topic.Question {
-		if v.Type == "img" {
-			questionText += "[图片]"
-		}
-		questionText += v.Data
-	}
-
-	var optionsText string
-
-	abc := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I"} // FIXME 弄到全局public去
-	for k, v := range q.Topic.Options {
-		optionsText += abc[k] + ". " + v + "\n"
-	}
-
-	optionsText = strings.TrimSuffix(optionsText, "\n")
-
-	s = "题目: " + questionText + " 选项：" + optionsText
-	if len(s) > 25 {
-		s = s[0:25] + "..."
-	}
-	return
-}
-
-// PushDigestToQQ TODO 推送摘要至QQ平台
+// PushDigestToQQ 推送摘要至QQ平台
 func PushDigestToQQ(target uint64, data *message.Message) {
 	logger.Info("正在推送答题概要至QQ")
 
@@ -117,11 +94,11 @@ func PushDigestToQQ(target uint64, data *message.Message) {
 func PushDigestToDingtalk(accessToken string, secret string, md dingtalk.Message) (err error) {
 	logger.Info("正在推送答题概要至钉钉")
 
-	client := dingtalk.Client{
+	c := dingtalk.Client{
 		AccessToken: accessToken,
 		Secret:      secret,
 	}
-	_, err = client.Send(md)
+	_, err = c.Send(md)
 	return
 }
 
@@ -147,7 +124,11 @@ func getRightRate(result *public.Result) string {
 func getMostWrongOption(wrong []public.ResultWrongField) string {
 	wrap := wrongFieldWrapper(wrong)
 	sort.Sort(wrap)
-	return wrap[0].Type
+	if wrap.Len() == 0 {
+		return "无"
+	} else {
+		return wrap[0].Type
+	}
 }
 
 func getFastestAnswerUser(tab *public.QuestionsTab) (name string) {
@@ -164,4 +145,8 @@ func getFastestAnswerUser(tab *public.QuestionsTab) (name string) {
 	}
 
 	return
+}
+
+func isEmptyQuestion(r *public.Result) bool {
+	return r.Count == 0
 }
