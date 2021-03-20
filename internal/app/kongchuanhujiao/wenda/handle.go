@@ -70,21 +70,6 @@ func HandleAnswer(m *message.Message) {
 	}
 }
 
-// HandleWordStat 处理词云
-func HandleWordStat(m *message.Message) {
-
-	ct := m.Chain[0].(*message.Text).Content
-
-	// 不处理空消息
-	if len(ct) == 0 {
-		return
-	}
-
-	words := client.GetClient().ExtractWords(ct)
-
-	wenda.PushWords(m.Target.Group.ID, words)
-}
-
 // HandleTest 处理测试
 func HandleTest(m *message.Message) {
 

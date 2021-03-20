@@ -5,6 +5,7 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/client"
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg"
+	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/ciyun"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
 	"github.com/kongchuanhujiao/server/internal/pkg/config"
 	"github.com/kongchuanhujiao/server/internal/pkg/logger"
@@ -22,7 +23,7 @@ func main() {
 	client.SetCallback(func(m *message.Message) {
 		wenda.HandleTest(m)
 		wenda.HandleAnswer(m)
-		wenda.HandleWordStat(m)
+		ciyun.HandleWordStat(m)
 	})
 	api.StartApis()
 

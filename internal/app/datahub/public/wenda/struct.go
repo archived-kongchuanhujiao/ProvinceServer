@@ -3,13 +3,7 @@ package wenda
 import "github.com/gorilla/websocket"
 
 type (
-	Runtime []*WSConn // Runtime 运行时
-
-	WSConn struct {
-		Conn           *websocket.Conn // Websocket 连接
-		ListenQuestion uint32          // 监听的问题题号
-		ListenGroup    uint64          // 监听消息的群聊
-	}
+	Runtime map[uint32][]*websocket.Conn // Runtime 运行时
 
 	// AnswersTab 回答表
 	AnswersTab struct {
