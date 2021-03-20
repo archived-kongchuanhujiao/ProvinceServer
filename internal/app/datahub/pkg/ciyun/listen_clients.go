@@ -30,6 +30,10 @@ func RemoveClient(id uint64, conn *websocket.Conn) {
 
 // PushWord 推送词云数据
 func PushWord(gid uint64, data []string) {
+	if len(wordCloudRuntime) == 0 || len(wordCloudRuntime[gid]) == 0 {
+		return
+	}
+
 	for _, v := range wordCloudRuntime[gid] {
 		err := v.WriteJSON(data)
 		if err != nil {
