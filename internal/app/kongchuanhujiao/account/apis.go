@@ -58,5 +58,5 @@ func (a *APIs) PostLogin(v *PostLoginReq) *kongchuanhujiao.Response {
 		return kongchuanhujiao.DefaultErrResp
 	}
 
-	return &kongchuanhujiao.Response{Message: t}
+	return kongchuanhujiao.GenerateSuccResp(t)
 }
