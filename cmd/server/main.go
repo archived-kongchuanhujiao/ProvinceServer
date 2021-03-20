@@ -22,6 +22,7 @@ func main() {
 	client.SetCallback(func(m *message.Message) {
 		wenda.HandleTest(m)
 		wenda.HandleAnswer(m)
+		wenda.HandleWordStat(m)
 	})
 	api.StartApis()
 
