@@ -76,9 +76,9 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 		return kongchuanhujiao.DefaultErrResp
 	}
 
-	return &kongchuanhujiao.Response{
-		Message: "ok", Data: &GetQuestionsRes{d, g, n, m, calc},
-	}
+	return kongchuanhujiao.GenerateSuccResp(
+		&GetQuestionsRes{d, g, n, m, calc},
+	)
 }
 
 // ====================================================================================================================
@@ -226,7 +226,7 @@ func (a *APIs) GetAnswers(v *GetAnswersReq) *kongchuanhujiao.Response {
 	if err != nil {
 		return kongchuanhujiao.DefaultErrResp
 	}
-	return &kongchuanhujiao.Response{Message: "ok", Data: ans}
+	return kongchuanhujiao.GenerateSuccResp(ans)
 }
 
 // ====================================================================================================================

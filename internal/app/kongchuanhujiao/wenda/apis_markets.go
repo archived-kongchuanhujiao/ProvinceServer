@@ -21,7 +21,7 @@ func (a *APIs) GetMarkets(v *GetMarketsReq) *kongchuanhujiao.Response {
 	if err != nil {
 		return kongchuanhujiao.DefaultErrResp
 	}
-	return &kongchuanhujiao.Response{Message: "ok", Data: q}
+	return kongchuanhujiao.GenerateSuccResp(q)
 }
 
 // ====================================================================================================================
@@ -41,5 +41,5 @@ func (a *APIs) PostMarkets(v *PostMarketsReq, c *context.Context) *kongchuanhuji
 			return kongchuanhujiao.DefaultErrResp
 		}
 	}
-	return kongchuanhujiao.DefaultErrResp
+	return kongchuanhujiao.DefaultSuccResp
 }
