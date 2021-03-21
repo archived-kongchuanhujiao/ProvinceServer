@@ -11,7 +11,6 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
@@ -188,7 +187,7 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchu
 
 	err = PushDigestData(q[0])
 	if err != nil {
-		logger.Error("推送作答数据失败", zap.Error(err))
+		zap.L().Error("推送作答数据失败", zap.Error(err))
 		return kongchuanhujiao.DefaultErrResp
 	}
 
@@ -239,7 +238,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 
 	_, fh, err := c.FormFile("file")
 	if err != nil {
-		logger.Warn("解析文件失败", zap.Error(err))
+		zap.L().Warn("解析文件失败", zap.Error(err))
 		return kongchuanhujiao.DefaultErrResp
 	}
 
@@ -263,7 +262,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 		err = os.MkdirAll(folderName, os.ModePerm)
 
 		if err != nil {
-			logger.Warn("创建文件夹失败", zap.Error(err))
+			zap.L().Warn("创建文件夹失败", zap.Error(err))
 
 			return kongchuanhujiao.DefaultErrResp
 		}
@@ -274,7 +273,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 	_, err = c.SaveFormFile(fh, dest)
 
 	if err != nil {
-		logger.Warn("解析文件失败", zap.Error(err))
+		zap.L().Warn("解析文件失败", zap.Error(err))
 
 		return kongchuanhujiao.DefaultErrResp
 	}
@@ -299,7 +298,7 @@ func (a *APIs) GetCsv(v *GetAnswerCSVReq, c *context.Context) {
 	}
 	csv, err := AnswerToCSV(ans)
 	if err != nil {
-		logger.Error("转换答题数据至 CSV 二进制流失败", zap.Error(err))
+		zap.L().Error("转换答题数据至 CSV 二进制流失败", zap.Error(err))
 		return
 	}
 

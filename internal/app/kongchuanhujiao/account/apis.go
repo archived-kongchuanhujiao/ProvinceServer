@@ -6,7 +6,6 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao"
 	"github.com/kongchuanhujiao/server/internal/pkg/config"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/iris-contrib/middleware/jwt"
 	"go.uber.org/zap"
@@ -54,7 +53,7 @@ func (a *APIs) PostLogin(v *PostLoginReq) *kongchuanhujiao.Response {
 		"iat": now.Unix(),
 	}).SignedString(config.GetJWTConf().Key)
 	if err != nil {
-		logger.Error("生成 JWT Token 失败", zap.Error(err))
+		zap.L().Error("生成 JWT Token 失败", zap.Error(err))
 		return kongchuanhujiao.DefaultErrResp
 	}
 

@@ -2,14 +2,13 @@ package ciyun
 
 import (
 	"github.com/gorilla/websocket"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 	"go.uber.org/zap"
 )
 
 // runtime 使用词云功能的客户端
 type runtime map[uint64][]*websocket.Conn
 
-var loggerr = logger.Named("数据总线").Named("词云")
+var loggerr = zap.L().Named("数据总线").Named("词云")
 var wordCloudRuntime = runtime{}
 
 // AddClient 新增客户端

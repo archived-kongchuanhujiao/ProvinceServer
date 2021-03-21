@@ -4,7 +4,6 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/account"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
 	"github.com/kongchuanhujiao/server/internal/pkg/config"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/iris-contrib/middleware/jwt"
 	"github.com/kataras/iris/v12"
@@ -26,7 +25,7 @@ func jwtMiddleware(c iris.Context) {
 
 	if err := jc.CheckJWT(c); err != nil {
 		c.StatusCode(401)
-		logger.Warn("未授权的访问", zap.Error(err), zap.String("客户", c.RemoteAddr()))
+		zap.L().Warn("未授权的访问", zap.Error(err), zap.String("客户", c.RemoteAddr()))
 		return
 	}
 
@@ -34,14 +33,14 @@ func jwtMiddleware(c iris.Context) {
 	err := t.Claims.Valid()
 	if err != nil {
 		c.StatusCode(401)
-		logger.Warn("无效的 Token", zap.Error(err), zap.String("客户", c.RemoteAddr()))
+		zap.L().Warn("无效的 Token", zap.Error(err), zap.String("客户", c.RemoteAddr()))
 		return
 	}
 
 	cla := t.Claims.(jwt.MapClaims)
 	if cla["iss"] != config.GetJWTConf().Iss {
 		c.StatusCode(401)
-		logger.Warn("危险的 Token", zap.Error(err), zap.String("客户", c.RemoteAddr()))
+		zap.L().Warn("危险的 Token", zap.Error(err), zap.String("客户", c.RemoteAddr()))
 		return
 	}
 
@@ -61,7 +60,7 @@ func StartApis() {
 
 	go func() {
 
-		loggerr := logger.Named("APIs")
+		loggerr := zap.L().Named("APIs")
 		loggerr.Info("启动服务中")
 		if err := app.Listen(
 			":5245",

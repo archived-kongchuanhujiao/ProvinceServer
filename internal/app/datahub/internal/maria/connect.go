@@ -3,8 +3,6 @@ package maria
 import (
 	"database/sql"
 
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
@@ -12,7 +10,7 @@ import (
 
 var (
 	db     *sqlx.DB
-	Logger = logger.Named("Maria")
+	Logger = zap.L().Named("Maria")
 )
 
 // Connect 连接至 Maria 数据库

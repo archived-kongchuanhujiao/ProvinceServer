@@ -1,12 +1,13 @@
 package ciyun
 
 import (
+	"net/http"
+
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/ciyun"
+
 	"github.com/gorilla/websocket"
 	"github.com/kataras/iris/v12/context"
-	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/ciyun"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 type APIs struct{} // APIs 词云 APIs
@@ -22,7 +23,7 @@ func (a *APIs) GetWordstat(v *GetWordStatReq, c *context.Context) {
 	up := websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }}
 	conn, err := up.Upgrade(c.ResponseWriter(), c.Request(), nil)
 	if err != nil {
-		logger.Error("升级至 Websocket 失败", zap.Error(err))
+		zap.L().Error("升级至 Websocket 失败", zap.Error(err))
 		return
 	}
 	defer conn.Close()

@@ -8,13 +8,14 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/ciyun"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao/wenda"
 	"github.com/kongchuanhujiao/server/internal/pkg/config"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
+
+	"go.uber.org/zap"
 )
 
 // main 启动函数
 func main() {
 
-	logger.Named("主").Info("Copyright (C) 2020-present | " + config.Commit)
+	zap.L().Named("主").Info("Copyright (C) 2020-present | " + config.Commit)
 
 	config.ReadConfigs()
 

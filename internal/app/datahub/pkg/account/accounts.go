@@ -4,7 +4,6 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/internal/maria"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/public/account"
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/account"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/Masterminds/squirrel"
 	jsoniter "github.com/json-iterator/go"
@@ -17,7 +16,7 @@ type tab struct {
 	Push string `json:"push" db:"push"` // 推送
 }
 
-var loggerr = logger.Named("数据总线").Named("账号")
+var loggerr = zap.L().Named("数据总线").Named("账号")
 
 // SelectAccount 获取账号
 func SelectAccount(id string, qq uint64) (data []*account.Tab, err error) {
