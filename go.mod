@@ -7,7 +7,7 @@ require (
 	github.com/CloudyKit/jet/v6 v6.1.0 // indirect
 	github.com/Joker/hpp v1.0.0 // indirect
 	github.com/Masterminds/squirrel v1.5.0
-	github.com/Mrs4s/MiraiGo v0.0.0-20210316104455-e136c01dfc2b
+	github.com/Mrs4s/MiraiGo v0.0.0-20210321041821-505aae133db3
 	github.com/Shopify/goreferrer v0.0.0-20210305184658-1a4fe54f556d // indirect
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gorilla/websocket v1.4.2
