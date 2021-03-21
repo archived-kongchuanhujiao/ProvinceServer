@@ -12,10 +12,9 @@ import (
 )
 
 type tab struct {
-	ID    string `json:"id" db:"id"`       // 标识号
-	QQ    uint64 `json:"qq" db:"qq"`       // QQ
-	Class uint32 `json:"class" db:"class"` // 班级 FIXME 是否需要
-	Push  string `json:"push" db:"push"`   // 推送
+	ID   string `json:"id" db:"id"`     // 标识号
+	QQ   uint64 `json:"qq" db:"qq"`     // QQ
+	Push string `json:"push" db:"push"` // 推送
 }
 
 var loggerr = logger.Named("数据总线").Named("账号")
@@ -51,7 +50,7 @@ func SelectAccount(id string, qq uint64) (data []*account.Tab, err error) {
 			return nil, err
 		}
 
-		data = append(data, &public.Tab{ID: v.ID, QQ: v.QQ, Class: v.Class, Push: pu})
+		data = append(data, &public.Tab{ID: v.ID, QQ: v.QQ, Push: pu})
 	}
 	return
 }
