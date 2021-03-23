@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "github.com/kongchuanhujiao/server/cmd/server/logger"
 	"github.com/kongchuanhujiao/server/internal/app/api"
 	"github.com/kongchuanhujiao/server/internal/app/client"
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
