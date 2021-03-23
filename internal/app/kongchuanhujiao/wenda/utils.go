@@ -38,33 +38,17 @@ func Exists(path string) bool {
 }
 
 // AnswerToCSV 将答案转换为 CSV
-func AnswerToCSV(ans []*wenda.AnswersTab) (r []byte, err error) {
+func AnswerToCSV(ans []*wenda.AnswersTab, mem wenda.GroupMembers) (r []byte) {
+
 	bf := bytes.NewBuffer(r)
 	w := csv.NewWriter(bf)
-	err = w.Write([]string{"QQ", "答题时间", "作答答案"})
+
+	_ = w.Write([]string{"用户名", "QQ", "答题时间", "答题内容"})
 	for _, an := range ans {
-		err = w.Write([]string{strconv.FormatUint(an.QQ, 10), an.Time, an.Answer})
+		_ = w.Write([]string{mem[an.QQ], strconv.FormatUint(an.QQ, 10), an.Time, an.Answer})
 	}
 	w.Flush()
 
 	r = bf.Bytes()
-
 	return
 }
-
-/* TODO 分词功能由其他包实现
-func DoWordSplit(s string) (words []string, err error) {
-	// FIXME
-	words, err = AC.Cli.C.GetWordSegmentation(s)
-
-	if err != nil {
-		return
-	}
-
-	for k, v := range words {
-		words[k] = strings.ReplaceAll(v, "\u0000", "")
-	}
-
-	return words, nil
-}
-*/

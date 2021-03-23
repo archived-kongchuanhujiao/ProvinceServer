@@ -297,11 +297,16 @@ func (a *APIs) GetCsv(v *GetAnswerCSVReq, c *context.Context) {
 	if err != nil {
 		return
 	}
-	csv, err := AnswerToCSV(ans)
-	if err != nil {
-		zap.L().Error("转换答题数据至 CSV 二进制流失败", zap.Error(err))
+
+	qua, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+	if err != nil || len(qua) == 0 {
 		return
 	}
+
+	csv := AnswerToCSV(
+		ans,
+		*client.GetClient().GetGroupMembers(qua[0].Topic.Target),
+	)
 
 	c.ContentType("application/csv; charset=utf-8")
 	c.Header("Content-Disposition", `attachment; filename="答题数据详情（`+
