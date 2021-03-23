@@ -16,7 +16,7 @@ func sendQuestionMsg(q *wenda.QuestionsTab) (err error) {
 	m := message.NewTextMessage("问题:\n")
 	for _, v := range q.Topic.Question {
 		if v.Type == "img" {
-			f, err := ioutil.ReadFile("assets/pictures/questions/" + v.Data)
+			f, err := ioutil.ReadFile("assets/pictures/questions/" + q.Creator + "/" + v.Data)
 			if err != nil {
 				zap.L().Error("读取题干图片失败", zap.Error(err))
 				return err
