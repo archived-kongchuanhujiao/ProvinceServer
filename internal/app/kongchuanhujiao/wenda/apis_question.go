@@ -3,6 +3,7 @@ package wenda
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/kongchuanhujiao/server/internal/app/client"
@@ -303,7 +304,8 @@ func (a *APIs) GetCsv(v *GetAnswerCSVReq, c *context.Context) {
 	}
 
 	c.ContentType("application/csv; charset=utf-8")
-	c.Header("Content-Disposition", `attachment; filename="所有数据.csv"`)
+	c.Header("Content-Disposition", `attachment; filename="答题数据详情（`+
+		strconv.FormatUint(uint64(v.ID), 10)+`）.csv"`)
 
 	_, _ = c.Write([]byte{239, 187, 191}) // UTF-8 BOM
 	_, _ = c.Write(csv)
