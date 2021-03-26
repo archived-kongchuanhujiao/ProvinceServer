@@ -47,7 +47,7 @@ func PushDigestData(tab *public.QuestionsTab) (err error) {
 	return
 }
 
-// convertToMarkDown 将问题数据转换为钉钉 Markdown 消息
+// convertToDTMessage 将问题数据转换为钉钉 Markdown 消息
 func convertToDTMessage(tab *public.QuestionsTab) *dingtalk.MarkdownMessage {
 	builder := dingtalk.NewMarkdownMessage()
 	builder.Markdown.Title = "答题数据："
@@ -133,6 +133,7 @@ func getMostWrongOption(wrong []public.ResultWrongField) string {
 	}
 }
 
+// getFastestAnswerUser 获取最快答对用户
 func getFastestAnswerUser(tab *public.QuestionsTab) (name string) {
 	ans, err := wenda.SelectAnswers(tab.ID)
 
@@ -151,6 +152,7 @@ func getFastestAnswerUser(tab *public.QuestionsTab) (name string) {
 	return
 }
 
+// isEmptyQuestion 该问题是否无人回答过
 func isEmptyQuestion(r *public.Result) bool {
 	return r.Count == 0
 }
