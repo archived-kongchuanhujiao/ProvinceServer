@@ -3,17 +3,17 @@ package wenda
 import (
 	"errors"
 	"fmt"
-	"github.com/kongchuanhujiao/server/internal/app/client"
-	"github.com/kongchuanhujiao/server/internal/app/client/message"
-	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
-	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
-	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/kongchuanhujiao/server/internal/app/client/message"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
+	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
+	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
+  
 	"github.com/CatchZeng/dingtalk"
+	"go.uber.org/zap"
 )
 
 // PushDigestData 推送答题数据
@@ -92,7 +92,8 @@ func PushDigestToQQ(target uint64, data *message.Message) {
 
 // PushDigestToDingtalk 推送摘要至钉钉平台
 func PushDigestToDingtalk(accessToken string, secret string, md dingtalk.Message) (err error) {
-	logger.Info("正在推送答题概要至钉钉")
+
+	zap.L().Info("正在推送答题概要至钉钉")
 
 	c := dingtalk.Client{
 		AccessToken: accessToken,

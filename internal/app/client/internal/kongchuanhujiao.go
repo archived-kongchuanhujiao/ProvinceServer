@@ -32,7 +32,7 @@ func (q *QQ) ExtractWords(s string) (w []string) {
 
 	w, err := q.client.GetWordSegmentation(s)
 	if err != nil {
-		loggerr.Error("分词失败", zap.Error(err))
+		zap.L().Error("分词失败", zap.Error(err))
 	}
 
 	for k, v := range w {

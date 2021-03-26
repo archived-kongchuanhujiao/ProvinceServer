@@ -6,8 +6,6 @@ import (
 	"encoding/base64"
 	"io/ioutil"
 
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
-
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -48,15 +46,15 @@ func ReadConfigs() {
 
 	bytes, err := ioutil.ReadFile(".kongchuanhujiao/config.yml")
 	if err != nil {
-		logger.Panic("读取配置文件失败", zap.Error(err))
+		zap.L().Panic("读取配置文件失败", zap.Error(err))
 	}
 
 	err = yaml.Unmarshal(bytes, &c)
 	if err != nil {
-		logger.Panic("无法读取配置信息", zap.Error(err))
+		zap.L().Panic("无法读取配置信息", zap.Error(err))
 	}
 
-	logger.Debug("读取配置信息成功")
+	zap.L().Debug("读取配置信息成功")
 
 	conf = &Configs{
 		Number: c.Number, Password: c.Password, Database: c.Database,
@@ -65,7 +63,7 @@ func ReadConfigs() {
 
 	err = parseJWTKey(c.JWT.Key)
 	if err != nil {
-		logger.Panic("解析 JWT 私钥失败", zap.Error(err))
+		zap.L().Panic("解析 JWT 私钥失败", zap.Error(err))
 	}
 
 	return

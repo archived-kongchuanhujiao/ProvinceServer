@@ -2,7 +2,6 @@ package wenda
 
 import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -13,7 +12,7 @@ type wrapper struct {
 	Result *wenda.Result `json:"result"`
 }
 
-var loggerr = logger.Named("数据总线").Named("问答")
+var loggerr = zap.L().Named("数据总线").Named("问答")
 var wendaRuntime = wenda.Runtime{}
 
 // AddClient 新增客户端

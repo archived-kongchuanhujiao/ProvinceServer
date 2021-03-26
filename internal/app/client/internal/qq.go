@@ -2,13 +2,12 @@ package internal
 
 import (
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/Mrs4s/MiraiGo/client"
 	"go.uber.org/zap"
 )
 
-var loggerr = logger.Named("QQ") // loggerr 日志
+var loggerr = zap.L().Named("QQ") // loggerr 日志
 
 // QQ 客户端
 type QQ struct {

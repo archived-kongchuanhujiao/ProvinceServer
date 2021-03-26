@@ -2,10 +2,10 @@ package account
 
 import (
 	"errors"
+
 	"github.com/kongchuanhujiao/server/internal/app/client"
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"go.uber.org/zap"
 )
@@ -15,7 +15,7 @@ func sendCode(id string) (err error) {
 
 	a, err := account.SelectAccount(id, 0)
 	if err != nil {
-		logger.Error("发送验证码失败", zap.Error(err))
+		zap.L().Error("发送验证码失败", zap.Error(err))
 		return
 	}
 	if len(a) == 0 {

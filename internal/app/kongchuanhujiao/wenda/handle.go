@@ -8,6 +8,8 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 	"github.com/kongchuanhujiao/server/internal/pkg/config"
+
+	"go.uber.org/zap"
 )
 
 // HandleAnswer 处理回答
@@ -86,6 +88,11 @@ func HandleTest(m *message.Message) {
 	case "空传版本":
 		client.GetClient().SendMessage(
 			message.NewTextMessage(config.Commit).SetGroupTarget(m.Target.Group),
+		)
+	case "空传打印堆栈":
+		zap.L().Error("自定义错误", zap.String("详情", "QQ"))
+		client.GetClient().SendMessage(
+			message.NewTextMessage("打印成功").SetGroupTarget(m.Target.Group),
 		)
 	default:
 		if strings.HasPrefix(t.Content, "空传分词 ") {

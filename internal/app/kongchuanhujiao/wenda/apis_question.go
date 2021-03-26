@@ -3,6 +3,7 @@ package wenda
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/kongchuanhujiao/server/internal/app/client"
@@ -11,7 +12,6 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
 	"github.com/kongchuanhujiao/server/internal/app/kongchuanhujiao"
-	"github.com/kongchuanhujiao/server/internal/pkg/logger"
 
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/context"
@@ -76,9 +76,9 @@ func (a *APIs) GetQuestions(v *GetQuestionsReq, c *context.Context) *kongchuanhu
 		return kongchuanhujiao.DefaultErrResp
 	}
 
-	return &kongchuanhujiao.Response{
-		Message: "ok", Data: &GetQuestionsRes{d, g, n, m, calc},
-	}
+	return kongchuanhujiao.GenerateSuccResp(
+		&GetQuestionsRes{d, g, n, m, calc},
+	)
 }
 
 // ====================================================================================================================
@@ -188,7 +188,7 @@ func (a *APIs) PostPushcenter(v *PostPushcenterReq, c *context.Context) *kongchu
 
 	err = PushDigestData(q[0])
 	if err != nil {
-		logger.Error("推送作答数据失败", zap.Error(err))
+		zap.L().Error("推送作答数据失败", zap.Error(err))
 		return kongchuanhujiao.DefaultErrResp
 	}
 
@@ -226,7 +226,7 @@ func (a *APIs) GetAnswers(v *GetAnswersReq) *kongchuanhujiao.Response {
 	if err != nil {
 		return kongchuanhujiao.DefaultErrResp
 	}
-	return &kongchuanhujiao.Response{Message: "ok", Data: ans}
+	return kongchuanhujiao.GenerateSuccResp(ans)
 }
 
 // ====================================================================================================================
@@ -239,7 +239,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 
 	_, fh, err := c.FormFile("file")
 	if err != nil {
-		logger.Warn("解析文件失败", zap.Error(err))
+		zap.L().Warn("解析文件失败", zap.Error(err))
 		return kongchuanhujiao.DefaultErrResp
 	}
 
@@ -263,7 +263,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 		err = os.MkdirAll(folderName, os.ModePerm)
 
 		if err != nil {
-			logger.Warn("创建文件夹失败", zap.Error(err))
+			zap.L().Warn("创建文件夹失败", zap.Error(err))
 
 			return kongchuanhujiao.DefaultErrResp
 		}
@@ -274,7 +274,7 @@ func (a *APIs) PostUploadPicture(c *context.Context) *kongchuanhujiao.Response {
 	_, err = c.SaveFormFile(fh, dest)
 
 	if err != nil {
-		logger.Warn("解析文件失败", zap.Error(err))
+		zap.L().Warn("解析文件失败", zap.Error(err))
 
 		return kongchuanhujiao.DefaultErrResp
 	}
@@ -297,14 +297,20 @@ func (a *APIs) GetCsv(v *GetAnswerCSVReq, c *context.Context) {
 	if err != nil {
 		return
 	}
-	csv, err := AnswerToCSV(ans)
-	if err != nil {
-		logger.Error("转换答题数据至 CSV 二进制流失败", zap.Error(err))
+
+	qua, err := wenda.SelectQuestions(&public.QuestionsTab{ID: v.ID}, 0)
+	if err != nil || len(qua) == 0 {
 		return
 	}
 
+	csv := AnswerToCSV(
+		ans,
+		*client.GetClient().GetGroupMembers(qua[0].Topic.Target),
+	)
+
 	c.ContentType("application/csv; charset=utf-8")
-	c.Header("Content-Disposition", `attachment; filename="所有数据.csv"`)
+	c.Header("Content-Disposition", `attachment; filename="答题数据详情（`+
+		strconv.FormatUint(uint64(v.ID), 10)+`）.csv"`)
 
 	_, _ = c.Write([]byte{239, 187, 191}) // UTF-8 BOM
 	_, _ = c.Write(csv)
