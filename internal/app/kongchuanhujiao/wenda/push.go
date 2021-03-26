@@ -3,6 +3,7 @@ package wenda
 import (
 	"errors"
 	"fmt"
+	"github.com/kongchuanhujiao/server/internal/app/client"
 	"sort"
 	"strconv"
 	"strings"
@@ -11,7 +12,7 @@ import (
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
 	public "github.com/kongchuanhujiao/server/internal/app/datahub/public/wenda"
-  
+
 	"github.com/CatchZeng/dingtalk"
 	"go.uber.org/zap"
 )
@@ -85,7 +86,7 @@ func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) 
 
 // PushDigestToQQ 推送摘要至QQ平台
 func PushDigestToQQ(target uint64, data *message.Message) {
-	logger.Info("正在推送答题概要至QQ")
+	zap.L().Info("正在推送答题概要至QQ")
 
 	client.GetClient().SendMessage(data.SetTarget(&message.Target{ID: target}))
 }
