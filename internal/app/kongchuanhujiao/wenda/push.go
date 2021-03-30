@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/kongchuanhujiao/server/internal/app/client"
 	"github.com/kongchuanhujiao/server/internal/app/client/message"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/account"
 	"github.com/kongchuanhujiao/server/internal/app/datahub/pkg/wenda"
@@ -20,6 +21,7 @@ import (
 func PushDigestData(tab *public.QuestionsTab) (err error) {
 
 	acc, err := account.SelectAccount(tab.Creator, 0)
+
 	if err != nil {
 		return
 	}
@@ -34,13 +36,18 @@ func PushDigestData(tab *public.QuestionsTab) (err error) {
 			err = PushDigestToDingtalk(p.Key, p.Secret, convertToDTMessage(tab))
 			// FIXME 错误处理
 		case "qq":
-			// TODO QQ群推送
+			t, err := strconv.ParseUint(p.Key, 10, 64)
+			if err != nil {
+				return err
+			}
+
+			PushDigestToQQ(t, convertToChain(tab))
 		}
 	}
 	return
 }
 
-// convertToMarkDown 将问题数据转换为钉钉 Markdown 消息
+// convertToDTMessage 将问题数据转换为钉钉 Markdown 消息
 func convertToDTMessage(tab *public.QuestionsTab) *dingtalk.MarkdownMessage {
 	builder := dingtalk.NewMarkdownMessage()
 	builder.Markdown.Title = "答题数据："
@@ -55,8 +62,7 @@ func convertToChain(tab *public.QuestionsTab) *message.Message {
 
 // digestQuestionData 摘要答题数据
 func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) {
-	sum = digestQuestion(tab)
-	template := ""
+	var temp string
 
 	calc, err := wenda.CalculateResult(tab.ID)
 
@@ -64,45 +70,25 @@ func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) 
 		return
 	}
 
-	if !isMarkdown {
-		template = "## #%v 详细信息  \n  \n> 正确人数 > %v 人  \n> 正确率 > %v  \n> 易错选项 > %v  \n> 最快答对同学 %v"
-	} else {
-		template = "#%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n> 最快答对同学 %v"
+	if isEmptyQuestion(calc) {
+		return fmt.Sprintf("题目 #%v 暂无数据", tab.ID)
 	}
-	sum += fmt.Sprintf(template, tab.ID, calc.Count, getRightRate(calc), getMostWrongOption(calc.Wrong), getFastestAnswerUser(tab))
+
+	temp = "题目 #%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n最快答对同学 > %v"
+
+	if isMarkdown {
+		temp = strings.ReplaceAll(temp, "\n", "  \n")
+	}
+
+	sum += fmt.Sprintf(temp, tab.ID, calc.Count, getRightRate(calc), getMostWrongOption(calc.Wrong), getFastestAnswerUser(tab))
 	return
 }
 
-// digestQuestion 摘要题干
-func digestQuestion(q *public.QuestionsTab) (s string) {
+// PushDigestToQQ 推送摘要至QQ平台
+func PushDigestToQQ(target uint64, data *message.Message) {
+	zap.L().Info("正在推送答题概要至QQ")
 
-	var questionText string
-	for _, v := range q.Topic.Question {
-		if v.Type == "img" {
-			questionText += "[图片]"
-		}
-		questionText += v.Data
-	}
-
-	var optionsText string
-
-	abc := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I"} // FIXME 弄到全局public去
-	for k, v := range q.Topic.Options {
-		optionsText += abc[k] + ". " + v + "\n"
-	}
-
-	optionsText = strings.TrimSuffix(optionsText, "\n")
-
-	s = "题目: " + questionText + " 选项：" + optionsText
-	if len(s) > 25 {
-		s = s[0:25] + "..."
-	}
-	return
-}
-
-// PushDigestToQQ TODO 推送摘要至QQ平台
-func PushDigestToQQ() (err error) {
-	return
+	client.GetClient().SendMessage(data.SetTarget(&message.Target{ID: target}))
 }
 
 // PushDigestToDingtalk 推送摘要至钉钉平台
@@ -110,11 +96,11 @@ func PushDigestToDingtalk(accessToken string, secret string, md dingtalk.Message
 
 	zap.L().Info("正在推送答题概要至钉钉")
 
-	client := dingtalk.Client{
+	c := dingtalk.Client{
 		AccessToken: accessToken,
 		Secret:      secret,
 	}
-	_, err = client.Send(md)
+	_, err = c.Send(md)
 	return
 }
 
@@ -140,9 +126,14 @@ func getRightRate(result *public.Result) string {
 func getMostWrongOption(wrong []public.ResultWrongField) string {
 	wrap := wrongFieldWrapper(wrong)
 	sort.Sort(wrap)
-	return wrap[0].Type
+	if wrap.Len() == 0 {
+		return "无"
+	} else {
+		return wrap[0].Type
+	}
 }
 
+// getFastestAnswerUser 获取最快答对用户
 func getFastestAnswerUser(tab *public.QuestionsTab) (name string) {
 	ans, err := wenda.SelectAnswers(tab.ID)
 
@@ -150,11 +141,20 @@ func getFastestAnswerUser(tab *public.QuestionsTab) (name string) {
 		return
 	}
 
+	g := client.GetClient().GetGroupMembers(tab.Topic.Target)
+
 	for _, an := range ans {
 		if an.Answer == tab.Topic.Key {
-			return strconv.FormatUint(an.QQ, 10)
+			return (*g)[an.QQ]
 		}
 	}
 
+	name = "无"
+
 	return
+}
+
+// isEmptyQuestion 该问题是否无人回答过
+func isEmptyQuestion(r *public.Result) bool {
+	return r.Count == 0
 }

@@ -105,6 +105,14 @@ func (a *APIs) PutQuestionsStatus(v *PutQuestionStatusReq, c *context.Context) *
 		return kongchuanhujiao.DefaultErrResp
 	}
 
+	if v.Status == 2 {
+		err = PushDigestData(qs[0])
+
+		if err != nil {
+			zap.L().Warn("推送问题数据摘要失败", zap.Error(err))
+		}
+	}
+
 	return kongchuanhujiao.DefaultSuccResp
 }
 
