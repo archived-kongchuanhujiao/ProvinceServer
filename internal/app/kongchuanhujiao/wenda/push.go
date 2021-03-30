@@ -62,7 +62,7 @@ func convertToChain(tab *public.QuestionsTab) *message.Message {
 
 // digestQuestionData 摘要答题数据
 func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) {
-	temp := ""
+	var temp string
 
 	calc, err := wenda.CalculateResult(tab.ID)
 
@@ -74,7 +74,7 @@ func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) 
 		return fmt.Sprintf("题目 #%v 暂无数据", tab.ID)
 	}
 
-	temp = "题目 #%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n> 最快答对同学 %v"
+	temp = "题目 #%v 详细信息\n\n 正确人数 > %v 人\n 正确率 > %v\n 易错选项 > %v\n最快答对同学 > %v"
 
 	if isMarkdown {
 		temp = strings.ReplaceAll(temp, "\n", "  \n")
