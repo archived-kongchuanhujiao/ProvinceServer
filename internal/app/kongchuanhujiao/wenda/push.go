@@ -141,9 +141,11 @@ func getFastestAnswerUser(tab *public.QuestionsTab) (name string) {
 		return
 	}
 
+	g := client.GetClient().GetGroupMembers(tab.Topic.Target)
+
 	for _, an := range ans {
 		if an.Answer == tab.Topic.Key {
-			return strconv.FormatUint(an.QQ, 10)
+			return (*g)[an.QQ]
 		}
 	}
 
