@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/kongchuanhujiao/server/internal/app/client"
@@ -36,12 +35,7 @@ func PushDigestData(tab *public.QuestionsTab) (err error) {
 			err = PushDigestToDingtalk(p.Key, p.Secret, convertToDTMessage(tab))
 			// FIXME 错误处理
 		case "qq":
-			t, err := strconv.ParseUint(p.Key, 10, 64)
-			if err != nil {
-				return err
-			}
-
-			PushDigestToQQ(t, convertToChain(tab))
+			PushDigestToQQ(tab.Topic.Target, convertToChain(tab))
 		}
 	}
 	return
@@ -87,8 +81,7 @@ func digestQuestionData(tab *public.QuestionsTab, isMarkdown bool) (sum string) 
 // PushDigestToQQ 推送摘要至QQ平台
 func PushDigestToQQ(target uint64, data *message.Message) {
 	zap.L().Info("正在推送答题概要至QQ")
-
-	client.GetClient().SendMessage(data.SetTarget(&message.Target{ID: target}))
+	client.GetClient().SendMessage(data.SetGroupTarget(&message.Group{ID: target}))
 }
 
 // PushDigestToDingtalk 推送摘要至钉钉平台
